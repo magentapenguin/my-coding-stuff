@@ -1,6 +1,12 @@
 import subprocess
 
 def push_to_github(repo_url, token):
+    # Change directory to the folder you want to backup
+    subprocess.run(["cd", "D:/coding"])
+
+    # Initialize a git repository
+    subprocess.run(["git", "init"])
+    
     # Add all changes
     subprocess.run(["git", "add", "D:/coding"])
 
