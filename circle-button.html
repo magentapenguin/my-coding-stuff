@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <script src="/circle-button.js"></script>
+        <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+        <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+            :root {
+                --light-mode-bg: #e0e0e0;
+                --light-mode-color: #000000;
+                --dark-mode-bg: #17141a;
+                --dark-mode-color: #ffffff;
+                --active: rgb(0, 138, 138);
+            }
+            :root, [data-theme="dark"] {
+                --bg: var(--dark-mode-bg);
+                --color: var(--dark-mode-color);
+                color-scheme: dark;
+            }
+            [data-theme="light"] {
+                --bg: var(--light-mode-bg);
+                --color: var(--light-mode-color);
+                color-scheme: light;
+            }
+            body {
+                --shop-bg: color-mix(in lch shorter hue, var(--bg, #000) 90%, grey);
+                --border-color: color-mix(in lch shorter hue, var(--bg, #000) 60%, grey);
+                background-color: var(--bg); 
+                color: var(--color);
+                font-family: 'Open Sans', sans-serif; 
+                width: 100vw; 
+                height: 100vh; 
+                margin: 0;
+                display: flex;
+                flex-wrap: wrap;
+                align-content: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+            .fancy-number {
+                position: absolute;
+                left: 55%;
+                top: 40%;
+                font-family: 'Share Tech Mono', monospace;
+                font-size: large;
+                font-weight: 400;
+                font-style: normal;
+                animation: fade-up 1s forwards;
+                -webkit-user-select: none;
+                user-select: none;
+                pointer-events: none;
+            }
+            #score {
+                position: absolute;
+                top: 10px;
+                left: 10px;
+                font-family: 'Share Tech Mono', monospace;
+                font-size: xx-large;
+                font-weight: 400;
+                opacity: 0;
+                -webkit-user-select: none;
+                user-select: none;
+                transition: opacity 0.5s;
+            }
+            #shop {
+                --shop-x: calc(-20vw - 2px);
+                position: absolute;
+                top: 0px;
+                right: var(--shop-x);
+                height: 100vh;
+                width: 20vw;
+                background: var(--shop-bg);
+                font-weight: 400;
+                border-left-style: solid;
+                border-width: 2px;
+                border-color: var(--border-color);
+                transition: right 1s, opacity 0.5s;
+                -webkit-user-select: none;
+                user-select: none;
+                hr {
+                    border-color: var(--border-color);
+                    border-style: solid;
+                    width: 100%;
+                }
+                footer {
+                    margin-top: auto;
+                    margin-bottom: 1rem;
+                }
+                section {
+                    display: flex;
+                    flex-direction: column;
+                    text-align: center;
+                }
+                
+                small {
+                    color:rgb(204, 204, 204);
+                    font-size: smaller;
+                }
+            }
+            #shop-toggle {
+                position: absolute;
+                display: flex;
+                justify-content: center;
+                align-content: center;
+                flex-wrap: wrap;
+                right: /*calc(var(--shop-x) + 20vw + 2px);*/ 20vw;
+                top: calc(50vh - 1.5em);
+                width: 1.5em;
+                height: 4em;
+                background-color: var(--shop-bg);
+                border-radius: 0.5em 0 0 0.5em;
+                border-style: solid;
+                border-width: 2px;
+                border-color: var(--border-color);
+                cursor: pointer;
+            }
+            #shop-toggle svg {
+                margin: auto;
+                transition: transform 0.5s;
+            }
+            #shop.show #shop-toggle svg {
+                transform: rotate3d(0, 1, 0, -180deg);
+            }
+            #shop-toggle:hover {
+                background-color: var(--border-color);
+            }
+            .shop-items {
+                display: flex;
+                flex-direction: column;
+            }
+            .shop-items .shop-item {
+                --item-bg: color-mix(in lch shorter hue, var(--shop-bg) 30%, rgb(73, 73, 73));
+                text-align: left;
+                padding: 0.75rem;
+                padding-top: 0.5rem;
+                border-radius: 1rem;
+                margin: 0.25rem;
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
+                background: var(--item-bg);
+                box-shadow: var(--bg) 0px 10px 10px 0px;
+                transition: background 0.1s;
+                line-height: 1.3em;
+                * {
+                    margin: 0; 
+                }
+                hr {
+                    --border-color-hr: color-mix(in lch shorter hue, var(--border-color) 70%, white);
+                    border-color: var(--border-color-hr) !important;
+                }                
+            }
+            .shop-items .shop-item:hover {
+                background: color-mix(in lch shorter hue, color-mix(in lch shorter hue, var(--bg, #000) 90%, grey) 20%, rgb(73, 73, 73));
+            }
+            .shop-items .shop-item:active {
+                background: var(--active);
+            }
+            .title {
+                margin-bottom: 0;
+            }
+            .show {
+                opacity: 1 !important;
+            }
+            .show:is(#shop):not(.fullhide) {
+                --shop-x: 0px;
+            }
+            .fullhide {
+                visibility: hidden;
+                opacity: 0;
+                display: none;
+            }
+            .text-button {
+                background: transparent;
+                border: none;
+                cursor: pointer;
+            }
+            #particles-js {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+            }
+            #error {
+                color: rgb(255, 94, 94);
+            }
+            #shoptip {
+                position: absolute;
+                width: max-content;
+                top: 0;
+                left: 0;
+                padding: 5px;
+                border-radius: 5px;
+                background: var(--active);
+                font-size: x-large;
+                transition: opacity 0.5s;
+                -webkit-backdrop-filter: blur(5px);
+                backdrop-filter: blur(5px);
+                opacity: 0.9;
+            }
+            .hide {
+                visibility: hidden;
+                opacity: 0;
+            }
+            #btn-bar {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                z-index: 10;
+                display: flex;
+                gap: 0.75rem;
+                button, a {
+                    background: transparent;
+                    border: none;
+                    cursor: pointer;
+                    padding: 0;
+                    margin: 0;
+                    color: inherit;
+                }
+                a {
+                    margin-right: 0.125rem;
+                }
+                button:hover {
+                    color: #696969;
+                }
+                a:hover {
+                    color: #703333;
+                }
+                * {
+                    font-size: 1.25rem;
+                }
+            }
+            @keyframes fade-up {
+                0% {
+                    transform: translateY(0);
+                    opacity: 0.7;
+                }
+                100% {
+                    transform: translateY(-200%);
+                    opacity: 0;
+                    display: none;
+                }
+            }
+            @keyframes fade-down {
+                0% {
+                    transform: translateY(0);
+                    opacity: 0.7;
+                }
+                100% {
+                    transform: translateY(100%);
+                    opacity: 0;
+                    display: none;
+                }
+            }
+            #center-text {
+                position: absolute;
+                left: 50%;
+                bottom: 10px;
+                text-transform: uppercase;
+                font-family: 'Share Tech Mono', monospace;
+                font-weight: 400;
+                transform: translateX(-50%);
+            }
+            .center {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+            }
+            #cfg-menu {
+                position: fixed;
+                left: 30px;
+                top: 30px;
+                width: calc(100% - 60px - 2em);
+                height: calc(100% - 60px - 2em);
+                background: var(--border-color);
+                border-radius: 1em;
+                padding: 1em;
+                z-index: 9999;
+                border: none;
+                margin: 0;
+                header {
+                    h2 {
+                        display: inline;
+                        margin: 0;
+                    }
+                    #cfg-close {
+                        float: right;
+                        padding: 0px;
+                        border-radius: 2px;
+                    }
+                    #cfg-close:focus-visible, #cfg-close:focus {
+                        box-shadow: 0 0 1px 2px var(--active);
+                        border: none;
+                        outline: none;
+                    }
+                    form {
+                        display: inline;
+                    }
+                }
+            }
+            ::backdrop {
+                opacity: 0.7;
+                backdrop-filter: blur(5px);
+                background-color: #000000;
+            }
+            #save::after {
+                content: " Saving...";
+                font-family: 'Share Tech Mono', monospace;
+                font-weight: 400;
+                opacity: 0;
+                display: none;
+                transition: opacity 1s;
+            }
+            #save:has(svg.fa-bounce)::after {
+                opacity: 1;
+                display: inline;
+            }
+            #save:has(svg.fa-bounce) {
+                pointer-events: none;
+                cursor: not-allowed;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="particles-js"></div>
+        <span id="score">00000</span>
+        <circle-button id='btn' content="Press"></circle-button>
+        <div id="shop" class="fullhide">
+            <div id="shoptip">Open the Shop!</div>
+            <div type="button" id="shop-toggle" class="fa-xl">
+                <i class="fa-solid fa-chevron-left"></i>
+            </div>
+            <section>
+                <header>
+                <h1 class="title">SHOP</h1>
+                <hr>
+                <small id="stats">CPS: 0 | Click Power: 1</small>
+                </header>
+                <div class="shop-items">
+                    <div class="shop-item" id="autoclickr">
+                        <h2>Autoclick.r</h2>
+                        <small>Level: 0 | Cost: 20</small>
+                        <hr>
+                        <p>Makes its level in clicks per sec</p>
+                        <small>Click to Buy</small>
+                    </div>
+                    <div class="shop-item" id="strongclick">
+                        <h2>StrongClick</h2>
+                        <small>Level: 0 | Cost: 40</small>
+                        <hr>
+                        <p>Adds its level in Click Power</p>
+                        <small>Click to Buy</small>
+                    </div>
+                </div>
+                <footer>
+                <div id="error" class="hide">Not enough points</div>
+                </footer>
+            </section>
+        </div>
+        <div id="btn-bar">
+            <a title="Exit" href="/"><i class="fa-solid fa-arrow-left-to-bracket"></i></a>
+            <button title="Settings" id="cfg"><i class="fa-solid fa-gear"></i></button>
+            <button title="Save" id="save"><i class="fa-solid fa-floppy-disk"></i></button>
+        </div>
+        <span id="center-text"><small>Prerelease version - In active development</small></span>
+        <dialog id="cfg-menu">
+            <header><h2>SETTINGS</h2><form><button class="text-button" id="cfg-close" formmethod="dialog"><i class="fa-solid fa-xmark fa-lg fa-fw"></i></button></form></header>
+            <section>
+
+            </section>
+        </dialog>
+        <script>
+            window.score = 0;
+            window.CPS = 0;
+            window.clickpower = 1;
+            function savedata() {
+                document.querySelector('#save svg').classList.add('fa-bounce')
+                x = shopitems.map((x)=>{return [x.elemid, x.level]})
+                y = Object.fromEntries(x)
+                d = {score: window.score, shoplvls:y, shoplocked: document.getElementById('shop').classList.contains('fullhide')}
+                localStorage.setItem("save",JSON.stringify(d))
+                setTimeout(()=>document.querySelector('#save svg').classList.remove('fa-bounce'),500)
+            }
+            setInterval(savedata, 30_000)
+            function loaddata() {
+                try {
+                x = localStorage.getItem("save")
+                if (!x) {return}
+                d = JSON.parse(x)
+                window.score = d.score
+                Object.entries(d.shoplvls).map(([key, val])=>{
+                    x = shopitems.indexOf(shopitems.find((x)=>{return x.elemid == key}))
+                    shopitems[x].level = val
+                })
+                shopitems.forEach((x)=>x.reload())
+                updatescore();
+                if (!d.shoplocked) {
+                    document.getElementById('shop').classList.remove('fullhide')
+                    document.getElementById('shop').animate({opacity: [0, 1], easing: ["ease-in"]},500)
+                    setTimeout(()=>document.getElementById('shoptip').remove())
+                }
+                } catch {
+                    localStorage.removeItem('save')
+                }
+            }
+            document.getElementById("save").addEventListener("click",savedata)
+            function pad(number) {
+                number = '' + number
+                if (number <= 9) {
+                    number = '0'+number
+                }
+                if (number <= 99) {
+                    number = '0'+number
+                }
+                if (number <= 999) {
+                    number = '0'+number
+                }
+                if (number <= 9999) {
+                    number = '0'+number
+                }
+                return number
+            }
+            function updatescore() {
+                let scoreElem = document.getElementById('score');
+                scoreElem.textContent = pad(score);
+                if (score > 0) {
+                    scoreElem.className = 'show'
+                }
+                if (score == 20) {
+                    document.getElementById('shop').classList.remove('fullhide')
+                    document.getElementById('shop').animate({opacity: [0, 1], easing: ["ease-in"]},500)
+                }
+            }
+            function dofancything(amount, x,y) {
+                let scoreElem = document.getElementById('score');
+                scoreElem.animate({transform: ['scale(1)', 'scale(1.1)','scale(1)'], easing: ["ease-in"]},100)
+                const s = document.createElement('span');
+                s.className = 'fancy-number'
+                s.textContent = '+'+amount ?? 1;
+                let l = 'calc('+((Math.random()*2-1)*2+-20)+'px + '+x+')';
+                let t = 'calc('+((Math.random()*2-1)*2+-30)+'px + '+y+')';
+                s.style.left = l
+                s.style.top = t
+                document.body.appendChild(s)
+                //setTimeout(()=>{s.remove()}, 1500)
+            }
+            function updatestats() {
+                document.getElementById("stats").textContent = `CPS: ${CPS} | Click Power: ${clickpower}`
+            }
+            document.getElementById('btn').addEventListener('click', function(e) {
+                score += clickpower;
+                updatescore();
+                dofancything(clickpower,e.pageX+'px',e.pageY+'px');
+            });
+            document.getElementById('shop-toggle').addEventListener('click', function(e) {
+                document.getElementById('shop').classList.toggle('show');
+                try {document.querySelector('#shoptip').remove()} catch {};
+
+            });
+            document.getElementById('cfg').addEventListener('click', function(e) {
+                document.getElementById('cfg').animate({transform: ['rotate(0deg)', 'rotate(360deg)']},700)
+                setTimeout(() => document.getElementById('cfg-menu').showModal(), 100)
+            });
+            var shopitems = [];
+            class ShopItem {
+                constructor(elementid, lvldata, name, desc, level) {
+                    this.element = document.getElementById(elementid);
+                    this.elemid = elementid;
+                    this.name = name ?? this.element.dataset.name ?? this.element.querySelector('h2').textContent;
+                    this.desc = desc ?? this.element.dataset.desc ?? this.element.querySelector('p').textContent;
+                    this.level = level ??this. element.dataset.level ?? 0;
+                    this.lvldata = lvldata;
+                    this.element.addEventListener('click', () => {this.buy_()});
+                    this.event_ = (level, event) => new CustomEvent("shop:"+event, {detail: {oldlevel: level, newlevel: ++level}})
+                    shopitems.push(this)
+                }
+                buy_() {
+                    if (this.lvldata.maxlvl > this.level) {
+                        if (window.score >= this.lvldata[this.level]) {
+                            let e = this.event_(this.level, "buy");
+                                this.element.dispatchEvent(e)
+                                score -= this.lvldata[this.level];
+                                this.level += 1;
+                                this.element.querySelector('small').textContent = `Level: ${this.level} | Cost: ${this.lvldata[this.level] ?? "N/A"}`;
+                            
+                        } else {
+                            document.getElementById('error').classList.remove('hide');
+                            document.getElementById('error').textContent = 'Not enough points';
+                            setTimeout(()=>{document.getElementById('error').classList.add('hide')}, 2000);
+                        } 
+                    } else {
+                        document.getElementById('error').classList.remove('hide');
+                        document.getElementById('error').textContent = 'Max level reached';
+                        setTimeout(()=>{document.getElementById('error').classList.add('hide')}, 2000);
+                    }
+                    
+                }
+                set level(value) {
+                    this.level_ = value;
+                    this.element.dataset.level = value;
+                }
+                get level() {
+                    return this.level_
+                }
+                set name(value) {
+                    this.name_ = value;
+                    this.element.dataset.name = value;
+                }
+                get name() {
+                    return this.name_
+                }
+                set desc(value) {
+                    this.desc_ = value;
+                    this.element.dataset.desc = value;
+                }
+                get desc() {
+                    return this.desc_
+                }
+                static fromElement(element, data) {
+                    return new ShopItem(element, data);
+                }
+                setevents(buy, reload) {
+                    this.element.addEventListener("shop:buy",buy)
+                    this.element.addEventListener("shop:reload",reload)
+                }
+                reload(usebuy=false) {
+                    if (usebuy) {
+                        let e = this.event_(this.level, "buy");
+                        this.element.dispatchEvent(e)
+                    } else {
+                        let e = this.event_(this.level, "reload");
+                        this.element.dispatchEvent(e)
+                    }
+                    this.element.querySelector('small').textContent = `Level: ${this.level} | Cost: ${this.lvldata[this.level] ?? "N/A"}`;
+                }
+            }
+
+            window.onload = () => {
+                new ShopItem("autoclickr", {0:20, 1:90, 2:270, 3:400, 4:560, maxlvl:5}).setevents(e => {window.CPS = [1,2,3,4,5][e.detail.oldlevel]; updatestats()}, e => {window.CPS = [0,1,2,3,4,5][e.detail.oldlevel]; updatestats()});
+                new ShopItem("strongclick", {0:40, 1:120, 2:240, 3:410, 4:630, maxlvl:5}).setevents(e => {window.clickpower = [2,3,4,5,6][e.detail.oldlevel]; updatestats()}, e => {window.clickpower = [1,2,3,4,5,6][e.detail.oldlevel]; updatestats()});
+                loaddata();
+            }
+            setInterval(()=>{if (CPS > 0) {score += CPS; updatescore(); dofancything(CPS, '50% + 5rem','50% - 2rem')}}, 1000)
+        </script>
+        <script type="module">
+        import {
+            computePosition,
+            flip,
+            shift,
+            offset,
+            arrow,
+            autoUpdate,
+        } from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.3/+esm';
+
+        const button = document.querySelector('#shop-toggle');
+        const tooltip = document.querySelector('#shoptip');
+        const arrowEl = document.createElement('div');
+        arrowEl.style.position = 'absolute';
+        arrowEl.style.width = '10px';
+        arrowEl.style.height = '10px';
+        arrowEl.style.clipPath = 'polygon(0% 0%,0% 100%,100% 100%)';
+        arrowEl.style.transform = 'rotate(-135deg)';
+        arrowEl.style.backgroundColor = 'var(--active)';
+        arrowEl.style.backdropFilter = 'blur(5px)';
+        arrowEl.style.zIndex = '1';
+        tooltip.appendChild(arrowEl);
+
+        const cleanup = autoUpdate(button, tooltip, () => {
+            computePosition(button, tooltip, {
+                middleware: [offset(16), flip(), shift({padding: 5}), arrow({element: arrowEl})],
+                placement: 'left',
+            }).then(({x, y, placement, middlewareData}) => {
+                Object.assign(tooltip.style, {
+                    left: `${x}px`,
+                    top: `${y}px`,
+                });
+                const {x: arrowX, y: arrowY} = middlewareData.arrow;
+ 
+                const staticSide = {
+                    top: 'bottom',
+                    right: 'left',
+                    bottom: 'top',
+                    left: 'right',
+                }[placement.split('-')[0]];
+                
+                Object.assign(arrowEl.style, {
+                    left: arrowX != null ? `${arrowX}px` : '',
+                    top: arrowY != null ? `${arrowY}px` : '',
+                    right: '',
+                    bottom: '',
+                    [staticSide]: '-5px',
+                });
+            });
+        }, {
+            animationFrame: true,
+        });
+        const observer=new MutationObserver(()=>{if(!document.contains(tooltip)){observer.disconnect();cleanup();}});observer.observe(document,{childList:true,subtree:true});
+        </script>
+        <script>particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});</script>
+    </body>
+</html>
