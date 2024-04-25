@@ -2,6 +2,7 @@ from subprocess import run
 
 def push_to_github(repo_url, token):
     run(["git", "init"], cwd="D:/coding")
+    run(["git", "config", "--add", "safe.directory", "D:/coding"], cwd="D:/coding")
     run(["git", "add", "."], cwd="D:/coding")
     run(["git", "commit", "-m", "'Auto-commit'"], cwd="D:/coding")
     run(["git", "remote", "add", "origin", repo_url], cwd="D:/coding")
