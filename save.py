@@ -2,10 +2,10 @@ import subprocess
 
 def push_to_github(repo_url, token):
     # Add all changes
-    subprocess.run(["git", "add", "."])
+    subprocess.run(["git", "add", "D:/coding"])
 
     # Commit changes
-    subprocess.run(["git", "commit", "-m", "Auto-commit"])
+    subprocess.run(["git", "commit", "-m", "backup"])
 
     # Set the remote URL
     subprocess.run(["git", "remote", "set-url", "origin", repo_url])
