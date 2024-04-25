@@ -14,7 +14,7 @@ def push_to_github(repo_url, token):
     subprocess.run(["git", "config", "--global", "credential.helper", f'!f() {{ echo "username=magentapenguin"; echo "password={token}"; }}; f'])
 
     # Push changes to the remote repository
-    subprocess.run(["git", "push", "origin", "master"])
+    subprocess.run(["git", "push", "origin", "main"])
 
 repo_url = "https://github.com/magentapenguin/my-coding-stuff"
 token = "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"
