@@ -1,16 +1,22 @@
-import octokit
+import subprocess
 
 def push_to_github(repo_url, token):
-    repo = octokit.Repo(repo_url, token)
-    repo.init()
-    repo.add_all()
-    repo.commit("Auto-commit")
-    repo.remove_remote("origin")
-    repo.add_remote("origin", repo_url)
-    repo.unset_credential_helper()
-    repo.set_credential_helper("store")
-    repo.push("origin", "master")
+    # Add all changes
+    subprocess.run(["git", "add", "."])
 
-repo_url = "https://github.com/magentapenguin/my-coding-stuff.git"
+    # Commit changes
+    subprocess.run(["git", "commit", "-m", "Auto-commit"])
+
+    # Set the remote URL
+    subprocess.run(["git", "remote", "set-url", "origin", "https://github.com/" + repo_url])
+
+    # Authenticate with token
+    subprocess.run(["git", "config", "--global", "credential.helper", "store"])
+    subprocess.run(["git", "config", "--global", "credential.helper", f'!f() {{ echo "username=token"; echo "password={token}"; }}; f'])
+
+    # Push changes to the remote repository
+    subprocess.run(["git", "push", "origin", "master"])
+
+repo_url = "magentapenguin/my-coding-stuff"
 token = "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"
 push_to_github(repo_url, token)
