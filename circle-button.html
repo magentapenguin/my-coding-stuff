@@ -402,6 +402,20 @@
             [type="reset"], #reset-save {
                 background: red;
                 border: none;
+                font-size: 1.1em;
+                border-radius: 0.5em;
+                padding: 0.25em 0.5em;
+                cursor: pointer;
+                color: white;
+            }
+            [type="submit"] {
+                background: rgb(0, 170, 0);
+                border: none;
+                font-size: 1.1em;
+                border-radius: 0.5em;
+                padding: 0.25em 0.5em;
+                cursor: pointer;
+                color: white;
             }
         </style>
     </head>
@@ -446,7 +460,7 @@
             <button title="Settings" id="cfg"><i class="fa-solid fa-gear"></i></button>
             <button title="Save" id="save"><i class="fa-solid fa-floppy-disk"></i></button>
         </div>
-        <span id="center-text"><small>Prerelease version - In active development</small></span>
+        <span id="center-text"><small>Prerelease version - Final version </small></span>
         <dialog id="cfg-menu">
             <header><h2>SETTINGS</h2><form><button type="submit" class="text-button" id="cfg-close" formmethod="dialog"><i class="fa-solid fa-xmark fa-lg fa-fw"></i></button></form></header>
             <form formmethod="dialog" id="cfg-form">
@@ -464,7 +478,7 @@
                 </div>
                 <div class="cfg-line">
                     <button id="reset-save" type="button">Reset Save</button>
-                    <button type="submit">Apply</button>
+                    <button type="submit">Apply Changes</button>
                 </div>
             </form>
         </dialog>
@@ -481,6 +495,7 @@
                 setTimeout(()=>document.querySelector('#save svg').classList.remove('fa-bounce'),500)
             }
             setInterval(savedata, 30_000)
+            document.getElementById("reset-save").addEventListener("click",()=>{localStorage.removeItem('save'); location.reload()})
             function loaddata() {
                 try {
                 x = localStorage.getItem("save")
