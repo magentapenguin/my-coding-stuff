@@ -22,7 +22,7 @@ def make(dir='./'):
     x = "<ul class=\"fa-ul\" style='--fa-li-margin: 2em'>"
     for entry in os.scandir(dir):
         if entry.is_file() and not entry.name.startswith("index") and entry.name.endswith(".html"):
-            x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-file\"></i></span><a href=\"/{entry.name}\">{entry.name}</a></li>"
+            x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-file\"></i></span><a href=\"/{os.path.relpath(entry.path)[0:]}\">{entry.name}</a></li>"
         elif entry.is_dir() and not entry.name.startswith("."):
             x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-folder-open\"></i></span>{entry.name}<br>"
             x += make(entry.path)

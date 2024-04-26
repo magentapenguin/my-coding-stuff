@@ -7,7 +7,429 @@
         <script src="/circle-button.js"></script>
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="/style.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+:root {
+    --light-mode-bg: #c0c0c0;
+    --light-mode-color: #000000;
+    --dark-mode-bg: #17141a;
+    --dark-mode-color: #ffffff;
+    --active: rgb(0, 138, 138);
+}
+:root, [data-theme="dark"] {
+    --bg: var(--dark-mode-bg);
+    --color: var(--dark-mode-color);
+    color-scheme: dark;
+}
+[data-theme="light"] {
+    --bg: var(--light-mode-bg);
+    --color: var(--light-mode-color);
+    color-scheme: light;
+}
+body {
+    --shop-bg: color-mix(in lch shorter hue, var(--bg, #000) 90%, grey);
+    --border-color: color-mix(in lch shorter hue, var(--bg, #000) 60%, grey);
+    background-color: var(--bg); 
+    color: var(--color);
+    font-family: 'Open Sans', sans-serif; 
+    width: 100vw; 
+    height: 100vh; 
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-content: center;
+    justify-content: center;
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.fancy-number {
+    position: absolute;
+    left: 55%;
+    top: 40%;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: large;
+    font-weight: 400;
+    font-style: normal;
+    animation: fade-up 1s forwards;
+    pointer-events: none;
+}
+#score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: xx-large;
+    font-weight: 400;
+    opacity: 0;
+    transition: opacity 0.5s;
+}
+#shop {
+    --shop-x: calc(-20vw - 2px);
+    position: absolute;
+    top: 0px;
+    right: var(--shop-x);
+    height: 100vh;
+    width: 20vw;
+    background: var(--shop-bg);
+    font-weight: 400;
+    border-left-style: solid;
+    border-width: 2px;
+    border-color: var(--border-color);
+    transition: right 1s, opacity 0.5s;
+    hr {
+        border-color: var(--border-color);
+        border-style: solid;
+        width: 100%;
+    }
+    footer {
+        margin-top: auto;
+        margin-bottom: 1rem;
+    }
+    section {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    small {
+        color: color-mix(in lch shorter hue, var(--shop-bg) 10%, var(--color));
+        font-size: smaller;
+    }
+}
+#shop-toggle {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+    right: /*calc(var(--shop-x) + 20vw + 2px);*/ 20vw;
+    top: calc(50vh - 1.5em);
+    width: 1.5em;
+    height: 4em;
+    background-color: var(--shop-bg);
+    border-radius: 0.5em 0 0 0.5em;
+    border-style: solid;
+    border-width: 2px;
+    border-color: var(--border-color);
+    cursor: pointer;
+}
+#shop-toggle svg {
+    margin: auto;
+    transition: transform 0.5s;
+}
+#shop.show #shop-toggle svg {
+    transform: rotate3d(0, 1, 0, -180deg);
+}
+#shop-toggle:hover {
+    background-color: var(--border-color);
+}
+.shop-items {
+    display: flex;
+    flex-direction: column;
+}
+.shop-items .shop-item {
+    --item-bg: color-mix(in lch shorter hue, var(--shop-bg) 30%, rgb(73, 73, 73));
+    text-align: left;
+    color: white;
+    padding: 0.75rem;
+    padding-top: 0.5rem;
+    border-radius: 1rem;
+    margin: 0.25rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    background: var(--item-bg);
+    box-shadow: var(--bg) 0px 10px 10px 0px;
+    transition: background 0.1s;
+    line-height: 1.3em;
+    * {
+        margin: 0; 
+    }
+    hr {
+        --border-color-hr: color-mix(in lch shorter hue, var(--border-color) 70%, white);
+        border-color: var(--border-color-hr) !important;
+    }
+    small {
+        color: #cfcfcf !important;
+    }      
+}
+.shop-items .shop-item:hover {
+    background: color-mix(in lch shorter hue, color-mix(in lch shorter hue, var(--bg, #000) 90%, grey) 20%, rgb(73, 73, 73));
+}
+.shop-items .shop-item:active {
+    background: var(--active);
+}
+.title {
+    margin-bottom: 0;
+}
+.show {
+    opacity: 1 !important;
+}
+.show:is(#shop):not(.fullhide) {
+    --shop-x: 0px;
+}
+.fullhide {
+    visibility: hidden;
+    opacity: 0;
+    display: none;
+}
+.text-button {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+#particles-js {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+#error {
+    color: rgb(255, 94, 94);
+}
+#shoptip {
+    position: absolute;
+    width: max-content;
+    top: 0;
+    left: 0;
+    padding: 5px;
+    border-radius: 5px;
+    background: var(--active);
+    font-size: x-large;
+    transition: opacity 0.5s;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    opacity: 0.9;
+}
+.hide {
+    visibility: hidden;
+    opacity: 0;
+}
+#btn-bar {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    z-index: 10;
+    display: flex;
+    gap: 0.75rem;
+    button, a {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        color: inherit;
+    }
+    a {
+        margin-right: 0.125rem;
+    }
+    button:hover {
+        color: #696969;
+    }
+    a:hover {
+        color: #703333;
+    }
+    * {
+        font-size: 1.5rem;
+    }
+}
+@keyframes fade-up {
+    0% {
+        transform: translateY(0);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(-200%);
+        opacity: 0;
+        display: none;
+    }
+}
+@keyframes fade-down {
+    0% {
+        transform: translateY(0);
+        opacity: 0.7;
+    }
+    100% {
+        transform: translateY(100%);
+        opacity: 0;
+        display: none;
+    }
+}
+#center-text {
+    position: absolute;
+    left: 50%;
+    bottom: 10px;
+    text-transform: uppercase;
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: 400;
+    transform: translateX(-50%);
+}
+.center {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+#cfg-menu {
+    position: fixed;
+    left: 60px;
+    top: 60px;
+    width: calc(100% - 120px - 2em);
+    height: calc(100% - 120px - 2em);
+    background: var(--border-color);
+    border-radius: 1em;
+    padding: 1em;
+    z-index: 9999;
+    border: none;
+    margin: 0;
+    header {
+        margin-bottom: 0.25rem;
+        h2 {
+            display: inline;
+            margin: 0;
+        }
+        #cfg-close {
+            float: right;
+            padding: 0px;
+            border-radius: 2px;
+        }
+        #cfg-close:focus-visible, #cfg-close:focus {
+            box-shadow: 0 0 1px 2px var(--active);
+            border: none;
+            outline: none;
+        }
+        form {
+            display: inline;
+        }
+    }
+    form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        padding: 1em;
+        footer {
+            margin-top: auto;
+            margin-left: -0.85em;
+        }
+    }
+}
+::backdrop {
+    opacity: 0.7;
+    -webkit-backdrop-filter: blur(5px);
+    backdrop-filter: blur(5px);
+    background-color: #000000;
+}
+#save::after {
+    content: " Saving...";
+    font-family: 'Share Tech Mono', monospace;
+    font-weight: 400;
+    opacity: 0;
+    display: none;
+    transition: opacity 1s;
+}
+#save:has(svg.fa-bounce)::after {
+    opacity: 1;
+    display: inline;
+}
+#save:has(svg.fa-bounce) {
+    pointer-events: none;
+    cursor: not-allowed;
+}
+
+.cfg-checkbox-div {
+    display: inline-block;
+    margin-left: 0.125rem;
+
+    .cfg-checkbox {
+        opacity: 0;
+        position: absolute;
+    }
+
+    .cfg-checkbox-label {
+        background-color: color-mix(in lch shorter hue, var(--shop-bg) 95%, grey);
+        width: 50px;
+        height: 26px;
+        border-radius: 50px;
+        position: relative;
+        padding: 5px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .fa-moon {color: #ffffff;}
+
+    .fa-sun {color: #f39c12;}
+
+    .fa-check {color: #00ff00;}
+
+    .fa-xmark {color: #ff0000;}
+
+    .cfg-checkbox-label .ball {
+        background-color: #fff;
+        width: 22px;
+        height: 22px;
+        position: absolute;
+        left: 2px;
+        top: 2px;
+        border-radius: 50%;
+        transition: transform 0.2s linear;
+    }
+
+    .cfg-checkbox:checked + .cfg-checkbox-label .ball {
+        transform: translateX(24px);
+    }
+    * {
+        box-sizing: border-box;
+    }
+}
+.badge {
+    display: inline-block;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 700;
+    line-height: 1;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.375rem;
+}
+.beta {
+    background-color: var(--active);
+}
+.alpha {
+    background-color: green;
+}
+.cfg-line {
+    display: flex;
+    gap: 0.25em;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+[type="reset"], #reset-save {
+    background: red;
+    border: none;
+    font-size: 1.1em;
+    border-radius: 0.5em;
+    padding: 0.25em 0.5em;
+    cursor: pointer;
+    color: white;
+}
+[type="submit"]:not([formmethod="dialog"], #cfg-close) {
+    background: rgb(0, 170, 0);
+    border: none;
+    font-size: 1.1em;
+    border-radius: 0.5em;
+    padding: 0.25em 0.5em;
+    cursor: pointer;
+    color: white;
+}
+        </style>
+        
     </head>
     <body>
         <div id="particles-js"></div>
@@ -45,33 +467,54 @@
                 </footer>
             </section>
         </div>
+        
         <div id="btn-bar">
             <a title="Exit" href="/"><i class="fa-solid fa-arrow-left-to-bracket"></i></a>
             <button title="Settings" id="cfg"><i class="fa-solid fa-gear"></i></button>
+            <button title="Fullscreen Toggle" id="fullscreen"><i class="fa-solid fa-expand"></i><i class="fa-solid fa-compress fullhide"></i></button>
             <button title="Save" id="save"><i class="fa-solid fa-floppy-disk"></i></button>
         </div>
         <span id="center-text"><small>Prerelease version - In Development</small></span>
         <dialog id="cfg-menu">
             <header><h2>SETTINGS</h2><form><button type="submit" class="text-button" id="cfg-close" formmethod="dialog"><i class="fa-solid fa-xmark fa-lg fa-fw"></i></button></form></header>
-            <form formmethod="dialog" id="cfg-form">
+            <form method="dialog" id="cfg-form">
                 <div class="cfg-line">
                     Theme:
                     <div class="cfg-checkbox-div">
                         <input type="checkbox" class="cfg-checkbox" id="cfg-theme" checked>
                         <label for="cfg-theme" class="cfg-checkbox-label">
-                            <i class="fa fa-moon"></i>
-                            <i class="fa fa-sun"></i>
+                            <i class="fa-solid fa-moon"></i>
+                            <i class="fa-solid fa-sun"></i>
+                            <span class="ball"></span>
+                        </label>
+                    </div>
+                    <span class="badge alpha">ALPHA</span>
+                </div>
+                <div class="cfg-line">
+                    Particles:
+                    <div class="cfg-checkbox-div">
+                        <input type="checkbox" class="cfg-checkbox" id="cfg-particle" checked>
+                        <label for="cfg-particle" class="cfg-checkbox-label">
+                            <i class="fa-solid fa-check"></i>
+                            <i class="fa-solid fa-xmark"></i>
                             <span class="ball"></span>
                         </label>
                     </div>
                     <span class="badge beta">BETA</span>
                 </div>
-                <div class="cfg-line">
+                <footer>
                     <button id="reset-save" type="button">Reset Save</button>
-                    <button type="submit">Apply Changes</button>
-                </div>
+                </footer>
             </form>
         </dialog>
+        <script src="https://unpkg.com/node-forge@1.0.0/dist/forge.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+        <script>
+            window.notyf = new Notyf();
+            window.onerror = (error) => {
+                notyf.error({message: 'Error: '+error, duration: 4000, dismissible: true});
+            }
+        </script>
         <script>
             window.score = 0;
             window.CPS = 0;
@@ -81,33 +524,64 @@
                 x = shopitems.map((x)=>{return [x.elemid, x.level]})
                 y = Object.fromEntries(x)
                 d = {score: window.score, shoplvls:y, shoplocked: document.getElementById('shop').classList.contains('fullhide')}
-                localStorage.setItem("save",JSON.stringify(d))
-                setTimeout(()=>document.querySelector('#save svg').classList.remove('fa-bounce'),500)
+                forge.md.sha512.create();
+                var md = forge.md.sha256.create();
+                dstr = JSON.stringify(d)
+                md.update(dstr);
+                
+                localStorage.setItem("save", JSON.stringify({data:dstr, hash:md.digest().toHex()}))
+                setTimeout(()=>document.querySelector('#save svg').classList.remove('fa-bounce'), 100)
             }
             setInterval(savedata, 30_000)
             document.getElementById("reset-save").addEventListener("click",()=>{localStorage.removeItem('save'); location.reload()})
             function loaddata() {
                 try {
-                x = localStorage.getItem("save")
-                if (!x) {return}
-                d = JSON.parse(x)
-                window.score = d.score
-                Object.entries(d.shoplvls).map(([key, val])=>{
-                    x = shopitems.indexOf(shopitems.find((x)=>{return x.elemid == key}))
-                    shopitems[x].level = val
-                })
-                shopitems.forEach((x)=>x.reload())
-                updatescore();
-                if (!d.shoplocked) {
-                    document.getElementById('shop').classList.remove('fullhide')
-                    document.getElementById('shop').animate({opacity: [0, 1], easing: ["ease-in"]},500)
-                    setTimeout(()=>document.getElementById('shoptip').remove())
-                }
-                } catch {
+                    x = localStorage.getItem("save")
+                    if (!x) {return}
+                    d = JSON.parse(x)
+                    var md = forge.md.sha256.create();
+                    dstr = d.data
+                    md.update(dstr);
+                    if (d.hash !== md.digest().toHex()) {
+                        throw "invalid hash"
+                    }
+                    d = JSON.parse(dstr)
+
+                    window.score = d.score
+                    Object.entries(d.shoplvls).map(([key, val])=>{
+                        x = shopitems.indexOf(shopitems.find((x)=>{return x.elemid == key}))
+                        shopitems[x].level = val
+                    })
+                    shopitems.forEach((x)=>x.reload())
+                    updatescore();
+                    if (!d.shoplocked) {
+                        document.getElementById('shop').classList.remove('fullhide')
+                        document.getElementById('shop').animate({opacity: [0, 1], easing: ["ease-in"]},500)
+                        setTimeout(()=>document.getElementById('shoptip').remove())
+                    }
+                } catch (e) {
+                    if (!(e instanceof Error)) {
+                        e = new Error(e);
+                    }
+                    window.onerror(e.message)
                     localStorage.removeItem('save')
+                    notyf.error({message: 'Error loading save! Save deleted.'});
                 }
             }
             document.getElementById("save").addEventListener("click",savedata)
+            function toggleFullScreen() {
+                btn = document.getElementById("fullscreen")
+                btn.getElementsByClassName("fa-expand")[0].classList.add('fullhide')
+                btn.getElementsByClassName("fa-compress")[0].classList.add('fullhide')
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen();
+                    btn.getElementsByClassName("fa-compress")[0].classList.remove('fullhide')
+                } else if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                    btn.getElementsByClassName("fa-expand")[0].classList.remove('fullhide')
+                }
+            }
+            document.getElementById("fullscreen").addEventListener("click", toggleFullScreen)
             function pad(number) {
                 number = '' + number
                 if (number <= 9) {
@@ -245,9 +719,20 @@
                 loaddata();
             }
             setInterval(()=>{if (CPS > 0) {score += CPS; updatescore(); dofancything(CPS, '50% + 5rem','50% - 2rem')}}, 1000)
-            const checkbox = document.getElementById("cfg-theme")
-            checkbox.addEventListener("change", () => {
-                document.body.dataset.theme = checkbox.checked ? "dark" : "light"
+            let themecfg = document.getElementById("cfg-theme")
+            themecfg.addEventListener("change", () => {
+                document.body.dataset.theme = themecfg.checked ? "dark" : "light"
+                document.querySelector("#particles-js .particles-js-canvas-el").remove()
+                particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});
+            })
+            let particlecfg = document.getElementById("cfg-particle")
+            particlecfg.addEventListener("change", () => {
+                if (!particlecfg.checked) {
+                    document.querySelector("#particles-js .particles-js-canvas-el").remove()
+                    pJSDom.pop()
+                } else {
+                    particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});
+                }
             })
         </script>
         <script type="module">
@@ -296,7 +781,7 @@
                     top: arrowY != null ? `${arrowY}px` : '',
                     right: '',
                     bottom: '',
-                    [staticSide]: '-5px',
+                    [staticSide]: '-4.5px',
                 });
             });
         }, {

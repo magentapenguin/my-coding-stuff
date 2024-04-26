@@ -2,7 +2,7 @@ import bottle, os
 
 @bottle.hook('after_request')
 def no_drive():
-    if not os.path.exists('D:/coding'):
+    if not os.path.exists('.'):
         bottle.abort(503, "Website Offline :(")
 
 @bottle.error(503)
