@@ -1,4 +1,6 @@
 import numpy as np
+import json
+from string import Template
 
 # Your data
 x = np.array([1, 2, 3])
@@ -29,14 +31,16 @@ while True:
     x = np.append(x, next_x)
     y = np.append(y, int(next_y))
 
-x = x-1
 
-data = {x:y for x, y in zip(x.tolist(), y.tolist())}
+data = {int(x):int(y) for x, y in zip((x-1).tolist(), y.tolist())}
 
-data['maxlvl'] = x[-1] + 1
+data['maxlvl'] = int(x[-1] + 1)
+def make(pricelvldata, elmid, varname, lvldata):
+    def strdata(data):
+        return json.dumps(data).replace(' ', '')
+    t = Template("""new ShopItem("$elmid", $pricedata).setevents(e => {$varname = $lvldata[e.detail.oldlevel]; updatestats()}, e => {$varname = $lvldata2[e.detail.oldlevel]; updatestats()});""")
+    return t.substitute(elmid=elmid, pricedata=strdata(pricelvldata), varname=varname, lvldata=strdata(lvldata), lvldata2=strdata([0]+lvldata))
 
-import json
-from string import Template
-make = lambda pricedata, elmid, varname, lvldata: Template("""new ShopItem("$elmid", $pricedata).setevents(e => {$varname = $lvldata[e.detail.oldlevel]; updatestats()}, e => {$varname = $lvldata2[e.detail.oldlevel]; updatestats()});""").substitute(pricedata=json.dumps(pricedata).replace(' ', ''), elmid=elmid, varname=varname, lvldata=json.dumps(lvldata).replace(' ', ''), lvldata2=json.dumps([0]+lvldata).replace(' ', ''))
+print(data)
 
-print(make(data, input("elemid: "), input("varname: "), x.tolist().))
+print(make(data, input("elemid: "), input("varname: "), list(x.tolist())[:-1]))
