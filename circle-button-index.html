@@ -46,18 +46,24 @@
             }
             #title {
                 position: absolute;
-                top: 20vh;
-                left: 30vw;
+                top: 10vh;
+                left: 40vw;
                 transform: translate(-50%, -50%);
-                font-size: 5rem;
+                font-size: calc(2rem + 3vw);
                 text-align: center;
                 margin-bottom: 2rem;
                 text-shadow: rgba(255, 255, 255, 0.65) 0 1rem 20px;
             }
-            @media screen and (max-width: 900px) {
+            @media screen and (max-width: 1000px) {
                 #title {
                     top: 10vh;
                     left: 50vw;
+                }
+            }
+            @media screen and (min-width: 1200px) {
+                #title {
+                    top: 20vh;
+                    left: 40vw;
                 }
             }
             #exit {
@@ -85,11 +91,11 @@
             }
             #exit:hover::after {
                 opacity: 1;
-                left: 10px;
+                left: 15px;
             }
             #exit::after {
                 position: relative;
-                left: 5px;
+                left: 10px;
                 content: 'Exit';
                 opacity: 0.25;
                 font-weight: 600;
@@ -102,6 +108,30 @@
                 border-style: solid;
                 width: calc(100% + 20px);
                 transform: translateX(-10px);
+                box-shadow: rgba(255, 255, 255, 0.65) 0 1rem 20px;
+            }
+            #share {
+                position: absolute;
+                top: 10px;
+                right: 20px;
+                font-size: 2rem;
+                color: white;
+                font-family: 'Open Sans', sans-serif;
+                background-color: transparent;
+                border: none;
+                cursor: pointer;
+            }
+            #share:hover::before {
+                opacity: 1;
+                right: 15px;
+            }
+            #share::before {
+                position: relative;
+                right: 10px;
+                content: 'Share';
+                opacity: 0.25;
+                font-weight: 600;
+                transition: opacity 0.5s ease-in-out, right 0.5s ease-in-out;
             }
         </style>
     </head>
@@ -113,7 +143,16 @@
         <circle-button id='btn' content="Play"></circle-button>
         <noscript>You do not have javascript active, click <a href="/circle-button.html">here</a> to continue</noscript>
         <small>Image from <a href="https://unsplash.com/photos/ice-capped-mountain-at-daytime-xfngap_DToE">Unsplash</a></small>
+        <button type="button" title="share" id="share"><i class="fa-solid fa-share-from-square"></i></button>
         <script>
+            const share = document.getElementById('share');
+            share.addEventListener('click', () => {
+                navigator.share({
+                    title: 'Circle Button Game',
+                    text: 'Play the Circle Button Game',
+                    url: location.href
+                });
+            });
             const btn = document.getElementById('btn');
             btn.addEventListener('click', () => {
                 var x = 0;
