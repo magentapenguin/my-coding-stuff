@@ -27,7 +27,7 @@ class CircleButton extends HTMLElement {
                 background-clip: padding-box;
             }
             .border-element {
-                background: linear-gradient(to bottom, #2de5d1, #1fa4e9);
+                background: linear-gradient(to bottom, #18fdc0, #176a95);
                 border-radius: 50%;
                 position: absolute;
                 inset: -0.25rem;

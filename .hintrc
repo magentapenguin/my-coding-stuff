@@ -9,7 +9,8 @@
         "ignore": [
           "backdrop-filter",
           "color: color-mix(in lch shorter hue, var(--shop-bg) 30%, var(--color))",
-          "color: color-mix(in lch shorter hue, var(--shop-bg) 10%, var(--color))"
+          "color: color-mix(in lch shorter hue, var(--shop-bg) 10%, var(--color))",
+          "background-color: color-mix(in lch shorter hue, var(--shop-bg) 95%, grey)"
         ]
       }
     ]

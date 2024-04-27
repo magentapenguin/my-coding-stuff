@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Circle Button</title>
+        <script src="/circle-button.js"></script>
+        <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+        <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous"></script>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
+            :root {
+                overflow: hidden;
+            }
+            body {
+                font-family: 'Open Sans', sans-serif;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: 0;
+                --bg: #17141a;
+                color: white;
+                background-color: var(--bg);
+            }
+            #particles-js {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                filter: blur(3px) brightness(0.5);
+            }
+            #title {
+                position: absolute;
+                top: 20vh;
+                left: 30vw;
+                transform: translate(-50%, -50%);
+                font-size: 5rem;
+                text-align: center;
+                margin-bottom: 2rem;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="particles-js"></div>
+        <h1 id="title">Circle Button</h1>
+        <circle-button id='btn' content="Play"></circle-button>
+        <script>
+            const btn = document.getElementById('btn');
+            btn.addEventListener('click', () => {
+                var x = 0;
+                var y = () => {
+                    btn.setAttribute("borderspin", x.toString())
+                    console.log(x);
+                    x+=5;
+                    requestAnimationFrame(y)
+                }
+                y();
+                setTimeout(() => {
+                    window.location.href = '/circle-button.html';
+                }, 1000);
+            });
+        </script>
+        <script>particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:'#fff'},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});</script>
+    
+    </body>
+</html>

@@ -21,16 +21,20 @@
 :root, [data-theme="dark"] {
     --bg: var(--dark-mode-bg);
     --color: var(--dark-mode-color);
+    --shop-bg: color-mix(in hsl shorter hue, var(--bg) 90%, grey);
+    --border-color: color-mix(in hsl shorter hue, var(--bg) 60%, grey);
+    --accent: color-mix(in hsl shorter hue, var(--shop-bg) 95%, grey);
     color-scheme: dark;
 }
 [data-theme="light"] {
     --bg: var(--light-mode-bg);
     --color: var(--light-mode-color);
+    --shop-bg: color-mix(in hsl shorter hue, var(--bg) 90%, grey);
+    --border-color: color-mix(in hsl shorter hue, var(--bg) 60%, grey);
+    --accent: color-mix(in hsl shorter hue, var(--shop-bg) 50%, rgb(63, 63, 63));
     color-scheme: light;
 }
 body {
-    --shop-bg: color-mix(in lch shorter hue, var(--bg, #000) 90%, grey);
-    --border-color: color-mix(in lch shorter hue, var(--bg, #000) 60%, grey);
     background-color: var(--bg); 
     color: var(--color);
     font-family: 'Open Sans', sans-serif; 
@@ -95,7 +99,7 @@ body {
     }
     
     small {
-        color: color-mix(in lch shorter hue, var(--shop-bg) 10%, var(--color));
+        color: color-mix(in hsl shorter hue, var(--shop-bg) 10%, var(--color));
         font-size: smaller;
     }
 }
@@ -131,7 +135,7 @@ body {
     flex-direction: column;
 }
 .shop-items .shop-item {
-    --item-bg: color-mix(in lch shorter hue, var(--shop-bg) 30%, rgb(73, 73, 73));
+    --item-bg: color-mix(in hsl shorter hue, var(--shop-bg) 30%, rgb(73, 73, 73));
     text-align: left;
     color: white;
     padding: 0.75rem;
@@ -148,7 +152,7 @@ body {
         margin: 0; 
     }
     hr {
-        --border-color-hr: color-mix(in lch shorter hue, var(--border-color) 70%, white);
+        --border-color-hr: color-mix(in hsl shorter hue, var(--border-color) 70%, white);
         border-color: var(--border-color-hr) !important;
     }
     small {
@@ -156,7 +160,7 @@ body {
     }      
 }
 .shop-items .shop-item:hover {
-    background: color-mix(in lch shorter hue, color-mix(in lch shorter hue, var(--bg, #000) 90%, grey) 20%, rgb(73, 73, 73));
+    background: color-mix(in hsl shorter hue, color-mix(in hsl shorter hue, var(--bg, #000) 90%, grey) 20%, rgb(73, 73, 73));
 }
 .shop-items .shop-item:active {
     background: var(--active);
@@ -199,6 +203,7 @@ body {
     background: var(--active);
     font-size: x-large;
     transition: opacity 0.5s;
+    color: white;
     -webkit-backdrop-filter: blur(5px);
     backdrop-filter: blur(5px);
     opacity: 0.9;
@@ -210,7 +215,7 @@ body {
 #btn-bar {
     position: absolute;
     bottom: 10px;
-    left: 10px;
+    left: 15px;
     z-index: 10;
     display: flex;
     gap: 0.75rem;
@@ -348,7 +353,7 @@ body {
     }
 
     .cfg-checkbox-label {
-        background-color: color-mix(in lch shorter hue, var(--shop-bg) 95%, grey);
+        background-color: var(--accent);
         width: 50px;
         height: 26px;
         border-radius: 50px;
@@ -520,6 +525,7 @@ body {
             window.CPS = 0;
             window.clickpower = 1;
             function savedata() {
+                try {
                 document.querySelector('#save svg').classList.add('fa-bounce')
                 x = shopitems.map((x)=>{return [x.elemid, x.level]})
                 y = Object.fromEntries(x)
@@ -530,7 +536,15 @@ body {
                 md.update(dstr);
                 
                 localStorage.setItem("save", JSON.stringify({data:dstr, hash:md.digest().toHex()}))
+                } catch (e) {
+                    if (!(e instanceof Error)) {
+                        e = new Error(e);
+                    }
+                    window.onerror(e.message)
+                    notyf.error({message: 'Error saving! Try again later.'});
+                } finally {
                 setTimeout(()=>document.querySelector('#save svg').classList.remove('fa-bounce'), 100)
+                }
             }
             setInterval(savedata, 30_000)
             document.getElementById("reset-save").addEventListener("click",()=>{localStorage.removeItem('save'); location.reload()})
