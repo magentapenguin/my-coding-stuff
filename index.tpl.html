@@ -10,7 +10,15 @@
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             }
             a {
-                text-decoration: none;
+                color: rgb(0, 140, 255);
+                text-underline-offset: .15em;
+                transition: color 0.25s ease-in-out;
+            }
+            a:hover {
+                color: rgb(1, 124, 224);
+            }
+            .no-dot {
+                list-style-type: none;
             }
         </style>
     </head>
@@ -19,15 +27,20 @@
         <% 
 def make(dir='./'):
     dir = os.path.abspath(dir)
-    x = "<ul class=\"fa-ul\" style='--fa-li-margin: 2em'>"
+    x = "<ul class=\"fa-ul no-dot\" style='--fa-li-margin: 2em; margin-bottom: 0.25rem;'>"
+    y = 0
     for entry in os.scandir(dir):
-        if entry.is_file() and not entry.name.startswith("index") and entry.name.endswith(".html"):
+        y+=1
+        if entry.is_file() and not entry.name.startswith("index.tpl") and entry.name.endswith(".html"):
             x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-file\"></i></span><a href=\"/{os.path.relpath(entry.path)[0:]}\">{entry.name}</a></li>"
         elif entry.is_dir() and not entry.name.startswith("."):
             x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-folder-open\"></i></span>{entry.name}<br>"
             x += make(entry.path)
             x += "</li>"
         end
+    end
+    if y == 0:
+        x += "<li style=\"margin-left: -1.5em;\"><i>(empty)</i></li>"
     end
     x += "</ul>"
     return x

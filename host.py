@@ -24,9 +24,37 @@ def offline(error):
     </body>
 </html>""", error=error)
 
+@bottle.error(404)
+def err404(error):
+    return bottle.template("""<!DOCTYPE html>
+<html lang="en-us">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Offline</title>
+        <style>
+            body {
+                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+            a {
+                color: rgb(0, 140, 255);
+                text-underline-offset: .15em;
+                transition: color 0.25s ease-in-out;
+            }
+            a:hover {
+                color: rgb(1, 124, 224);
+            }
+        </style>
+    </head>
+    <body>
+        <h1>404: Not Found</h1>
+        <a href="/">Home</a>
+    </body>
+</html>""", error=error)
+
 @bottle.route('/')
 def index():
-    return bottle.template('./index.html')
+    return bottle.template('./index.tpl.html')
 
 
 @bottle.route('/<file:path>')

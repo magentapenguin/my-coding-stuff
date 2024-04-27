@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Circle Button</title>
-        <script src="/circle-button.js"></script>
+        <script src="/circle-button/circle-button.js"></script>
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous"></script>
         <style>
@@ -137,16 +137,6 @@
                 filter: blur(1px);
                 transition: opacity 0.5s ease-in-out, right 0.5s ease-in-out, filter 0.5s ease-in-out;
             }
-            a.cool-link:hover::after {
-                opacity: 1;
-            }
-            a.cool-link::after {
-                margin-left: 5px;
-                content: 'hmmmm';
-                opacity: 0.1;
-                height: 1em;
-                transition: opacity 0.5s ease-in-out;
-            }
         </style>
     </head>
     <body>
@@ -155,8 +145,8 @@
         <a title="Exit" href="/" id="exit" class="icon-link"><i class="fa-solid fa-arrow-left-to-bracket"></i></a>
         <h1 id="title">Circle Button Game<hr class="line"></h1>
         <circle-button id='btn' content="Play"></circle-button>
-        <noscript>You do not have javascript active, click <a href="/circle-button.html">here</a> to continue</noscript>
-        <small>Image from <a href="https://unsplash.com/photos/ice-capped-mountain-at-daytime-xfngap_DToE" class="cool-link">Unsplash</a></small>
+        <noscript>You do not have javascript active, click <a href="/circle-button/circle-button.html">here</a> to continue</noscript>
+        <small>Image from <a href="https://unsplash.com/photos/ice-capped-mountain-at-daytime-xfngap_DToE" rel="noopener">Unsplash</a></small>
         <button type="button" title="share" id="share"><i class="fa-solid fa-share-from-square"></i></button>
         <script>
             const share = document.getElementById('share');
