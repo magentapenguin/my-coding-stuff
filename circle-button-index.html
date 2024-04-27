@@ -7,6 +7,17 @@
         <script src="/circle-button.js"></script>
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous"></script>
+        <!-- Hotjar Tracking Code for Site 4961193 (name missing) -->
+        <script>
+            (function(h,o,t,j,a,r){
+                h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+                h._hjSettings={hjid:4961193,hjsv:6};
+                a=o.getElementsByTagName('head')[0];
+                r=o.createElement('script');r.async=1;
+                r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+                a.appendChild(r);
+            })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+        </script>
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
             :root {
@@ -21,14 +32,28 @@
                 margin: 0;
                 --bg: #17141a;
                 color: white;
+                background-image: url('/bg.jpg');
+                background-position: center;
+                background-size: cover;
+            }
+            #extra {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
                 background-color: var(--bg);
+                filter: opacity(0.8) brightness(0.5);
+                -webkit-backdrop-filter: blur(10px);
+                backdrop-filter: blur(10px);
+                z-index: -1;
             }
             #particles-js {
                 position: absolute;
                 width: 100%;
                 height: 100%;
                 z-index: -1;
-                filter: blur(3px) brightness(0.5);
+                filter: blur(3px);
             }
             #title {
                 position: absolute;
@@ -38,13 +63,59 @@
                 font-size: 5rem;
                 text-align: center;
                 margin-bottom: 2rem;
+                text-shadow: rgba(255, 255, 255, 0.65) 0 1rem 20px;
+            }
+            @media screen and (max-width: 900px) {
+                #title {
+                    top: 10vh;
+                    left: 50vw;
+                }
+            }
+            #exit {
+                position: absolute;
+                top: 10px;
+                left: 20px;
+                font-size: 2rem;
+                color: white;
+                text-decoration: none;
+            }
+            a {
+                color: rgb(0, 140, 255);
+                text-underline-offset: .15em;
+                transition: color 0.25s ease-in-out;
+            }
+            a:hover {
+                color: rgb(1, 124, 224);
+            }
+            small {
+                position: absolute;
+                bottom: 10px;
+                left: 20px;
+                font-size: 1rem;
+                color: white;
+            }
+            #exit:hover::after {
+                opacity: 1;
+                left: 10px;
+            }
+            #exit::after {
+                position: relative;
+                left: 5px;
+                content: 'Exit';
+                opacity: 0.25;
+                font-weight: 600;
+                transition: opacity 0.5s ease-in-out, left 0.5s ease-in-out;
             }
         </style>
     </head>
     <body>
+        <div id="extra"></div>
         <div id="particles-js"></div>
-        <h1 id="title">Circle Button</h1>
+        <a title="Exit" href="/" id="exit" class="icon-link"><i class="fa-solid fa-arrow-left-to-bracket"></i></a>
+        <h1 id="title">Circle Button Game</h1>
         <circle-button id='btn' content="Play"></circle-button>
+        <noscript>You do not have javascript active, click <a href="/circle-button.html">here</a> to continue</noscript>
+        <small>Image from <a href="https://unsplash.com/photos/ice-capped-mountain-at-daytime-xfngap_DToE">Unsplash</a></small>
         <script>
             const btn = document.getElementById('btn');
             btn.addEventListener('click', () => {
@@ -60,6 +131,16 @@
                     window.location.href = '/circle-button.html';
                 }, 1000);
             });
+            Object.values(document.getElementsByClassName("icon-link")).forEach((x)=> {x.addEventListener("click", () => {
+                x.querySelectorAll("i, svg").forEach((y) => {
+                    y.style.display = "none";
+                })
+                var icon = document.createElement("i");
+                icon.classList.add("fa-solid")
+                icon.classList.add("fa-spinner-third")
+                icon.classList.add("fa-spin")
+                x.insertBefore(icon, x.children.item(0))
+            })})
         </script>
         <script>particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:'#fff'},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});</script>
     

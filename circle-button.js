@@ -1,5 +1,5 @@
 class CircleButton extends HTMLElement {
-    static observedAttributes = ["content", 'borderspin'];
+    static observedAttributes = ["content", 'borderspin','disabled'];
 
     constructor() {
         super();
