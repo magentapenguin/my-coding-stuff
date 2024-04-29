@@ -1,9 +1,27 @@
-import bottle, os
+import bottle, os.path
+import os, os.path, time
 
-@bottle.hook('after_request')
-def no_drive():
-    if not os.path.exists('.'):
-        bottle.abort(503, "Website Offline :(")
+def make(dir='D:/coding'):
+    dir = os.path.abspath(dir)
+    x = "<ul class=\"fa-ul no-dot\" style='--fa-li-margin: 2em; margin-bottom: 0.25rem;'>"
+    y = 0
+    for entry in sorted(os.scandir(dir), key=lambda x: not x.is_dir()):
+        y+=1
+        if entry.is_file() and not entry.name.startswith("index.tpl") and not entry.name.startswith("."):
+            x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-fw fa-file\"></i></span><a href=\"/{os.path.relpath(entry.path)[0:]}\""+("target='_blank'" if not entry.name.endswith('.html') else '')+f">{entry.name}</a></li>"
+        elif entry.is_dir() and not entry.name.startswith("."):
+            x += f"<li><span class=\"click\"><span class=\"fa-li\"><i class=\"fa-solid fa-fw fa-folder-open\"></i></span>{entry.name}</span><br>"
+            x += make(entry.path)
+            x += "</li>"
+    if y == 0:
+        x += "<li style=\"margin-left: -1.5em;\" class=\"empty\"><i>(empty)</i></li>"
+    x += "</ul>"
+    return x
+
+#@bottle.hook('after_request')
+#def no_drive():
+#    if not os.path.exists('.'):
+#        bottle.abort(503, "Website Offline :(")
 
 @bottle.error(503)
 def offline(error):
@@ -24,43 +42,12 @@ def offline(error):
     </body>
 </html>""", error=error)
 
-@bottle.error(404)
-def err404(error):
-    return bottle.template("""<!DOCTYPE html>
-<html lang="en-us">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Offline</title>
-        <style>
-            body {
-                font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-                margin-left: 0.5rem;
-                margin-right: 0.5rem;
-            }
-            a {
-                color: rgb(0, 140, 255);
-                text-underline-offset: .15em;
-                transition: color 0.25s ease-in-out;
-            }
-            a:hover {
-                color: rgb(0, 124, 224);
-            }
-        </style>
-    </head>
-    <body>
-        <h1>404: Not Found</h1>
-        <a href="/">Home</a>
-    </body>
-</html>""", error=error)
-
-@bottle.route('/')
+@bottle.route("/")
 def index():
-    return bottle.template('./index.tpl.html')
+    return bottle.template("./index.tpl.html", make=make)
 
+@bottle.route("/<path:path>")
+def static(path):
+    return bottle.static_file(path, root='./')
 
-@bottle.route('/<file:path>')
-def static(file):
-    return bottle.static_file(file, root='.')
-
-bottle.run(host='localhost', port=8080, debug=True)
+bottle.run(host='localhost',port=8080, debug=True)
