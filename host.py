@@ -35,6 +35,8 @@ def err404(error):
         <style>
             body {
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                margin-left: 0.5rem;
+                margin-right: 0.5rem;
             }
             a {
                 color: rgb(0, 140, 255);
@@ -42,7 +44,7 @@ def err404(error):
                 transition: color 0.25s ease-in-out;
             }
             a:hover {
-                color: rgb(1, 124, 224);
+                color: rgb(0, 124, 224);
             }
         </style>
     </head>

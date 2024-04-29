@@ -7,6 +7,7 @@
         <script src="/circle-button/circle-button.js"></script>
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous"></script>
+        <link rel="prefetch" href="/circle-button/bg.jpg" as="image">
         <style>
             @import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap');
             :root {
@@ -21,7 +22,7 @@
                 margin: 0;
                 --bg: #17141a;
                 color: white;
-                background-image: url('/bg.jpg');
+                background-image: url('/circle-button/i-bg.jpg');
                 background-position: center;
                 background-size: cover;
             }
@@ -46,7 +47,7 @@
             }
             #title {
                 position: absolute;
-                top: 10vh;
+                top: 20vh;
                 left: 40vw;
                 transform: translate(-50%, -50%);
                 font-size: calc(2rem + 3vw);
@@ -54,16 +55,21 @@
                 margin-bottom: 2rem;
                 text-shadow: rgba(255, 255, 255, 0.65) 0 1rem 20px;
             }
-            @media screen and (max-width: 1000px) {
+            @media screen and (max-width: 1010px) {
                 #title {
                     top: 15vh;
                     left: 50vw;
                 }
             }
-            @media screen and (min-width: 1200px) {
+            @media screen and (max-width: 380px) {
+                #share {
+                    visibility: hidden;
+                }
+            }
+            @media screen and (max-width: 800px) {
                 #title {
-                    top: 20vh;
-                    left: 40vw;
+                    top: 12vh;
+                    left: 50vw;
                 }
             }
             #exit {
@@ -137,6 +143,7 @@
                 filter: blur(1px);
                 transition: opacity 0.5s ease-in-out, right 0.5s ease-in-out, filter 0.5s ease-in-out;
             }
+            
         </style>
     </head>
     <body>
@@ -160,6 +167,7 @@
             const btn = document.getElementById('btn');
             btn.addEventListener('click', () => {
                 var x = 0;
+                btn.setAttribute("content", "•••")
                 var y = () => {
                     btn.setAttribute("borderspin", x.toString())
                     console.log(x);
@@ -168,13 +176,14 @@
                 }
                 y();
                 setTimeout(() => {
-                    window.location.href = '/circle-button.html';
+                    window.location.href = '/circle-button/circle-button.html';
                 }, 1000);
             });
             Object.values(document.getElementsByClassName("icon-link")).forEach((x)=> {x.addEventListener("click", () => {
                 x.querySelectorAll("i, svg").forEach((y) => {
                     y.style.display = "none";
                 })
+                x.style.pointerEvents = "none";
                 var icon = document.createElement("i");
                 icon.classList.add("fa-solid")
                 icon.classList.add("fa-spinner-third")

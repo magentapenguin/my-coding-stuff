@@ -4,7 +4,7 @@ from string import Template
 
 # Your data
 x = np.array([1, 2, 3])
-y = np.array([20, 270, 360])
+y = np.array([40, 80, 120])
 
 def magic():
     # Calculate the coefficients of the linear regression model
@@ -34,7 +34,7 @@ while True:
 
 data = {int(x):int(y) for x, y in zip((x-1).tolist(), y.tolist())}
 
-data['maxlvl'] = int(x[-1] + 1)
+data['maxlvl'] = int(x[-1])
 def make(pricelvldata, elmid, varname, lvldata):
     def strdata(data):
         return json.dumps(data).replace(' ', '')
