@@ -37,8 +37,16 @@
                     color: rgb(27, 152, 255);
                 }
             }
+            .no-dot {
+                list-style-type: none;
+            }
             .hide {
                 display: none;
+            }
+            .click {
+                cursor: pointer;
+                -webkit-user-select: none;
+                user-select: none;
             }
             main {
                 margin: 6rem;
@@ -93,8 +101,36 @@
                     margin-left: 0.1rem;
                 }
             }
+            .fa-folder-open {
+                transform: translateX(2px);
+            }
+            .empty {
+                font-style: italic;
+                display: inline-block;
+                margin-left: -1.5em;
+            }
+            ul:has(> .empty) {
+                display: inline-block;
+            }
+            li:has(> ul > .empty) {
+                .click {
+                    cursor: default;
+                }
+                br {
+                    display: none;
+                }
+            }
             .hilite {
                 background-color: rgba(238, 255, 0, 0.568);
+            }
+            .download {
+                text-decoration: none;
+                opacity: 0.5;
+                margin-left: 0.15em;
+                transition: opacity 0.25s ease-in-out;
+            }
+            .download:hover {
+                opacity: 1;
             }
         </style>
     </head>
@@ -102,7 +138,33 @@
         <div class="bg"></div>
         <main>
             <h1>Website Navigator</h1>
+            <p>Click on the folder icons to expand or collapse the directory tree.
+                Click on the files to open them.</p>
+            {{!make()}}
         </main>
         <small>Image from <a href="https://unsplash.com/photos/birds-eye-view-of-mountains-eluzJSfkNCk" rel="noopener">Unsplash</a></small>
+        <script>
+            document.querySelectorAll("li:has(> ul > .empty) .click").forEach(x => {
+                x.classList.add("no-fold")
+            });
+            document.querySelectorAll(".fa-ul li:has(> .fa-ul) .click:not(.no-fold)").forEach(x => {
+                let run = e => {
+                    let y = x.querySelector("& [data-fa-i2svg]").children[0];
+                    if (y.classList.values().toArray().includes('fa-folder-closed')) {
+                        y.classList.add("fa-solid", "fa-folder-open");
+                    } else {
+                        y.classList.add("fa-solid", "fa-folder-closed");
+                    }
+                    x.closest("li").querySelector("ul").classList.toggle("hide");
+                }
+                x.addEventListener("click", run);
+                var m = new MutationObserver(() => {if (document.querySelector("html").classList.contains("fontawesome-i2svg-complete")) {setTimeout(run(), 10)}});
+                m.observe(document.querySelector("html"), {attributes: true, attributeFilter: ["class"]})
+                console.log(x, m);
+            });
+            document.querySelectorAll("li:has(> ul > .empty) > .click > .fa-li > i").forEach(x => {
+                x.classList.add("fa-solid", "fa-folder");
+            });
+        </script>
     </body>
 </html>

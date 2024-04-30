@@ -8,13 +8,14 @@ def make(dir='D:/coding'):
     for entry in sorted(os.scandir(dir), key=lambda x: not x.is_dir()):
         y+=1
         if entry.is_file() and not entry.name.startswith("index.tpl") and not entry.name.startswith("."):
-            x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-fw fa-file\"></i></span><a href=\"/{os.path.relpath(entry.path)[0:]}\""+("target='_blank'" if not entry.name.endswith('.html') else '')+f">{entry.name}</a></li>"
-        elif entry.is_dir() and not entry.name.startswith("."):
+            x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-fw fa-file\"></i></span><a href=\"/{os.path.relpath(entry.path)[0:]}\""+("target='_blank'" if not entry.name.endswith('.html') else '')+f">{entry.name}</a> <a title=\"download\" class=\"download\" href=\"/{os.path.relpath(entry.path)[0:]}\" download><i class=\"fa-regular fa-download\"></i></a></li>"
+        elif entry.is_dir() and not (entry.name.startswith(".") or entry.name.endswith("__pycache__")):
+            print(entry.name)
             x += f"<li><span class=\"click\"><span class=\"fa-li\"><i class=\"fa-solid fa-fw fa-folder-open\"></i></span>{entry.name}</span><br>"
             x += make(entry.path)
             x += "</li>"
     if y == 0:
-        x += "<li class=\"empty\"><i>(empty)</i></li>"
+        x += "<li style=\"margin-left: -1.5em;\" class=\"empty\"><i>(empty)</i></li>"
     x += "</ul>"
     return x
 
@@ -44,7 +45,11 @@ def offline(error):
 
 @bottle.route("/")
 def index():
-    return bottle.template("./index.tpl.html", make=make)
+    return bottle.template("./index.tpl.html")
+
+@bottle.route("/nav")
+def nav():
+    return bottle.template("./nav.tpl.html", make=make)
 
 @bottle.route("/<path:path>")
 def static(path):

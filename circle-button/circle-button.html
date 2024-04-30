@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Document</title>
         <script src="/circle-button/circle-button.js"></script>
+        <script src="/exit.js"></script>
         <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous" async></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
@@ -234,8 +235,8 @@
                 button:hover {
                     color: #696969;
                 }
-                a:hover {
-                    color: #703333;
+                exit-btn:hover {
+                    --color: #703333;
                 }
                 * {
                     font-size: 1.5rem;
@@ -323,8 +324,6 @@
             }
             ::backdrop {
                 opacity: 0.7;
-                -webkit-backdrop-filter: blur(5px);
-                backdrop-filter: blur(5px);
                 background-color: #000000;
             }
             #save::after {
@@ -456,7 +455,7 @@
                 width: 100%;
                 height: 100%;
                 background-color: var(--bg);
-                filter: opacity(0.85) brightness(0.5);
+                filter: opacity(0.85) brightness(0.9);
                 -webkit-backdrop-filter: blur(12px);
                 backdrop-filter: blur(12px);
                 z-index: -1;
@@ -503,7 +502,7 @@
         </div>
         
         <div id="btn-bar">
-            <a title="Exit" href="/circle-button/circle-button-index.html" class="icon-link"><i class="fa-solid fa-arrow-left-to-bracket"></i></a>
+            <exit-btn title="Exit" href="/circle-button/circle-button-index.html"></exit-btn>
             <button title="Settings" id="cfg"><i class="fa-solid fa-gear"></i></button>
             <button title="Fullscreen Toggle" id="fullscreen"><i class="fa-solid fa-expand"></i><i class="fa-solid fa-compress fullhide"></i></button>
             <button title="Save" id="save"><i class="fa-solid fa-floppy-disk"></i></button>
@@ -759,7 +758,7 @@
 
             window.onload = () => {
                 new ShopItem("autoclickr", {"0":20,"1":50,"2":110,"3":150,"4":195,"5":240,"6":285,"7":330,"8":375,"9":420,"10":465,"11":510,"12":555,"13":600,"14":645,"15":690,"16":735,"17":780,"18":825,"19":870,"20":915,"21":960,"22":1005,"23":1050,"24":1095,"25":1140,"26":1185,"27":1230,"28":1275,"29":1320,"30":1365,"31":1410,"32":1455,"33":1500,"34":1545,"35":1590,"36":1635,"37":1680,"38":1725,"39":1770,"40":1815,"41":1860,"42":1905,"43":1950,"44":1995,"45":2040,"46":2085,"47":2130,"48":2175,"49":2220,"50":2265,"51":2310,"52":2355,"53":2400,"54":2445,"55":2490,"56":2535,"57":2580,"58":2625,"59":2670,"60":2715,"61":2760,"62":2805,"63":2850,"64":2895,"65":2940,"66":2985,"67":3030,"68":3075,"69":3120,"70":3165,"71":3210,"72":3255,"73":3300,"74":3345,"75":3390,"maxlvl":76}).setevents(e => {CPS = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75][e.detail.oldlevel]; updatestats()}, e => {CPS = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75][e.detail.oldlevel]; updatestats()});
-                new ShopItem("strongclick", {"0":40,"1":80,"2":120,"3":160,"4":200,"5":240,"6":280,"7":320,"8":360,"9":400,"10":440,"11":480,"12":520,"13":560,"14":600,"15":640,"16":680,"17":720,"18":760,"19":800,"20":840,"21":880,"22":920,"23":960,"24":1000,"25":1040,"26":1080,"27":1120,"28":1160,"29":1200,"30":1240,"31":1280,"32":1320,"33":1360,"34":1400,"35":1440,"36":1480,"37":1520,"38":1560,"39":1600,"40":1640,"41":1680,"42":1720,"43":1760,"44":1800,"45":1840,"46":1880,"47":1920,"48":1960,"49":2000,"50":2040,"51":2080,"52":2120,"53":2160,"54":2200,"55":2240,"56":2280,"57":2320,"58":2360,"59":2400,"60":2440,"61":2480,"62":2520,"63":2560,"64":2600,"65":2640,"66":2680,"67":2720,"68":2760,"69":2800,"70":2840,"71":2880,"72":2920,"73":2960,"74":3000,"75":3040,"maxlvl":76}).setevents(e => {window.clickpower = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75][e.detail.oldlevel]; updatestats()}, e => {window.clickpower = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75][e.detail.oldlevel]; updatestats()});
+                new ShopItem("strongclick", {"0":40,"1":80,"2":120,"3":160,"4":200,"5":240,"6":280,"7":320,"8":360,"9":400,"10":440,"11":480,"12":520,"13":560,"14":600,"15":640,"16":680,"17":720,"18":760,"19":800,"20":840,"21":880,"22":920,"23":960,"24":1000,"25":1040,"26":1080,"27":1120,"28":1160,"29":1200,"30":1240,"31":1280,"32":1320,"33":1360,"34":1400,"35":1440,"36":1480,"37":1520,"38":1560,"39":1600,"40":1640,"41":1680,"42":1720,"43":1760,"44":1800,"45":1840,"46":1880,"47":1920,"48":1960,"49":2000,"50":2040,"51":2080,"52":2120,"53":2160,"54":2200,"55":2240,"56":2280,"57":2320,"58":2360,"59":2400,"60":2440,"61":2480,"62":2520,"63":2560,"64":2600,"65":2640,"66":2680,"67":2720,"68":2760,"69":2800,"70":2840,"71":2880,"72":2920,"73":2960,"74":3000,"75":3040,"maxlvl":76}).setevents(e => {window.clickpower = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76][e.detail.oldlevel+1]; updatestats()}, e => {window.clickpower = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75][e.detail.oldlevel]; updatestats()});
                 loaddata();
                 
             }
@@ -844,6 +843,6 @@
         });
         const observer=new MutationObserver(()=>{if(!document.contains(tooltip)){observer.disconnect();cleanup();}});observer.observe(document,{childList:true,subtree:true});
         </script>
-        <script>particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});</script>
+        <script>//particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});</script>
     </body>
 </html>
