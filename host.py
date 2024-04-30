@@ -7,7 +7,7 @@ def make(dir='D:/coding'):
     y = 0
     for entry in sorted(os.scandir(dir), key=lambda x: not x.is_dir()):
         y+=1
-        if entry.is_file() and not entry.name.startswith("index.tpl") and not entry.name.startswith("."):
+        if entry.is_file() and not entry.name.endswith(".tpl.html") and not entry.name.startswith("."):
             x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-fw fa-file\"></i></span><a href=\"/{os.path.relpath(entry.path)[0:]}\""+("target='_blank'" if not entry.name.endswith('.html') else '')+f">{entry.name}</a> <a title=\"download\" class=\"download\" href=\"/{os.path.relpath(entry.path)[0:]}\" download><i class=\"fa-regular fa-download\"></i></a></li>"
         elif entry.is_dir() and not (entry.name.startswith(".") or entry.name.endswith("__pycache__")):
             print(entry.name)
