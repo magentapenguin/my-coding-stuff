@@ -4,28 +4,35 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Website Navigator</title>
+        <script src="/exit.js"></script>
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous" data-auto-replace-svg="nest"></script>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="mask-icon" href="favicon.svg" color="#000000">
+        <link rel="prefetch" href="/cool-bg.jpg" as="image">
         <style>
-            body {
+            :root {
+                color-scheme: light dark;
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
                 font-size: calc(1.5rem - 0.35vw);
                 height: 100vh;
                 width: 100vw;
                 overflow: hidden;
                 margin: 0;
+                --color: light-dark(black, white);
+                --bg: light-dark(rgba(195, 228, 255, 0.6), rgba(0, 26, 48, 0.6));
+                --link: light-dark(rgb(0, 94, 172), rgb(91, 181, 255));
+                --link-hover: light-dark(rgb(0, 57, 104), rgb(27, 152, 255));
                 display: flex;
                 justify-content: center;
                 align-items: center;
             }
             a {
-                color: rgb(0, 94, 172);
+                color: var(--link);
                 text-underline-offset: .15em;
                 transition: color 0.25s ease-in-out;
             }
             a:hover {
-                color: rgb(0, 57, 104);
+                color: var(--link-hover);
             }
             small {
                 a {
@@ -35,6 +42,22 @@
                 }
                 a:hover {
                     color: rgb(27, 152, 255);
+                }
+            }
+            main {
+                margin: 6rem;
+                border-radius: 2rem;
+                background-color: var(--bg, rgba(195, 228, 255, 0.6));
+                backdrop-filter: blur(1rem);
+                padding: 1rem;
+                padding-left: 2rem;
+                padding-right: 2rem;
+                box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
+                height: 70vh;
+                width: 60vw;
+                overflow: auto;
+                h1 {
+                    margin-top: 0.5rem;
                 }
             }
             .no-dot {
@@ -47,22 +70,6 @@
                 cursor: pointer;
                 -webkit-user-select: none;
                 user-select: none;
-            }
-            main {
-                margin: 6rem;
-                border-radius: 2rem;
-                background-color: rgba(195, 228, 255, 0.6);
-                backdrop-filter: blur(1rem);
-                padding: 1rem;
-                padding-left: 2rem;
-                padding-right: 2rem;
-                box-shadow: 0 0 1rem rgba(0, 0, 0, 0.5);
-                height: 70vh;
-                width: 60vw;
-                overflow: auto;
-                h1 {
-                    margin-top: 0.5rem;
-                }
             }
             .bg {
                 filter: sepia(0.25);
@@ -132,10 +139,30 @@
             .download:hover {
                 opacity: 1;
             }
+            exit-btn {
+                position: absolute;
+                top: 5px;
+                left: 12px;
+                padding: 0.5rem;
+                font-size: 1.5rem;
+            }
+            exit-btn::after {
+                content: 'Back';
+            }
+            .extra {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100vw;
+                height: 100vh;
+                background-color: light-dark(transparent, rgba(0, 12, 22, 0.9));
+            }
         </style>
     </head>
     <body>
         <div class="bg"></div>
+        <div class="extra"></div>
+        <exit-btn href="/"></exit-btn>
         <main>
             <h1>Website Navigator</h1>
             <p>Click on the folder icons to expand or collapse the directory tree.
