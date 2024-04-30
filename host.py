@@ -14,7 +14,7 @@ def make(dir='D:/coding'):
             x += make(entry.path)
             x += "</li>"
     if y == 0:
-        x += "<li style=\"margin-left: -1.5em;\" class=\"empty\"><i>(empty)</i></li>"
+        x += "<li class=\"empty\"><i>(empty)</i></li>"
     x += "</ul>"
     return x
 

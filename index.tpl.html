@@ -61,7 +61,7 @@
                 width: 60vw;
                 overflow: auto;
                 h1 {
-                    margin-top: 0.1rem;
+                    margin-top: 0.5rem;
                 }
             }
             .bg {
@@ -103,17 +103,21 @@
             .empty {
                 font-style: italic;
                 display: inline-block;
+                margin-left: -1.5em;
             }
             ul:has(> .empty) {
                 display: inline-block;
             }
-            li:has(ul > .empty) {
+            li:has(> ul > .empty) {
                 .click {
                     cursor: default;
                 }
                 br {
                     display: none;
                 }
+            }
+            .hilite {
+                background-color: rgba(238, 255, 0, 0.568);
             }
         </style>
     </head>
@@ -127,8 +131,12 @@
         </main>
         <small>Image from <a href="https://unsplash.com/photos/birds-eye-view-of-mountains-eluzJSfkNCk" rel="noopener">Unsplash</a></small>
         <script>
+            document.querySelectorAll("li:has(> ul > .empty) .click").forEach(x => {
+                x.classList.add("no-fold")
+                console.log(x);
+            });
             window.onload = () => {
-                document.querySelectorAll(".fa-ul li:has(.fa-ul):not(:has(ul > .empty)) .click").forEach(x => {
+                document.querySelectorAll(".fa-ul li:has(> .fa-ul) .click:not(.no-fold)").forEach(x => {
                     x.addEventListener("click", e => {
                         let y = x.querySelector("& [data-fa-i2svg]").children[0];
                         if (y.classList.values().toArray().includes('fa-folder-closed')) {
@@ -138,11 +146,12 @@
                         }
                         x.closest("li").querySelector("ul").classList.toggle("hide");
                     });
-                });
-                document.querySelectorAll("li:has(> ul > .empty) > .click > .fa-li > i").forEach(x => {
-                    x.classList.add("fa-solid", "fa-folder");
+                    console.log(x);
                 });
             };
+            document.querySelectorAll("li:has(> ul > .empty) > .click > .fa-li > i").forEach(x => {
+                x.classList.add("fa-solid", "fa-folder");
+            });
         </script>
     </body>
 </html>

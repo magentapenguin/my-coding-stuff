@@ -524,7 +524,7 @@
                     </div>
                     <span class="badge alpha">ALPHA</span>
                 </div>
-                <div class="cfg-line">
+                <!--<div class="cfg-line">
                     Particles:
                     <div class="cfg-checkbox-div">
                         <input type="checkbox" class="cfg-checkbox" id="cfg-particle" checked>
@@ -535,7 +535,7 @@
                         </label>
                     </div>
                     <span class="badge beta">BETA</span>
-                </div>
+                </div>-->
                 <small>Image from <a href="https://unsplash.com/photos/a-snow-covered-mountain-under-a-cloudy-sky-AmgQZJtVEk0" rel="noopener" class="link">Unsplash</a></small>
                 <footer>
                     <button id="reset-save" type="button">Reset Save</button>
@@ -767,18 +767,18 @@
             let themecfg = document.getElementById("cfg-theme")
             themecfg.addEventListener("change", () => {
                 document.body.dataset.theme = themecfg.checked ? "dark" : "light"
-                document.querySelector("#particles-js .particles-js-canvas-el").remove()
-                particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});
+                //document.querySelector("#particles-js .particles-js-canvas-el").remove()
+                //particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});
             })
-            let particlecfg = document.getElementById("cfg-particle")
-            particlecfg.addEventListener("change", () => {
-                if (!particlecfg.checked) {
-                    document.querySelector("#particles-js .particles-js-canvas-el").remove()
-                    pJSDom.pop()
-                } else {
-                    particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});
-                }
-            })
+            //let particlecfg = document.getElementById("cfg-particle")
+            //particlecfg.addEventListener("change", () => {
+            //    if (!particlecfg.checked) {
+            //        document.querySelector("#particles-js .particles-js-canvas-el").remove()
+            //        pJSDom.pop()
+            //    } else {
+            //        particlesJS("particles-js",{particles:{number:{value:160,density:{enable:!0,value_area:800}},color:{value:getComputedStyle(document.body,null).getPropertyValue('--color')},shape:{type:"circle",stroke:{width:0,color:"#000000"}},opacity:{value:.175,random:!0,anim:{enable:!1}},size:{value:3,random:!0,anim:{enable:!1}},line_linked:{enable:!1},move:{enable:!0,speed:1,direction:"none",random:!0,straight:!1,out_mode:"out",bounce:!1,attract:{enable:!1}}},interactivity:{detect_on:"window",events:{onhover:{enable:!0,mode:"bubble"},onclick:{enable:!1},resize:!0},modes:{bubble:{distance:250,size:0,duration:2,opacity:0,speed:3}}},retina_detect:!0});
+            //    }
+            //})
             Object.values(document.getElementsByClassName("icon-link")).forEach((x)=> {x.addEventListener("click", () => {
                 x.querySelectorAll("i, svg").forEach((y) => {
                     y.style.display = "none";
