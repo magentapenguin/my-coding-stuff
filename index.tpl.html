@@ -8,7 +8,8 @@
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous" data-auto-replace-svg="nest"></script>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="mask-icon" href="favicon.svg" color="#000000">
-        <link rel="prefetch" href="/cool-bg.jpg" as="image">
+        <link rel="prefetch" href="/cool-bg.jpg" as="image"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.7.3/styles/overlayscrollbars.min.css" integrity="sha512-Bs5euU6gggblSxpjGQtZeL2VUbDzlygloRfncgWNOiT/86SnWnBmbHQW20k9ZeCa0Bf4kl6Y/gvH4YKFE26PrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.7.3/browser/overlayscrollbars.browser.es6.min.js" integrity="sha512-yF8/A6HJc4a4CzVz3qKhsUzg6Rz1piDFbIsSI3gDaE+8RcRLysYPgWItBmAkvJU2KCskkEaOwe7tCXzQaedi3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             :root {
                 color-scheme: light dark;
@@ -49,7 +50,7 @@
             }
             main {
                 margin: 6rem;
-                border-radius: 2rem;
+                border-radius: 0.6rem;
                 background-color: var(--bg, rgba(195, 228, 255, 0.6));
                 backdrop-filter: blur(1rem);
                 padding: 1rem;
@@ -61,6 +62,11 @@
                 overflow: auto;
                 h1 {
                     margin-top: 0.5rem;
+                }
+                
+                .os-scrollbar-vertical {
+                    right: 0.5rem;
+                    --os-padding-perpendicular: 0.1rem;
                 }
             }
             .bg {
@@ -89,15 +95,15 @@
             @media screen and (max-height: 600px) {
                 main {
                     height: 90vh;
-                    margin-top: 0.1rem;
-                    margin-bottom: 0.1rem;
+                    margin-top: 0.5rem;
+                    margin-bottom: 0.5rem;
                 }
             }
-            @media screen and (max-width: 1200px) {
+            @media screen and (max-width: 700px) {
                 main {
-                    width: 100vw;
-                    margin-right: 0.1rem;
-                    margin-left: 0.1rem;
+                    width: 90vw;
+                    margin-right: 0.5rem;
+                    margin-left: 0.5rem;
                 }
             }
             .hilite {
@@ -140,14 +146,14 @@
                 left: 0;
                 width: 100vw;
                 height: 100vh;
-                background-color: light-dark(transparent, rgba(0, 12, 22, 0.9));
+                background-color: light-dark(transparent, #000c1680);
             }
         </style>
     </head>
     <body>
         <div class="bg"></div>
         <div class="extra"></div>
-        <main>
+        <main data-overlayscrollbars-initialize>
             <h1>Website Quicklinks</h1>
             <details>
                 <summary>Games</summary>
@@ -158,6 +164,13 @@
             <a href="/nav">Full Navigator</a>
         </main>
         <small>Image from <a href="https://unsplash.com/photos/birds-eye-view-of-mountains-eluzJSfkNCk" rel="noopener">Unsplash</a></small>
+        <script>
+            OverlayScrollbarsGlobal.OverlayScrollbars(document.querySelector('main'), {
+                overflow: {
+                    x: 'hidden',
+                },
+            });
+        </script>
         <script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script>
     </body>
 </html>
