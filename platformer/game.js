@@ -1,11 +1,12 @@
 // Start kaboom
-kaboom()
+kaboom({
+	background: [141, 183, 255],
+})
 
 // Load assets
-loadSprite("char", "./sprites/character02r.png", {
+loadSprite("char", "./sprites/character03r.png", {
 	// The image contains 9 frames layed out horizontally, slice it into individual frames
-	sliceX: 4,
-    sliceY: 4,
+	sliceX: 10,
 	// Define animations
 	anims: {
 		"idle": {
@@ -18,33 +19,114 @@ loadSprite("char", "./sprites/character02r.png", {
             from: 2,
             to: 5,
             loop: true,
-            speed: 10,
+            speed: 15,
         },
 		// This animation only has 1 frame
 		"jump": 1,
 	},
 })
 
+loadSprite("portal", "./sprites/portalr.png", {
+	sliceX: 4,
+	// Define animations
+	anims: {
+		"spin": {
+            from: 0,
+            to: 3,
+            loop: true,
+            speed: 5,
+        }
+	},
+})
+
+
 loadSprite("grass", "./sprites/grassr.png")
+loadSprite("spike", "./sprites/spiker.png")
 
 loadSound("jumpland", "./sounds/jumpland.wav")
+loadSound("happy", "./sounds/happy.mp3")
+
+function handleout() {
+	return {
+		id: "handleout",
+		require: [ "pos" ],
+		update() {
+			const spos = this.screenPos()
+			if (
+				spos.x < 0 ||
+				spos.x > width() ||
+				spos.y < 0 ||
+				spos.y > height()
+			) {
+				// triggers a custom event when out
+				this.trigger("out")
+			}
+		},
+	}
+}
 
 // Set the gravity acceleration (pixels per second)
-setGravity(1600)
+setGravity(1800)
 
-const SPEED = 600
+const SPEED = 500
 
-// Add player game object
-const player = add([
-	sprite("char"),
-	pos(center()),
-	area(),
-	// body() component gives the ability to respond to gravity
-	body(),
-])
+const level = addLevel([
+	// Design the level layout with symbols
+	"     ==       ^   ", 
+	"          ======  ",
+	"                  ",
+	" @   ^^^^^        ",
+	"==========   .    ",
+	"             =====",
+], {
+	// The size of each grid
+	tileWidth: 64,
+	tileHeight: 64,
+	// The position of the top left block
+	pos: vec2(0, 0),
+	// Define what each symbol means (in components)
+	tiles: {
+		"@": () => [
+			sprite("char"),
+			area({ scale: vec2(1, 0.9) }),
+			body({jumpForce: SPEED*2}),
+			anchor("bot"),
+			"player",
+		],
+		"=": () => [
+			sprite("grass"),
+			area(),
+			body({ isStatic: true }),
+			anchor("bot"),
+		],
+		"^": () => [
+			sprite("spike"),
+			area({ scale: 0.2}),
+			body({ isStatic: true }),
+			anchor("bot"),
+			"danger",
+		],
+        ".": () => [
+            sprite("portal"),
+            area(),
+            body({ isStatic: true }),
+            anchor("bot"),
+            "portal",
+        ],
+	},
+})
+// Get the player object from tag
+const player = level.get("player")[0]
+
+const music = play("happy", {
+	loop: true,
+	paused: false,
+})
+
+level.get("portal")[0].play("spin")
 
 player.play("idle")
-
+debug.inspect = true
 onKeyPress("space", () => {
 	if (player.isGrounded()) {
 		player.jump()
@@ -92,12 +174,21 @@ onKeyDown("right", () => {
 	})
 })
 
-// Add a platform to hold the player
-add([
-	rect(width(), 48),
-	outline(4),
-	area(),
-	pos(0, height() - 48),
-	// Give objects a body() component if you don't want other solid objects pass through
-	body({ isStatic: true }),
-])
+player.onCollide("danger", (x) => {
+	player.pos = level.tile2Pos(0, 1)
+})
+player.onUpdate(() => {
+	// center camera to player
+	camPos(player.pos)
+	// check fall death
+	if (player.pos.y >= height()*2) {
+		player.pos = level.tile2Pos(0, 1)
+	}
+    if (!player.isGrounded()) {
+        player.play("jump")
+    }
+})
+player.onPhysicsResolve(() => {
+	// Set the viewport center to player.pos
+	camPos(player.pos)
+})

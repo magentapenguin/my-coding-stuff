@@ -21,7 +21,7 @@ def resize_image(image_path, output_path, size):
 
 
 if __name__ == '__main__':
-    image_path = './sprites/grass.png'
-    output_path = './sprites/grassr.png'
-    size = (128, 128)
+    image_path = './sprites/portal.png'
+    output_path = './sprites/portalr.png'
+    size = (128*2, 64)
     resize_image(image_path, output_path, size)
