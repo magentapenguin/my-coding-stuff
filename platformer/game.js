@@ -39,12 +39,29 @@ loadSprite("portal", "./sprites/portalr.png", {
 	},
 })
 
+loadSprite("coin", "./sprites/coinr.png", {
+	sliceX: 4,
+	// Define animations
+	anims: {
+		"move": {
+            from: 0,
+            to: 3,
+            loop: true,
+            speed: 3,
+        }
+	},
+})
+
 
 loadSprite("grass", "./sprites/grassr.png")
 loadSprite("spike", "./sprites/spiker.png")
+loadSprite("steel", "./sprites/steelr.png")
 
 loadSound("jumpland", "./sounds/jumpland.wav")
 loadSound("happy", "./sounds/happy.mp3")
+loadSound("empty", "./sounds/empty.wav")
+
+loadFont("VT323", "./VT323-Regular.ttf")
 
 function handleout() {
 	return {
@@ -70,15 +87,31 @@ setGravity(1800)
 
 const SPEED = 500
 
-const level = addLevel([
-	// Design the level layout with symbols
-	"     ==       ^   ", 
-	"          ======  ",
-	"                  ",
-	" @   ^^^^^        ",
-	"==========   .    ",
-	"             =====",
-], {
+const LEVELS = [
+    [
+        "     $$           ",
+        "     ==       ^   ", 
+        "          ======  ",
+        "                  ",
+        " @   ^^^^^        ",
+        "==========   .    ",
+        "             =====",
+    ],
+    [
+        "    $$           ",
+        "    ==                 ",
+        "",
+        "      $            |   ",
+        "           |       |  ",
+        "      |    |       |   ",
+        "      |    |       |  ",
+        "      |    |       |  ",
+        "@     |^^^^|^^^^^^^|  .",
+        "========================",
+    ],
+]
+
+const LEVELCFG = {
 	// The size of each grid
 	tileWidth: 64,
 	tileHeight: 64,
@@ -108,87 +141,154 @@ const level = addLevel([
 		],
         ".": () => [
             sprite("portal"),
-            area(),
+            area({ scale: 0.2}),
             body({ isStatic: true }),
             anchor("bot"),
             "portal",
         ],
+        "$": () => [
+            sprite("coin"),
+            area({ scale: 0.2}),
+            body({ isStatic: true }),
+            anchor("bot"),
+            "coin",
+        ],
+        "|": () => [
+            sprite("steel"),
+            area(),
+            body({ isStatic: true }),
+            anchor("bot"),
+        ],
 	},
-})
-// Get the player object from tag
-const player = level.get("player")[0]
+}
 
 const music = play("happy", {
-	loop: true,
-	paused: false,
+    loop: true,
+    paused: false,
+    volume: 0.5,
 })
 
-level.get("portal")[0].play("spin")
+scene("game", ({ levelIdx, score }) => {
 
-player.play("idle")
-debug.inspect = true
-onKeyPress("space", () => {
-	if (player.isGrounded()) {
-		player.jump()
-		player.play("jump")
-	}
-})
-onKeyPress("up", () => {
-	if (player.isGrounded()) {
-		player.jump()
-		player.play("jump")
-	}
-})
+	// Use the level passed, or first level
+	const level = addLevel(LEVELS[levelIdx || 0], LEVELCFG)
 
-player.onGround(() => {
-    play("jumpland")
-	if (!isKeyDown("left") && !isKeyDown("right")) {
-		player.play("idle")
-	} else {
-		player.play("run")
-	}
-})
+	
+    // Get the player object from tag
+    const player = level.get("player")[0]
 
-onKeyDown("left", () => {
-	player.move(-SPEED, 0)
-	player.flipX = true
-    if (player.isGrounded() && player.curAnim() !== "run") {
-		player.play("run")
-	}
-})
 
-onKeyDown("right", () => {
-	player.move(SPEED, 0)
-	player.flipX = false
-    if (player.isGrounded() && player.curAnim() !== "run") {
-		player.play("run")
-	}
-})
+    level.get("portal")[0].play("spin")
+    level.get("coin").forEach((x)=>x.play("move"))
 
-;["left", "right"].forEach((key) => {
-	onKeyRelease(key, () => {
-	// Only reset to "idle" if player is not holding any of these keys
-		if (player.isGrounded() && !isKeyDown("left") && !isKeyDown("right")) {
-			player.play("idle")
+    player.play("idle")
+    
+    onKeyPress("space", () => {
+        if (player.isGrounded()) {
+            player.jump()
+            player.play("jump")
+        }
+    })
+    onKeyPress("up", () => {
+        if (player.isGrounded()) {
+            player.jump()
+            player.play("jump")
+        }
+    })
+
+    player.onGround(() => {
+        play("jumpland")
+        if (!isKeyDown("left") && !isKeyDown("right")) {
+            player.play("idle")
+        } else {
+            player.play("run")
+        }
+    })
+
+    onKeyDown("left", () => {
+        player.move(-SPEED, 0)
+        player.flipX = true
+        if (player.isGrounded() && player.curAnim() !== "run") {
+            player.play("run")
+        }
+    })
+
+    onKeyDown("right", () => {
+        player.move(SPEED, 0)
+        player.flipX = false
+        if (player.isGrounded() && player.curAnim() !== "run") {
+            player.play("run")
+        }
+    })
+
+    ;["left", "right"].forEach((key) => {
+        onKeyRelease(key, () => {
+        // Only reset to "idle" if player is not holding any of these keys
+            if (player.isGrounded() && !isKeyDown("left") && !isKeyDown("right")) {
+                player.play("idle")
+            }
+        })
+    })
+
+    player.onCollide("danger", (x) => {
+        player.pos = level.tile2Pos(0, 1)
+    })
+    
+    player.onCollide("coin", (coin) => {
+		destroy(coin)
+		score++
+		scoreLabel.text = score
+	})
+
+    player.onUpdate(() => {
+        // center camera to player
+        camPos(player.pos)
+        // check fall death
+        if (player.pos.y >= height()*2) {
+            player.pos = level.tile2Pos(0, 1)
+        }
+        if (!player.isGrounded()) {
+            player.play("jump")
+        }
+    })
+    player.onPhysicsResolve(() => {
+        // Set the viewport center to player.pos
+        camPos(player.pos)
+    })
+    player.onCollide("portal", () => {
+		if (levelIdx < LEVELS.length - 1) {
+			// If there's a next level, go() to the same scene but load the next level
+			go("game", {
+				levelIdx: levelIdx + 1,
+				score: score,
+			})
+		} else {
+			// Otherwise we have reached the end of game, go to "win" scene!
+			go("win", { score: score })
 		}
 	})
+    
+    const scoreLabel = add([
+		text(score, {font: "VT323"}),
+		pos(12),
+        fixed(),
+	])
+    
+    onKeyPress(()=>play('empty'))
 })
 
-player.onCollide("danger", (x) => {
-	player.pos = level.tile2Pos(0, 1)
+onKeyPress("r", () => {
+    go("game", {
+        levelIdx: 0,
+        score: 0,
+    })
 })
-player.onUpdate(() => {
-	// center camera to player
-	camPos(player.pos)
-	// check fall death
-	if (player.pos.y >= height()*2) {
-		player.pos = level.tile2Pos(0, 1)
-	}
-    if (!player.isGrounded()) {
-        player.play("jump")
-    }
-})
-player.onPhysicsResolve(() => {
-	// Set the viewport center to player.pos
-	camPos(player.pos)
-})
+
+function start() {
+	// Start with the "game" scene, with initial parameters
+	go("game", {
+		levelIdx: 0,
+		score: 0,
+	})
+}
+start()
