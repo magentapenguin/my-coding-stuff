@@ -40,28 +40,31 @@ loadSprite("portal", "./sprites/portalr.png", {
 })
 
 loadSprite("coin", "./sprites/coinr.png", {
-	sliceX: 4,
+	sliceX: 8,
 	// Define animations
 	anims: {
 		"move": {
             from: 0,
-            to: 3,
+            to: 7,
             loop: true,
-            speed: 3,
+            speed: 5,
         }
 	},
 })
 
 
 loadSprite("grass", "./sprites/grassr.png")
+loadSprite("ghosty", "./sprites/ghostr.png")
 loadSprite("spike", "./sprites/spiker.png")
+loadSprite("wspike", "./sprites/widespiker.png")
 loadSprite("steel", "./sprites/steelr.png")
 
 loadSound("jumpland", "./sounds/jumpland.wav")
 loadSound("happy", "./sounds/happy.mp3")
 loadSound("empty", "./sounds/empty.wav")
+loadSound("coin", "./sounds/coin1.wav")
 
-loadFont("VT323", "./VT323-Regular.ttf")
+loadFont("pixel", "./Silkscreen-Regular.ttf")
 
 function handleout() {
 	return {
@@ -82,6 +85,62 @@ function handleout() {
 	}
 }
 
+function patrol(speed = 60, dir = 1) {
+	return {
+		id: "patrol",
+		require: [ "pos", "area" ],
+		add() {
+			this.on("collide", (obj, col) => {
+				if (col.isLeft() || col.isRight()) {
+					dir = -dir
+				}
+			})
+		},
+		update() {
+			this.move(speed * dir, 0)
+            this.flipX = dir < 0
+		},
+	}
+}
+
+function addButton(txt, p, f) {
+
+	// add a parent background object
+	const btn = add([
+		rect(240, 80, { radius: 8 }),
+		pos(p),
+		area(),
+		scale(1),
+		anchor("center"),
+		outline(4),
+	])
+
+	
+	btn.add([
+		text(txt, {font:"pixel"}),
+		anchor("center"),
+		color(0, 0, 0),
+	])
+
+	
+	btn.onHover(() => {
+		btn.scale = vec2(1.2)
+        setCursor("pointer")
+	})
+
+	
+	btn.onHoverEnd(() => {
+		btn.scale = vec2(1)
+        setCursor("default")
+	})
+
+	
+	btn.onClick(f.bind(btn))
+
+	return btn
+
+}
+
 // Set the gravity acceleration (pixels per second)
 setGravity(1800)
 
@@ -89,26 +148,55 @@ const SPEED = 500
 
 const LEVELS = [
     [
-        "     $$           ",
-        "     ==       ^   ", 
-        "          ======  ",
-        "                  ",
-        " @   ^^^^^        ",
-        "==========   .    ",
-        "             =====",
+        "             $$           ",
+        "             ==       ^   ", 
+        "                   ======  ",
+        "                            ",
+        " @             ^^^^^        ",
+        "====================   .    ",
+        "                       =====",
     ],
     [
         "    $$           ",
         "    ==                 ",
-        "",
-        "      $            |   ",
-        "           |       |  ",
-        "      |    |       |   ",
-        "      |    |       |  ",
-        "      |    |       |  ",
-        "@     |^^^^|^^^^^^^|  .",
+        "                       ",
+        "                   #   ",
+        "      $    #       #  ",
+        "      #    #       #   ",
+        "      #    #       #  ",
+        "      #    #       #  ",
+        " @    #^^^^#^^^^^^^#  .",
         "========================",
     ],
+    [
+        "          ",
+        "  .^      ",
+        "  ##      ",
+        "          ",
+        "        ##",
+        "          ",
+        "          ",
+        "$^        ",
+        "###      $",
+        "         #",
+        "          ",
+        "    $$    ",
+        "    ##    ",
+        "          ",
+        " @       ",
+        "==="
+    ],
+    [
+        "          #     $",
+        "          #     $",
+        "          #     $",
+        "          #     $",
+        "          #     $",
+        "          #     $",
+        "          #      ",
+        " @  #   > #     .",
+        "==================="
+    ]
 ]
 
 const LEVELCFG = {
@@ -139,26 +227,41 @@ const LEVELCFG = {
 			anchor("bot"),
 			"danger",
 		],
+        "*": () => [
+			sprite("wspike"),
+			area({ scale: vec2(1,0.2) }),
+			body({ isStatic: true }),
+			anchor("bot"),
+			"danger",
+		],
         ".": () => [
             sprite("portal"),
-            area({ scale: 0.2}),
+            area({ scale: vec2(0.5, 0.9)}),
             body({ isStatic: true }),
             anchor("bot"),
             "portal",
         ],
         "$": () => [
             sprite("coin"),
-            area({ scale: 0.2}),
+            area({ scale: 0.1}),
             body({ isStatic: true }),
             anchor("bot"),
             "coin",
         ],
-        "|": () => [
+        "#": () => [
             sprite("steel"),
             area(),
             body({ isStatic: true }),
             anchor("bot"),
         ],
+        ">": () => [
+            sprite("ghosty"),
+			area(),
+			anchor("bot"),
+			body(),
+			patrol(),
+            "enemy"
+        ]
 	},
 }
 
@@ -169,17 +272,44 @@ const music = play("happy", {
 })
 
 scene("game", ({ levelIdx, score }) => {
-
+    var startscore = score ??= 0;
 	// Use the level passed, or first level
-	const level = addLevel(LEVELS[levelIdx || 0], LEVELCFG)
+	const level = addLevel(LEVELS[levelIdx ??= 0], LEVELCFG)
 
-	
+    if (levelIdx === 0) {
+        const movetip = add([
+            text("Use ← and → to move", {font: "pixel"}),
+            pos(12),
+			z(-1)
+        ])
+		const jumptip = add([
+            text("Use Space or ↑ to jump", {font: "pixel"}),
+            pos(vec2(200,-32)),
+			z(-1)
+        ])
+    }
+
+    if (levelIdx === 3) {
+        const movetip = add([
+            text("Jump on Ghosts to explode them,\n and launch yourself!", {font: "pixel"}),
+            pos(vec2(-96, 128)),
+			z(-1)
+        ])
+    }
+
     // Get the player object from tag
     const player = level.get("player")[0]
-
+    
+    
+    player.onCollide("coin", (coin) => {
+		destroy(coin)
+        play("coin")
+		score++
+		scoreLabel.text = score
+	})
 
     level.get("portal")[0].play("spin")
-    level.get("coin").forEach((x)=>x.play("move"))
+    level.get("coin").forEach((x)=>setTimeout(()=>x.play("move")))
 
     player.play("idle")
     
@@ -189,6 +319,7 @@ scene("game", ({ levelIdx, score }) => {
             player.play("jump")
         }
     })
+
     onKeyPress("up", () => {
         if (player.isGrounded()) {
             player.jump()
@@ -196,8 +327,9 @@ scene("game", ({ levelIdx, score }) => {
         }
     })
 
-    player.onGround(() => {
-        play("jumpland")
+
+    player.onGround((obj) => {
+        if(!obj.is("coin")) play("jumpland")
         if (!isKeyDown("left") && !isKeyDown("right")) {
             player.play("idle")
         } else {
@@ -221,6 +353,14 @@ scene("game", ({ levelIdx, score }) => {
         }
     })
 
+    onKeyPress("down", () => {
+		player.weight = 10
+	})
+
+	onKeyRelease("down", () => {
+		player.weight = 1
+	})
+
     ;["left", "right"].forEach((key) => {
         onKeyRelease(key, () => {
         // Only reset to "idle" if player is not holding any of these keys
@@ -230,30 +370,54 @@ scene("game", ({ levelIdx, score }) => {
         })
     })
 
-    player.onCollide("danger", (x) => {
-        player.pos = level.tile2Pos(0, 1)
-    })
-    
-    player.onCollide("coin", (coin) => {
-		destroy(coin)
-		score++
-		scoreLabel.text = score
+    player.onGround((l) => {
+		if (l.is("enemy")) {
+			player.jump(SPEED * 3.5)
+			destroy(l)
+			addKaboom(player.pos)
+		}
+	})
+    player.onCollide("enemy", (e, col) => {
+		// if it's not from the top, die
+		if (!col.isBottom()) {
+			go("lose", { levelIdx: levelIdx, score: startscore })
+		}
 	})
 
+    player.onCollide("danger", (x) => {
+		go("lose", { levelIdx: levelIdx, score: startscore })
+    })
+    let curTween = null
+
+    function gotocam() {
+        if (curTween) curTween.cancel()
+        // start the tween
+        curTween = tween(
+            // start value (accepts number, Vec2 and Color)
+            camPos(),
+            // destination value
+            player.pos,
+            // duration (in seconds)
+            0.5,
+            // how value should be updated
+            (val) => camPos(val),
+            // interpolation function (defaults to easings.linear)
+            easings.easeOutExpo,
+        )
+    }      
     player.onUpdate(() => {
         // center camera to player
-        camPos(player.pos)
+        gotocam()
         // check fall death
         if (player.pos.y >= height()*2) {
-            player.pos = level.tile2Pos(0, 1)
+            go("lose", { levelIdx: levelIdx, score: startscore })
         }
         if (!player.isGrounded()) {
             player.play("jump")
         }
     })
     player.onPhysicsResolve(() => {
-        // Set the viewport center to player.pos
-        camPos(player.pos)
+        gotocam()
     })
     player.onCollide("portal", () => {
 		if (levelIdx < LEVELS.length - 1) {
@@ -267,22 +431,34 @@ scene("game", ({ levelIdx, score }) => {
 			go("win", { score: score })
 		}
 	})
-    
-    const scoreLabel = add([
-		text(score, {font: "VT323"}),
-		pos(12),
+    const scorecoin = add([
+		sprite("coin"),
+		pos(vec2(0)),
         fixed(),
 	])
-    
+    scorecoin.play("move")
+    const scoreLabel = add([
+		text(score, {
+            size: 64, 
+            font: "pixel" 
+        }),
+		pos(vec2(64,0)),
+        fixed(),
+	])
+
     onKeyPress(()=>play('empty'))
+	onKeyPress("r", () => {
+		go("game", {
+			levelIdx: 0,
+			score: 0,
+		})
+	})
+    onKeyPress("escape", () => {
+		go("menu")
+	})
 })
 
-onKeyPress("r", () => {
-    go("game", {
-        levelIdx: 0,
-        score: 0,
-    })
-})
+
 
 function start() {
 	// Start with the "game" scene, with initial parameters
@@ -291,4 +467,65 @@ function start() {
 		score: 0,
 	})
 }
-start()
+
+scene("lose", (x) => {
+	add([
+		text("You Lose\nSpace, click, or tap to restart level\nPress R to restart game", {align:"center"}),
+		pos(center()),
+		anchor("center")
+	])
+	addKaboom(center(),{scale: 20})
+	onClick(()=>go("game", x))
+	onKeyPress("space", ()=>go("game", x))
+	onKeyPress("r", start)
+})
+scene("win", () => {
+	add([
+		text("You Win", {align:"center"}),
+		pos(center()),
+		anchor("center")
+	])
+	onClick(start)
+})
+scene("menu", () => {
+    add([
+        text("IF THE MUSIC INS'T PLAYING, CLICK THE PAGE",{
+            align: "center",
+            size: 16,
+            font: "pixel",
+        }),
+        pos(vec2(center().x, 16)),
+        anchor("center")
+    ])
+
+    add([
+        text("Stickman Jump Game",{
+            align: "center",
+            size: 72,
+            font: "pixel",
+        }),
+        pos(center().sub(vec2(0, 128))),
+        anchor("center")
+    ])
+    onKeyPress(()=>play('empty'))
+    onClick(()=>play('empty'))
+    addButton("Play", center(), ()=>{setCursor("default");start()})
+    addButton("Settings", center().add(vec2(0, 96)), ()=>{go("settings")})
+});
+scene("settings", () => {
+    add([
+        text("Settings",{
+            align: "center",
+            size: 72,
+            font: "pixel",
+        }),
+        pos(center().sub(vec2(0, 128))),
+        anchor("center")
+    ])
+    addButton("Back", center().add(vec2(0, 96)), ()=>{go("menu")})
+    addButton("Music On/Off", center().add(vec2(0, 0)), ()=>{
+        music.paused = !music.paused
+    })
+})
+
+go("menu")
