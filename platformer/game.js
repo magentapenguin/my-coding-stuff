@@ -82,6 +82,56 @@ function handleout() {
 				this.trigger("out")
 			}
 		},
+    }
+}
+
+function tooltip(txt) {
+	return {
+		id: "tooltip",
+		require: [ "pos", "area" ],
+        add() {
+            this.hovertween = null
+			this.onHover(() => {
+                let formattxt = formatText({
+                    text: txt,
+                    font: "pixel",
+                })
+                
+                this.tooltipObj = add([
+                    rect(formattxt.width/2 +64, formattxt.height/2 +24, { radius: 8 }),
+                    pos(mousePos().add(vec2(0, 32))),
+                    area(),
+                    scale(1),
+                    color(0, 0, 0),
+                ])
+                
+                this.tooltipObj.add([
+                    text(txt, {font:"pixel"}),
+                    color(255,255,255),
+                    pos(8, 8)
+                ])
+            })
+            this.onHoverUpdate(() => {
+                let curTween = this.hovertween
+                if (curTween) curTween.cancel()
+                // start the tween
+                curTween = tween(
+                    // start value (accepts number, Vec2 and Color)
+                    this.tooltipObj.pos,
+                    // destination value
+                    mousePos().add(vec2(0, 32)),
+                    // duration (in seconds)
+                    0.2,
+                    // how value should be updated
+                    (val) => this.tooltipObj.pos = val,
+                    // interpolation function (defaults to easings.linear)
+                    easings.easeOutExpo,
+                )
+            })
+            this.onHoverEnd(() => {
+                destroy(this.tooltipObj)
+            })
+		},
 	}
 }
 
@@ -103,21 +153,25 @@ function patrol(speed = 60, dir = 1) {
 	}
 }
 
-function addButton(txt, p, f) {
-
-	// add a parent background object
-	const btn = add([
-		rect(240, 80, { radius: 8 }),
+function addButton(txt, p, f, hover) {
+    
+    let x = [
+		rect(420, 80, { radius: 8 }),
 		pos(p),
 		area(),
 		scale(1),
 		anchor("center"),
 		outline(4),
-	])
+	]
+    if (hover) x.push(tooltip(hover))
+
+
+	// add a parent background object
+	const btn = add(x)
 
 	
 	btn.add([
-		text(txt, {font:"pixel"}),
+		text(txt, {font:"pixel", align:"center"}),
 		anchor("center"),
 		color(0, 0, 0),
 	])
@@ -135,11 +189,13 @@ function addButton(txt, p, f) {
 	})
 
 	
-	btn.onClick(f.bind(btn))
+	btn.onClick((...args)=>f.call(btn, btn, ...args))
 
 	return btn
 
 }
+
+
 
 // Set the gravity acceleration (pixels per second)
 setGravity(1800)
@@ -170,8 +226,8 @@ const LEVELS = [
     ],
     [
         "          ",
-        "  .^      ",
-        "  ##      ",
+        ".  ^      ",
+        "####      ",
         "          ",
         "        ##",
         "          ",
@@ -196,6 +252,17 @@ const LEVELS = [
         "          #      ",
         " @  #   > #     .",
         "==================="
+    ],
+    [
+        "                     # ",
+        "                     # ",
+        "                *    # .",
+        "      $    $    #    ====",
+        "      $    $    #      ",
+        "                #      ",
+        "                #      ",
+        "@#^^^^>^^^^>^^^^#>^^^^^",
+        "========================",
     ]
 ]
 
@@ -265,6 +332,61 @@ const LEVELCFG = {
 	},
 }
 
+const CONTROLSCHEMES = {
+    wasd: {jump: "w", left: "a", right: "d", down: "s", icons: ["W", "A", "D", "S"]},
+    arrow: {jump: "up", left: "left", right: "right", down: "down", icons: ["▲", "◀", "▶", "▼"]}
+}
+
+var controlscheme = "arrow"
+
+function bindkeys(scheme, player) {
+    onKeyPress("space", () => {
+        if (player.isGrounded()) {
+            player.jump()
+            player.play("jump")
+        }
+    })
+    onKeyPress(scheme.jump, () => {
+        if (player.isGrounded()) {
+            player.jump()
+            player.play("jump")
+        }
+    })
+
+    onKeyDown(scheme.left, () => {
+        player.move(-SPEED, 0)
+        player.flipX = true
+        if (player.isGrounded() && player.curAnim() !== "run") {
+            player.play("run")
+        }
+    })
+
+    onKeyDown(scheme.right, () => {
+        player.move(SPEED, 0)
+        player.flipX = false
+        if (player.isGrounded() && player.curAnim() !== "run") {
+            player.play("run")
+        }
+    })
+
+    onKeyPress(scheme.down, () => {
+		player.weight = 10
+	})
+
+	onKeyRelease(scheme.down, () => {
+		player.weight = 1
+	})
+
+    ;[scheme.left, scheme.right].forEach((key) => {
+        onKeyRelease(key, () => {
+        // Only reset to "idle" if player is not holding any of these keys
+            if (player.isGrounded() && !isKeyDown(scheme.left) && !isKeyDown(scheme.right)) {
+                player.play("idle")
+            }
+        })
+    })
+}
+
 const music = play("happy", {
     loop: true,
     paused: false,
@@ -277,21 +399,21 @@ scene("game", ({ levelIdx, score }) => {
 	const level = addLevel(LEVELS[levelIdx ??= 0], LEVELCFG)
 
     if (levelIdx === 0) {
-        const movetip = add([
-            text("Use ← and → to move", {font: "pixel"}),
+        add([
+            text(`Use ${CONTROLSCHEMES[controlscheme].icons[1]} and ${CONTROLSCHEMES[controlscheme].icons[2]} to move`, {font: "pixel"}),
             pos(12),
 			z(-1)
         ])
-		const jumptip = add([
-            text("Use Space or ↑ to jump", {font: "pixel"}),
+		add([
+            text(`Use Space or ${CONTROLSCHEMES[controlscheme].icons[0]} to jump`, {font: "pixel"}),
             pos(vec2(200,-32)),
 			z(-1)
         ])
     }
 
     if (levelIdx === 3) {
-        const movetip = add([
-            text("Jump on Ghosts to explode them,\n and launch yourself!", {font: "pixel"}),
+        add([
+            text("Jump on Ghosts \nto explode them,\n and launch yourself!", {font: "pixel"}),
             pos(vec2(-96, 128)),
 			z(-1)
         ])
@@ -300,6 +422,7 @@ scene("game", ({ levelIdx, score }) => {
     // Get the player object from tag
     const player = level.get("player")[0]
     
+    bindkeys(CONTROLSCHEMES[controlscheme], player)
     
     player.onCollide("coin", (coin) => {
 		destroy(coin)
@@ -312,20 +435,6 @@ scene("game", ({ levelIdx, score }) => {
     level.get("coin").forEach((x)=>setTimeout(()=>x.play("move")))
 
     player.play("idle")
-    
-    onKeyPress("space", () => {
-        if (player.isGrounded()) {
-            player.jump()
-            player.play("jump")
-        }
-    })
-
-    onKeyPress("up", () => {
-        if (player.isGrounded()) {
-            player.jump()
-            player.play("jump")
-        }
-    })
 
 
     player.onGround((obj) => {
@@ -336,43 +445,11 @@ scene("game", ({ levelIdx, score }) => {
             player.play("run")
         }
     })
-
-    onKeyDown("left", () => {
-        player.move(-SPEED, 0)
-        player.flipX = true
-        if (player.isGrounded() && player.curAnim() !== "run") {
-            player.play("run")
-        }
-    })
-
-    onKeyDown("right", () => {
-        player.move(SPEED, 0)
-        player.flipX = false
-        if (player.isGrounded() && player.curAnim() !== "run") {
-            player.play("run")
-        }
-    })
-
-    onKeyPress("down", () => {
-		player.weight = 10
-	})
-
-	onKeyRelease("down", () => {
-		player.weight = 1
-	})
-
-    ;["left", "right"].forEach((key) => {
-        onKeyRelease(key, () => {
-        // Only reset to "idle" if player is not holding any of these keys
-            if (player.isGrounded() && !isKeyDown("left") && !isKeyDown("right")) {
-                player.play("idle")
-            }
-        })
-    })
+    
 
     player.onGround((l) => {
 		if (l.is("enemy")) {
-			player.jump(SPEED * 3.5)
+			player.jump(SPEED * 3)
 			destroy(l)
 			addKaboom(player.pos)
 		}
@@ -387,6 +464,7 @@ scene("game", ({ levelIdx, score }) => {
     player.onCollide("danger", (x) => {
 		go("lose", { levelIdx: levelIdx, score: startscore })
     })
+
     let curTween = null
 
     function gotocam() {
@@ -453,9 +531,7 @@ scene("game", ({ levelIdx, score }) => {
 			score: 0,
 		})
 	})
-    onKeyPress("escape", () => {
-		go("menu")
-	})
+    onKeyPress("escape", () => go("menu"))
 })
 
 
@@ -470,10 +546,16 @@ function start() {
 
 scene("lose", (x) => {
 	add([
-		text("You Lose\nSpace, click, or tap to restart level\nPress R to restart game", {align:"center"}),
+		text("Press space to restart level\nPress R to restart game", {align:"center"}),
 		pos(center()),
 		anchor("center")
 	])
+    add([
+		text("You Lose!", {align:"center", font: "pixel", size: 72}),
+		pos(center().sub(vec2(0, 72))),
+		anchor("center")
+	])
+    onKeyPress("escape", () => go("menu"))
 	addKaboom(center(),{scale: 20})
 	onClick(()=>go("game", x))
 	onKeyPress("space", ()=>go("game", x))
@@ -485,6 +567,8 @@ scene("win", () => {
 		pos(center()),
 		anchor("center")
 	])
+    onKeyPress("escape", () => go("menu"))
+	onKeyPress("space", start)
 	onClick(start)
 })
 scene("menu", () => {
@@ -513,6 +597,7 @@ scene("menu", () => {
     addButton("Settings", center().add(vec2(0, 96)), ()=>{go("settings")})
 });
 scene("settings", () => {
+    onKeyPress("escape", () => go("menu"))
     add([
         text("Settings",{
             align: "center",
@@ -522,10 +607,14 @@ scene("settings", () => {
         pos(center().sub(vec2(0, 128))),
         anchor("center")
     ])
-    addButton("Back", center().add(vec2(0, 96)), ()=>{go("menu")})
-    addButton("Music On/Off", center().add(vec2(0, 0)), ()=>{
+    addButton("Back", center().add(vec2(0, 256)), ()=>{go("menu")})
+    addButton("Music\nOn/Off", center().add(vec2(0, 0)), ()=>{
         music.paused = !music.paused
-    })
+    }, "Toggle Music")
+    addButton(controlscheme == "wasd" ? "Switch to\nArrow keys" : "Switch to\nWASD", center().add(vec2(0, 96)), (btn)=>{
+        controlscheme = (controlscheme == "wasd" ? "arrow" : "wasd")
+        btn.children[0].text = controlscheme == "wasd" ? "Switch to\nArrow keys" : "Switch to\nWASD"
+    }, "Switch\ncontrol scheme")
 })
 
 go("menu")
