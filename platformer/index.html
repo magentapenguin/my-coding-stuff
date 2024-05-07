@@ -3,10 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
+        <title>Stickman Jump</title>
         <style>
-            body {
+            * {
                 overflow: hidden;
+                scrollbar-width: none;
             }
             ::-webkit-scrollbar {
                 display: none;
@@ -14,7 +15,8 @@
         </style>
     </head>
     <body>
-        <script src="https://unpkg.com/kaboom@3000.0.1/dist/kaboom.js"></script>
+        <script src="//cdn.jsdelivr.net/npm/kaboom/dist/kaboom.min.js"></script>
         <script src="./game.js"></script>
+        <canvas id="main"></canvas>
     </body>
 </html>
