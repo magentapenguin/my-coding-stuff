@@ -245,6 +245,8 @@ const LEVELS = [
         "",
         "",
         "",
+        "",
+        "",
         "              . $$$$$",
         "              ========="
     ],
@@ -311,14 +313,15 @@ const LEVELCFG = {
             sprite("grass"),
             area(),
             body({ isStatic: true }),
-            offscreen({ hide: true }),
+            // odd that the offscreen component causes the game to lag
+            //offscreen({ hide: true }),
             anchor("bot"),
         ],
         "^": () => [
             sprite("spike"),
             area({ scale: 0.2 }),
             body({ isStatic: true }),
-            offscreen({ hide: true }),
+            //offscreen({ hide: true }),
             anchor("bot"),
             "danger",
         ],
@@ -326,7 +329,7 @@ const LEVELCFG = {
             sprite("wspike"),
             area({ scale: vec2(0.8, 0.2) }),
             body({ isStatic: true }),
-            offscreen({ hide: true }),
+            //offscreen({ hide: true }),
             anchor("bot"),
             "danger",
         ],
@@ -334,7 +337,7 @@ const LEVELCFG = {
             sprite("portal"),
             area({ scale: vec2(0.5, 0.9) }),
             body({ isStatic: true }),
-            offscreen({ hide: true }),
+            //offscreen({ hide: true }),
             anchor("bot"),
             "portal",
         ],
@@ -342,7 +345,7 @@ const LEVELCFG = {
             sprite("coin"),
             area({ scale: 0.1 }),
             body({ isStatic: true }),
-            offscreen({ hide: true }),
+            //offscreen({ hide: true }),
             anchor("bot"),
             "coin",
         ],
@@ -350,7 +353,7 @@ const LEVELCFG = {
             sprite("steel"),
             area(),
             body({ isStatic: true }),
-            offscreen({ hide: true }),
+            //offscreen({ hide: true }),
             anchor("bot"),
         ],
         ">": () => [
@@ -359,15 +362,15 @@ const LEVELCFG = {
             anchor("bot"),
             body(),
             patrol(),
-            offscreen({ hide: true }),
+            //offscreen({ hide: true }),
             "enemy"
         ]
     },
 }
 
 const CONTROLSCHEMES = {
-    wasd: { jump: "w", left: "a", right: "d", down: "s", icons: ["W", "A", "D", "S"] },
-    arrow: { jump: "up", left: "left", right: "right", down: "down", icons: ["▲", "◀", "▶", "▼"] }
+    wasd: { jump: "w", left: "a", right: "d", down: "s", icons: ["W", "A", "D", "S"], human: "WASD" },
+    arrow: { jump: "up", left: "left", right: "right", down: "down", icons: ["▲", "◀", "▶", "▼"], human: "Arrow keys"}
 }
 
 var controlscheme = "arrow"
