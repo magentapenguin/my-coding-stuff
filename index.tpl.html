@@ -116,7 +116,7 @@
                 user-select: none;
             }
 
-            details[open] *:not(summary) {
+            details[open] >*:not(summary) {
                 margin-left: 0.5em;
             }
 
@@ -148,6 +148,11 @@
                 height: 100vh;
                 background-color: light-dark(transparent, #000c1680);
             }
+            .icon {
+                margin: 0;
+                transform: translateY(5px);
+                margin-right: 0.25em;
+            }
         </style>
     </head>
     <body>
@@ -158,7 +163,8 @@
             <details>
                 <summary>Games</summary>
                 <ul>
-                    <li><a href="/circle-button/circle-button-index.html">Circle Button Game</a></li>
+                    <li><a href="/circle-button/circle-button-index.html"><img src="/circle-button/favicon-32x32.png" width="24" class="icon"></img>Circle Button Game</a></li>
+                    <li><a href="/platformer/index.html"><img src="/platformer/favicon.png" width="24" class="icon"></img>Stickman Jump Game</a></li>
                 </ul>
             </details>
             <a href="/nav">Full Navigator</a>

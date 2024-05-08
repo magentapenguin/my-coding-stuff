@@ -152,6 +152,12 @@
                 left: 12px;
                 padding: 0.5rem;
                 font-size: 1.5rem;
+                --t: 0%;
+                transition: --t 0.25s;
+                background-image: radial-gradient(#00ffea67 0%, transparent var(--t));
+            }
+            exit-btn:hover {
+                --t: 70%;
             }
             exit-btn::after {
                 content: 'Back';
@@ -205,6 +211,6 @@
                 },
             });
         </script>
-        <script src="//instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script>
+        <script src="https://instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script>
     </body>
 </html>

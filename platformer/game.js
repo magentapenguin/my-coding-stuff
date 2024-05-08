@@ -230,7 +230,7 @@ const LEVELCFG = {
 
 const CONTROLSCHEMES = {
     wasd: { jump: "w", left: "a", right: "d", down: "s", icons: ["W", "A", "D", "S"], human: "WASD" },
-    arrow: { jump: "up", left: "left", right: "right", down: "down", icons: ["↑", "←", "→", "↓"], human: "Arrow keys"}
+    arrow: { jump: "up", left: "left", right: "right", down: "down", icons: ["↑", "←", "→", "↓"], human: "Arrow keys" },
 }
 
 var controlscheme = "arrow"
@@ -266,11 +266,11 @@ function bindkeys(scheme, player) {
     })
 
     onKeyPress(scheme.down, () => {
-        player.weight = 10
+        player.wie = 10
     })
 
     onKeyRelease(scheme.down, () => {
-        player.weight = 1
+        player.mass = 1
     })
 
         ;[scheme.left, scheme.right].forEach((key) => {
@@ -310,7 +310,7 @@ scene("game", ({ levelIdx, score }) => {
     if (levelIdx === 3) {
         add([
             text("Jump on Ghosts\nto explode them,\nand launch yourself!", { font: "pixel" }),
-            pos(vec2(-64, 128)),
+            pos(vec2(0, 128)),
             z(-1)
         ])
     }
@@ -519,6 +519,7 @@ scene("menu", (x) => {
     onClick(() => play('empty'))
     addButton("Play", (x)=>x.pos = center(), () => { setCursor("default"); go("game", x ?? JSON.parse(localStorage.getItem("platformersave")) ?? { levelIdx: 0, score: 0 }) })
     addButton("Settings", (x)=>x.pos = center().add(vec2(0, 96)), () => { go("settings") })
+    if (document.getElementById('main').dataset.exitbtn == "true") addButton("Exit", (x)=>x.pos = center().add(vec2(0, 192)), () => {location.assign('/') })
 });
 
 scene("settings", (x) => {
