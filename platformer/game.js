@@ -1,3 +1,6 @@
+import kaboom from "https://cdn.jsdelivr.net/npm/kaboom/+esm";
+import { addButton, onsize, patrol, } from "./utills.js";
+
 // Start kaboom
 kaboom({
     canvas: document.getElementById('main'),
@@ -65,152 +68,9 @@ loadSound("happy", "./sounds/happy.mp3")
 loadSound("empty", "./sounds/empty.wav")
 loadSound("coin", "./sounds/coin1.wav")
 
-loadFont("pixel", "./Silkscreen-Regular.ttf")
+loadFont("pixel", "'./Kitchen Sink.ttf'")
 
-function handleout() {
-    return {
-        id: "handleout",
-        require: ["pos"],
-        update() {
-            const spos = this.screenPos()
-            if (
-                spos.x < 0 ||
-                spos.x > width() ||
-                spos.y < 0 ||
-                spos.y > height()
-            ) {
-                // triggers a custom event when out
-                this.trigger("out")
-            }
-        },
-    }
-}
-
-function tooltip(txt) {
-    return {
-        id: "tooltip",
-        require: ["pos", "area"],
-        add() {
-            this.hovertween = null
-            this.onHover(() => {
-                let formattxt = formatText({
-                    text: txt,
-                    font: "pixel",
-                })
-
-                this.tooltipObj = add([
-                    rect(formattxt.width / 2 + 64, formattxt.height / 2 + 24, { radius: 8 }),
-                    pos(mousePos().add(vec2(0, 32))),
-                    area(),
-                    scale(1),
-                    color(0, 0, 0),
-                ])
-
-                this.tooltipObj.add([
-                    text(txt, { font: "pixel" }),
-                    color(255, 255, 255),
-                    pos(8, 8)
-                ])
-            })
-            this.onHoverUpdate(() => {
-                let curTween = this.hovertween
-                if (curTween) curTween.cancel()
-                // start the tween
-                curTween = tween(
-                    // start value (accepts number, Vec2 and Color)
-                    this.tooltipObj.pos,
-                    // destination value
-                    mousePos().add(vec2(0, 32)),
-                    // duration (in seconds)
-                    0.2,
-                    // how value should be updated
-                    (val) => this.tooltipObj.pos = val,
-                    // interpolation function (defaults to easings.linear)
-                    easings.easeOutExpo,
-                )
-            })
-            this.onHoverEnd(() => {
-                destroy(this.tooltipObj)
-            })
-        },
-    }
-}
-
-function patrol(speed = 60, dir = 1) {
-    return {
-        id: "patrol",
-        require: ["pos", "area"],
-        add() {
-            this.on("collide", (obj, col) => {
-                if (col.isLeft() || col.isRight()) {
-                    dir = -dir
-                }
-            })
-        },
-        update() {
-            this.move(speed * dir, 0)
-            this.flipX = dir < 0
-        },
-    }
-}
-
-function onsize(func) {
-    return {
-        id: 'resizehandler',
-        require: ['pos'],
-        add() {
-            onResize(()=>{
-                func(this)
-            })
-            func(this)
-        }
-    }
-}
-
-function addButton(txt, p, f, hover) {
-
-    let x = [
-        rect(420, 80, { radius: 8 }),
-        pos(),
-        area(),
-        scale(1),
-        anchor("center"),
-        outline(4),
-        onsize(p)
-    ]
-    if (hover) x.push(tooltip(hover))
-
-
-    // add a parent background object
-    const btn = add(x)
-
-
-    btn.add([
-        text(txt, { font: "pixel", align: "center" }),
-        anchor("center"),
-        color(0, 0, 0),
-    ])
-
-
-    btn.onHover(() => {
-        btn.scale = vec2(1.2)
-        setCursor("pointer")
-    })
-
-
-    btn.onHoverEnd(() => {
-        btn.scale = vec2(1)
-        setCursor("default")
-    })
-
-
-    btn.onClick((...args) => f.call(btn, btn, ...args))
-
-    return btn
-
-}
-
-
+const credits = {'Kaboom.js - Game Framework':'https://kaboomjs.com', 'Polyducks - Font': 'https://polyducks.itch.io/kitchen-sink-font'}
 
 // Set the gravity acceleration (pixels per second)
 setGravity(1800)
@@ -370,7 +230,7 @@ const LEVELCFG = {
 
 const CONTROLSCHEMES = {
     wasd: { jump: "w", left: "a", right: "d", down: "s", icons: ["W", "A", "D", "S"], human: "WASD" },
-    arrow: { jump: "up", left: "left", right: "right", down: "down", icons: ["▲", "◀", "▶", "▼"], human: "Arrow keys"}
+    arrow: { jump: "up", left: "left", right: "right", down: "down", icons: ["↑", "←", "→", "↓"], human: "Arrow keys"}
 }
 
 var controlscheme = "arrow"
@@ -567,10 +427,10 @@ scene("game", ({ levelIdx, score }) => {
     scorecoin.play("move")
     const scoreLabel = add([
         text(score, {
-            size: 64,
+            size: 48,
             font: "pixel"
         }),
-        pos(vec2(64, 0)),
+        pos(vec2(64, 12)),
         fixed(),
     ])
 
@@ -615,7 +475,7 @@ scene("lose", (x) => {
 })
 scene("win", ({score}) => {
     add([
-        text(`You got ${score} of 25 coins!\nPress Space to restart`, { align: "center" }),
+        text(`You got ${score} of 20 coins!\nPress Space to restart`, { align: "center" }),
         pos(),
         onsize((x)=>{x.pos = center()}),
         anchor("center")
