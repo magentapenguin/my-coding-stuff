@@ -594,20 +594,3 @@ scene("credits", () => {
 })
 
 go("menu")
-
-
-
-function toggleFullScreen() {
-    let btn = document.getElementById("fullscreen")
-    btn.getElementsByClassName("fa-expand")[0].style.display = 'none'
-    btn.getElementsByClassName("fa-compress")[0].style.display = 'none'
-    if (!isFullscreen()) {
-        setFullscreen(true)
-        document.documentElement.requestFullscreen();
-        btn.getElementsByClassName("fa-compress")[0].style.display = 'block'
-    } else  {
-        setFullscreen(false)
-        btn.getElementsByClassName("fa-expand")[0].style.display = 'block'
-    }
-}
-document.getElementById("fullscreen").addEventListener("click", toggleFullScreen)
