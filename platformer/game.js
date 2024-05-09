@@ -1,5 +1,5 @@
 import kaboom from "https://cdn.jsdelivr.net/npm/kaboom/+esm";
-import { addButton, onsize, patrol, } from "./utills.js";
+import { addButton, onsize, patrol, cursormod, } from "./utills.js";
 
 // Start kaboom
 kaboom({
@@ -70,7 +70,13 @@ loadSound("coin", "./sounds/coin1.wav")
 
 loadFont("pixel", "'./Kitchen Sink.ttf'")
 
-const credits = {'Kaboom.js - Game Framework':'https://kaboomjs.com', 'Polyducks - Font': 'https://polyducks.itch.io/kitchen-sink-font'}
+const credits = {
+    'Kaboom.js - Game Framework':'https://kaboomjs.com', 
+    'Polyducks - Font': 'https://polyducks.itch.io/kitchen-sink-font', 
+    'MentalSanityOff - Fall Sound': 'http://www.freesound.org/people/MentalSanityOff/sounds/148796/', 
+    'rezoner - Music': 'https://opengameart.org/content/happy-arcade-tune',
+    'Luke.RUSTLTD - Coin Sound': 'https://opengameart.org/content/10-8bit-coin-sounds',
+}
 
 // Set the gravity acceleration (pixels per second)
 setGravity(1800)
@@ -289,12 +295,14 @@ const music = play("happy", {
     volume: 0.5,
 })
 
+window.photo = false
+
 scene("game", ({ levelIdx, score }) => {
     var startscore = score ??= 0;
     // Use the level passed, or first level
     const level = addLevel(LEVELS[levelIdx ??= 0], LEVELCFG)
 
-    if (levelIdx === 0) {
+    if (levelIdx === 0 && !photo) {
         add([
             text(`Use ${CONTROLSCHEMES[controlscheme].icons[1]} and ${CONTROLSCHEMES[controlscheme].icons[2]} to move`, { font: "pixel" }),
             pos(12),
@@ -307,7 +315,7 @@ scene("game", ({ levelIdx, score }) => {
         ])
     }
 
-    if (levelIdx === 3) {
+    if (levelIdx === 3 && !photo) {
         add([
             text("Jump on Ghosts\nto explode them,\nand launch yourself!", { font: "pixel" }),
             pos(vec2(0, 128)),
@@ -433,6 +441,10 @@ scene("game", ({ levelIdx, score }) => {
         pos(vec2(64, 12)),
         fixed(),
     ])
+    if (photo) {
+        scorecoin.hidden = true
+        scoreLabel.hidden = true
+    }
 
     onKeyPress(() => play('empty'))
     onKeyPress("r", () => {
@@ -519,7 +531,8 @@ scene("menu", (x) => {
     onClick(() => play('empty'))
     addButton("Play", (x)=>x.pos = center(), () => { setCursor("default"); go("game", x ?? JSON.parse(localStorage.getItem("platformersave")) ?? { levelIdx: 0, score: 0 }) })
     addButton("Settings", (x)=>x.pos = center().add(vec2(0, 96)), () => { go("settings") })
-    if (document.getElementById('main').dataset.exitbtn == "true") addButton("Exit", (x)=>x.pos = center().add(vec2(0, 192)), () => {location.assign('/') })
+    addButton("Credits", (x)=>x.pos = center().add(vec2(0, 96*2)), () => { go("credits") })
+    if (document.getElementById('main').dataset.exitbtn == "true") {addButton("Exit", (x)=>x.pos = center().add(vec2(0, 96*3)), () => {location.assign('/') })}
 });
 
 scene("settings", (x) => {
@@ -529,6 +542,10 @@ scene("settings", (x) => {
         xmove = -(height()/2 - 256);
         console.log(xmove)
     }})
+    if (height() < 1500) {
+        xmove = -(height()/2 - 256);
+        console.log(xmove)
+    }
     add([
         text("Settings", {
             align: "center",
@@ -548,5 +565,49 @@ scene("settings", (x) => {
         btn.children[0].text = controlscheme == "wasd" ? "Switch to\nArrow keys" : "Switch to\nWASD"
     }, "Switch\ncontrol scheme")
 })
+scene("credits", () => {
+    add([
+        text("Credits", {
+            align: "center",
+            size: 72,
+            font: "pixel",
+        }),
+        pos(),
+        onsize((x)=>x.pos=center().sub(vec2(0, 128))),
+        anchor("center")
+    ])
+    let y = 0;
+    for (const [key, value] of Object.entries(credits)) {
+        let x = add([
+            text(`${key}: ${value}`, { align: "center", font: "pixel", size: 20, width: width() }),
+            pos(),
+            area(),
+            onsize((x)=>x.pos=center().add(vec2(0, x.ymove-32))),
+            anchor("center"),
+            cursormod("pointer", 1.2),
+            {ymove: y},
+        ])
+        x.onClick(() => {window.open(value)})
+        y += 40
+    }
+    addButton("Back", (x)=>x.pos=center().add(vec2(0, 256)), () => { go("menu") })
+})
 
 go("menu")
+
+
+
+function toggleFullScreen() {
+    let btn = document.getElementById("fullscreen")
+    btn.getElementsByClassName("fa-expand")[0].style.display = 'none'
+    btn.getElementsByClassName("fa-compress")[0].style.display = 'none'
+    if (!isFullscreen()) {
+        setFullscreen(true)
+        document.documentElement.requestFullscreen();
+        btn.getElementsByClassName("fa-compress")[0].style.display = 'block'
+    } else  {
+        setFullscreen(false)
+        btn.getElementsByClassName("fa-expand")[0].style.display = 'block'
+    }
+}
+document.getElementById("fullscreen").addEventListener("click", toggleFullScreen)

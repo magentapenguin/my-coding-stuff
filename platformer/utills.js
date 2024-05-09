@@ -110,6 +110,7 @@ export function addButton(txt, p, f, hover) {
         scale(1),
         anchor("center"),
         outline(4),
+        cursormod("pointer", 1.2),
         onsize(p)
     ];
     if (hover) x.push(tooltip(hover));
@@ -126,20 +127,39 @@ export function addButton(txt, p, f, hover) {
     ]);
 
 
-    btn.onHover(() => {
-        btn.scale = vec2(1.2);
-        setCursor("pointer");
-    });
-
-
-    btn.onHoverEnd(() => {
-        btn.scale = vec2(1);
-        setCursor("default");
-    });
-
-
     btn.onClick((...args) => f.call(btn, btn, ...args));
 
     return btn;
 
+}
+
+/**
+ * Creates a cursor modifier object.
+ * @param {string} c - The cursor type.
+ * @param {number} [scale=1] - The scale factor for the cursor.
+ * @returns {Object} The cursor modifier object.
+ */
+export function cursormod(c, scale = 1) {
+    return {
+        id: "cursormod",
+        add() {
+            /**
+             * Event handler for when the cursor is hovered over.
+             * Sets the cursor scale and type.
+             */
+            this.onHover(() => {
+                this.scale = vec2(scale);
+                setCursor(c);
+            });
+
+            /**
+             * Event handler for when the cursor is no longer hovered over.
+             * Resets the cursor scale and type to default.
+             */
+            this.onHoverEnd(() => {
+                this.scale = vec2(1);
+                setCursor("default");
+            });
+        }
+    };
 }
