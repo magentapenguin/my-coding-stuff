@@ -435,7 +435,7 @@ scene("game", ({ levelIdx, score }) => {
     scorecoin.play("move")
     const scoreLabel = add([
         text(score, {
-            size: 48,
+            size: 46,
             font: "pixel"
         }),
         pos(vec2(64, 12)),

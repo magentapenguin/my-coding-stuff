@@ -16,7 +16,7 @@
             :root {
                 color-scheme: light dark;
                 font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-                font-size: calc(1.5rem - 0.35vw);
+                font-size: calc(1rem + 0.3vw);
                 height: 100vh;
                 width: 100vw;
                 overflow: hidden;
@@ -152,12 +152,10 @@
                 left: 12px;
                 padding: 0.5rem;
                 font-size: 1.5rem;
-                --t: 0%;
-                transition: --t 0.25s;
-                background-image: radial-gradient(#00ffea67 0%, transparent var(--t));
+                transition: text-decoration 0.25s;
             }
             exit-btn:hover {
-                --t: 70%;
+                text-decoration: underline;
             }
             exit-btn::after {
                 content: 'Back';
