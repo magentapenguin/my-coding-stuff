@@ -209,8 +209,9 @@ const LEVELCFG = {
         ],
         "$": () => [
             sprite("coin"),
-            area({ scale: 0.1 }),
+            area({ scale: vec2(0.5,0.8) }),
             body({ isStatic: true }),
+            pos(0, -5),
             //offscreen({ hide: true }),
             anchor("bot"),
             "coin",
@@ -230,7 +231,15 @@ const LEVELCFG = {
             patrol(),
             //offscreen({ hide: true }),
             "enemy"
-        ]
+        ],
+        /*"-": () => [
+            sprite("grass"),
+            area(),
+            body({ isStatic: true }),
+            // odd that the offscreen component causes the game to lag
+            //offscreen({ hide: true }),
+            anchor("bot"),
+        ],*/
     },
 }
 
@@ -328,13 +337,6 @@ scene("game", ({ levelIdx, score }) => {
 
     bindkeys(CONTROLSCHEMES[controlscheme], player)
 
-    player.onCollide("coin", (coin) => {
-        destroy(coin)
-        play("coin")
-        score++
-        scoreLabel.text = score
-    })
-
     level.get("portal").forEach((x)=>x.play("spin"))
     level.get("coin").forEach((x,i) => setTimeout(() => x.play("move"), i*50))
 
@@ -350,6 +352,12 @@ scene("game", ({ levelIdx, score }) => {
         }
     })
 
+    player.onCollide("coin", (coin) => {
+        destroy(coin)
+        play("coin")
+        score++
+        scoreLabel.text = score
+    })
 
     player.onGround((l) => {
         if (l.is("enemy")) {
@@ -415,6 +423,7 @@ scene("game", ({ levelIdx, score }) => {
     player.onPhysicsResolve(() => {
         gotocam()
     })
+    
     player.onCollide("portal", () => {
         if (levelIdx < LEVELS.length - 1) {
             // If there's a next level, go() to the same scene but load the next level

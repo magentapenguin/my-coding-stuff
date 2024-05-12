@@ -1,10 +1,13 @@
-from tkinter import Tk, Label, Toplevel
+from tkinter import Tk, Label
 from tkinter.ttk import Button
 from time import sleep
 import sys, random
 
 x = True
 dev = not (getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'))
+
+
+
 
 def end():
     global x

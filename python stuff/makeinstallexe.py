@@ -14,6 +14,6 @@ with tempfile.TemporaryFile(dir=os.path.abspath("./tmp"), delete=True, delete_on
         '--noconfirm',
         '--uac-admin',
         '--icon=susinstall.ico',
-        '--name=oddsareitsfine',
+        '--name=autoclickerinstaller',
         f.name,
     ])
