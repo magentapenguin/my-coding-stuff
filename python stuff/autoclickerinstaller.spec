@@ -2,7 +2,7 @@
 
 
 a = Analysis(
-    ['D:\\coding\\python stuff\\tmp\\tmpyvs_13en'],
+    ['D:\\coding\\python stuff\\tmp\\tmpwihg15cc'],
     pathex=[],
     binaries=[],
     datas=[],
