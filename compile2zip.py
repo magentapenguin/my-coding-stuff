@@ -17,6 +17,7 @@ def zipdir(path, zip, exlude=[]):
                     x = x.encode('utf-8')
                 dst.write(x)
                 print(colorama.Fore.GREEN + "OK" + colorama.Style.RESET_ALL)
+    print("Finished")
 
 def main():
     if len(sys.argv) < 2:

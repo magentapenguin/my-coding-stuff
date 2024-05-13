@@ -43,6 +43,15 @@ loadSprite("portal", "./sprites/portalr.png", {
     },
 })
 
+loadSprite("fullscreen", "./sprites/fullscreen.png", {
+    sliceX: 2,
+    // Define animations
+    anims: {
+        "small": 1,
+        "big": 0,
+    },
+})
+
 loadSprite("coin", "./sprites/coinr.png", {
     sliceX: 8,
     // Define animations
@@ -210,8 +219,6 @@ const LEVELCFG = {
         "$": () => [
             sprite("coin"),
             area({ scale: vec2(0.5,0.8) }),
-            body({ isStatic: true }),
-            pos(0, -5),
             //offscreen({ hide: true }),
             anchor("bot"),
             "coin",
@@ -305,6 +312,39 @@ const music = play("happy", {
 })
 
 window.photo = false
+
+function addfullscreenbtn() {
+    const btn = add([
+        sprite("fullscreen"),
+        pos(),
+        scale(1 / 18),
+        fixed(),
+        area(),
+        onsize((x)=>{x.pos=vec2(width() - 512 / 18 - 8, height() - 512 / 18 - 8)}),
+        "fullscreen",
+        cursormod("pointer", 1 / 18, 1 / 18),
+    ])
+    if (!isFullscreen()) {
+        btn.play("big")
+    } else {
+        btn.play("small")
+    }
+
+    btn.onClick(() => {
+        if (isFullscreen()) {
+            setFullscreen(false)
+            btn.play("big")
+        } else {
+            setFullscreen(true)
+            btn.play("small")
+        }
+    })
+
+    return btn
+}
+
+
+
 
 scene("game", ({ levelIdx, score }) => {
     var startscore = score ??= 0;
@@ -463,6 +503,7 @@ scene("game", ({ levelIdx, score }) => {
         })
     })
     onKeyPress("escape", () => go("menu", { levelIdx: levelIdx, score: startscore }))
+    addfullscreenbtn()
 })
 
 
@@ -493,6 +534,7 @@ scene("lose", (x) => {
     onClick(() => go("game", x))
     onKeyPress("space", () => go("game", x))
     onKeyPress("r", start)
+    addfullscreenbtn()
 })
 scene("win", ({score}) => {
     add([
@@ -510,6 +552,7 @@ scene("win", ({score}) => {
     onKeyPress("escape", () => go("menu"))
     onKeyPress("space", start)
     onClick(start)
+    addfullscreenbtn()
 })
 scene("menu", (x) => {
     add([
@@ -542,6 +585,7 @@ scene("menu", (x) => {
     addButton("Settings", (x)=>x.pos = center().add(vec2(0, 96)), () => { go("settings") })
     addButton("Credits", (x)=>x.pos = center().add(vec2(0, 96*2)), () => { go("credits") })
     if (document.getElementById('main').dataset.exitbtn == "true") {addButton("Exit", (x)=>x.pos = center().add(vec2(0, 96*3)), () => {location.assign('/') })}
+    addfullscreenbtn()
 });
 
 scene("settings", (x) => {
@@ -573,6 +617,7 @@ scene("settings", (x) => {
         controlscheme = (controlscheme == "wasd" ? "arrow" : "wasd")
         btn.children[0].text = controlscheme == "wasd" ? "Switch to\nArrow keys" : "Switch to\nWASD"
     }, "Switch\ncontrol scheme")
+    addfullscreenbtn()
 })
 scene("credits", () => {
     add([
@@ -600,6 +645,7 @@ scene("credits", () => {
         y += 40
     }
     addButton("Back", (x)=>x.pos=center().add(vec2(0, 256)), () => { go("menu") })
+    addfullscreenbtn()
 })
 
 go("menu")

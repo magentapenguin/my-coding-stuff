@@ -134,13 +134,15 @@ export function addButton(txt, p, f, hover) {
 }
 
 /**
- * Creates a cursor modifier object.
+ * A utility function that creates a cursor modifier object.
  * @param {string} c - The cursor type.
- * @param {number} [scale=1] - The scale factor for the cursor.
- * @returns {Object} The cursor modifier object.
+ * @param {number} [scale=1] - The scale of the cursor.
+ * @param {number} [basescale=1] - The base scale of the cursor.
+ * @returns {Object} - The cursor modifier object.
  */
-export function cursormod(c, scale = 1) {
+export function cursormod(c, scale = 1, basescale = 1) {
     return {
+        reqires: ["pos", "area"],
         id: "cursormod",
         add() {
             /**
@@ -157,7 +159,7 @@ export function cursormod(c, scale = 1) {
              * Resets the cursor scale and type to default.
              */
             this.onHoverEnd(() => {
-                this.scale = vec2(1);
+                this.scale = vec2(basescale);
                 setCursor("default");
             });
         }
