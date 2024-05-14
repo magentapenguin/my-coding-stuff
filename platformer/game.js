@@ -120,8 +120,6 @@ const LEVELS = [
         "",
         "",
         "",
-        "",
-        "",
         "              . $$$$$",
         "              ========="
     ],
@@ -165,6 +163,13 @@ const LEVELS = [
         "                #      ",
         "@#^^^^>^^^^>^^^^#>^^^^^",
         "========================",
+    ],
+    [
+        "         ---",
+        "           ",
+        "           ",
+        "@         $",
+        "================",
     ]
 ]
 
@@ -182,6 +187,7 @@ const LEVELCFG = {
             area({ scale: vec2(1, 0.9) }),
             body({ jumpForce: SPEED * 2 }),
             anchor("bot"),
+            {goingdown:false},
             "player",
         ],
         "=": () => [
@@ -239,14 +245,14 @@ const LEVELCFG = {
             //offscreen({ hide: true }),
             "enemy"
         ],
-        /*"-": () => [
-            sprite("grass"),
+        "-": () => [
+            sprite("steel"),
             area(),
             body({ isStatic: true }),
-            // odd that the offscreen component causes the game to lag
             //offscreen({ hide: true }),
             anchor("bot"),
-        ],*/
+            "mesh",
+        ],
     },
 }
 
@@ -288,11 +294,13 @@ function bindkeys(scheme, player) {
     })
 
     onKeyPress(scheme.down, () => {
-        player.wie = 10
+        player.mass = 10
+        player.goingdown = true
     })
 
     onKeyRelease(scheme.down, () => {
         player.mass = 1
+        player.goingdown = false
     })
 
         ;[scheme.left, scheme.right].forEach((key) => {
@@ -314,6 +322,7 @@ const music = play("happy", {
 window.photo = false
 
 function addfullscreenbtn() {
+    return
     const btn = add([
         sprite("fullscreen"),
         pos(),
@@ -379,6 +388,15 @@ scene("game", ({ levelIdx, score }) => {
 
     level.get("portal").forEach((x)=>x.play("spin"))
     level.get("coin").forEach((x,i) => setTimeout(() => x.play("move"), i*50))
+    level.get("mesh").forEach((x) => {
+        x.onUpdate(() => {
+            if (player.goingdown) {
+                x.unuse("body")
+            } else {
+                x.use(body({ isStatic:true}))
+            }
+        })
+    })
 
     player.play("idle")
 
@@ -504,6 +522,11 @@ scene("game", ({ levelIdx, score }) => {
     })
     onKeyPress("escape", () => go("menu", { levelIdx: levelIdx, score: startscore }))
     addfullscreenbtn()
+    player.onBeforePhysicsResolve((collision) => {
+		if (collision.target.is("mesh") && player.isJumping() || player.goingdown) {
+			collision.preventResolution()
+		}
+	})
 })
 
 

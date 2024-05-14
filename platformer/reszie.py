@@ -20,7 +20,7 @@ def resize_image(image_path, output_path, size):
 
 
 if __name__ == '__main__':
-    image_path = './sprites/charicon.png'
-    output_path = './icon.png'
+    image_path = './sprites/mesh.png'
+    output_path = './sprites/meshr.png'
     size = (16*4, 16*4)
     resize_image(image_path, output_path, size)
