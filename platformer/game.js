@@ -324,18 +324,18 @@ function addfullscreenbtn() {
         "fullscreen",
         cursormod("pointer", 1 / 18, 1 / 18),
     ])
-    if (!isFullscreen()) {
+    if (document.fullscreenElement) {
         btn.play("big")
     } else {
         btn.play("small")
     }
 
     btn.onClick(() => {
-        if (isFullscreen()) {
-            setFullscreen(false)
+        if (!document.fullscreenElement) {
+            document.body.requestFullscreen()
             btn.play("big")
         } else {
-            setFullscreen(true)
+            document.exitFullscreen()
             btn.play("small")
         }
     })
