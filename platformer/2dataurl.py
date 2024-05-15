@@ -35,10 +35,11 @@ def convert2dataurl(s, filetype='js', fatal=False):
                 x = filename
                 
                 if mimetypes.guess_type(filename)[0].startswith('text') or mimetypes.guess_type(filename)[0].startswith('application/javascript'):
-                    with tempfile.NamedTemporaryFile('w+b', delete_on_close=False) as f, open(filename, 'r') as g:
+                    with tempfile.NamedTemporaryFile('w', delete=False, suffix='.'+os.path.split(filename)[1].split('.')[1]) as f, open(filename, 'r') as g:
                         f.write(g.read())
                         f.close()
-                        x = run(f.name)
+                        x = run(f.name, os.path.abspath(os.path.split(filename)[0]))
+                        os.unlink(f.name)
                     print('New file:', x)
                 dataurl = dataurl_from_file(x, fatal)
                 if isinstance(dataurl, Exception):
