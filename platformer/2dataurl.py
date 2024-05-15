@@ -1,10 +1,11 @@
-import base64, mimetypes, re, os.path
+import base64, mimetypes, re, os.path, tempfile
 
 def dataurl(mime, data):
     return 'data:%s;base64,%s' % (mime, base64.b64encode(data).decode('ascii'))
 
 def dataurl_from_file(filename, fatal=False):
     mime, _ = mimetypes.guess_type(filename)
+    print('Mime:', mime)
     try:
         with open(filename, 'rb') as f:
             return dataurl(mime, f.read())
@@ -32,8 +33,13 @@ def convert2dataurl(s, filetype='js', fatal=False):
                 filename = code.split('->')[1].strip()
                 print('Converting:', filename)
                 x = filename
-                if mimetypes.guess_type(filename)[0].startswith('text'):
-                    x = run(filename)
+                
+                if mimetypes.guess_type(filename)[0].startswith('text') or mimetypes.guess_type(filename)[0].startswith('application/javascript'):
+                    with tempfile.NamedTemporaryFile('w+b', delete_on_close=False) as f, open(filename, 'r') as g:
+                        f.write(g.read())
+                        f.close()
+                        x = run(f.name)
+                    print('New file:', x)
                 dataurl = dataurl_from_file(x, fatal)
                 if isinstance(dataurl, Exception):
                     print('Error:', dataurl)

@@ -166,7 +166,12 @@ const LEVELS = [
         "========================",
     ],
     [
-        "         ---",
+        "     ---",
+        "      $ ",
+        "          ",
+        "          ",
+        "      #$$   ",
+        "      ===---",
         "           ",
         "           ",
         "@         $",
@@ -185,7 +190,7 @@ const LEVELCFG = {
         "@": () => [
             sprite("char"),
             pos(),
-            area({ scale: vec2(1, 0.9) }),
+            area({ scale: vec2(0.8, 0.8) }),
             body({ jumpForce: SPEED * 2 }),
             anchor("bot"),
             {goingdown:false},
@@ -239,12 +244,12 @@ const LEVELCFG = {
         ],
         ">": () => [
             sprite("ghosty"),
-            area(),
+            area({ scale: vec2(0.6, 0.9) }),
             anchor("bot"),
-            body(),
+            body({mass: 5, gravityScale: 0,}),
             patrol(),
             //offscreen({ hide: true }),
-            "enemy"
+            "ghosty"
         ],
         "-": () => [
             sprite("mesh"),
@@ -419,16 +424,10 @@ scene("game", ({ levelIdx, score }) => {
     })
 
     player.onGround((l) => {
-        if (l.is("enemy")) {
+        if (l.is("ghosty")) {
             player.jump(SPEED * 3)
             destroy(l)
             addKaboom(player.pos)
-        }
-    })
-    player.onCollide("enemy", (e, col) => {
-        // if it's not from the top, die
-        if (!col.isBottom()) {
-            go("lose", { levelIdx: levelIdx, score: startscore })
         }
     })
 
@@ -524,7 +523,7 @@ scene("game", ({ levelIdx, score }) => {
     onKeyPress("escape", () => go("menu", { levelIdx: levelIdx, score: startscore }))
     addfullscreenbtn()
     player.onBeforePhysicsResolve((collision) => {
-		if (collision.target.is("mesh") && player.isJumping() || player.goingdown) {
+		if (collision.target.is("mesh") && (player.isJumping() || player.goingdown)) {
 			collision.preventResolution()
 		}
 	})

@@ -64,7 +64,7 @@ export function patrol(speed = 60, dir = 1) {
         require: ["pos", "area"],
         add() {
             this.on("collide", (obj, col) => {
-                if (col.isLeft() || col.isRight()) {
+                if ((col.isLeft() || col.isRight()) && !obj.is("player")) {
                     dir = -dir;
                 }
             });
