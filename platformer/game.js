@@ -1,5 +1,5 @@
 import kaboom from "https://cdn.jsdelivr.net/npm/kaboom/+esm";
-import { addButton, onsize, patrol, cursormod, } from "./utills.js";
+import { addButton, onsize, patrol, cursormod, } from "./utills.js"; // 2dataurl-> ./utills.js
 
 // Start kaboom
 kaboom({
@@ -8,7 +8,7 @@ kaboom({
 })
 
 // Load assets
-loadSprite("char", "./sprites/character03r.png", {
+loadSprite("char", "./sprites/character03r.png", { // 2dataurl-> ./sprites/character03r.png
     // The image contains 9 frames layed out horizontally, slice it into individual frames
     sliceX: 10,
     // Define animations
@@ -30,7 +30,7 @@ loadSprite("char", "./sprites/character03r.png", {
     },
 })
 
-loadSprite("portal", "./sprites/portalr.png", {
+loadSprite("portal", "./sprites/portalr.png", { // 2dataurl-> ./sprites/portalr.png
     sliceX: 4,
     // Define animations
     anims: {
@@ -43,7 +43,7 @@ loadSprite("portal", "./sprites/portalr.png", {
     },
 })
 
-loadSprite("fullscreen", "./sprites/fullscreen.png", {
+loadSprite("fullscreen", "./sprites/fullscreen.png", { // 2dataurl-> ./sprites/fullscreen.png
     sliceX: 2,
     // Define animations
     anims: {
@@ -52,7 +52,7 @@ loadSprite("fullscreen", "./sprites/fullscreen.png", {
     },
 })
 
-loadSprite("coin", "./sprites/coinr.png", {
+loadSprite("coin", "./sprites/coinr.png", { // 2dataurl-> ./sprites/coinr.png
     sliceX: 8,
     // Define animations
     anims: {
@@ -66,18 +66,19 @@ loadSprite("coin", "./sprites/coinr.png", {
 })
 
 
-loadSprite("grass", "./sprites/grassr.png")
-loadSprite("ghosty", "./sprites/ghostr.png")
-loadSprite("spike", "./sprites/spiker.png")
-loadSprite("wspike", "./sprites/widespiker.png")
-loadSprite("steel", "./sprites/steelr.png")
+loadSprite("grass", "./sprites/grassr.png") // 2dataurl-> ./sprites/grassr.png
+loadSprite("ghosty", "./sprites/ghostr.png") // 2dataurl-> ./sprites/ghostr.png
+loadSprite("spike", "./sprites/spiker.png") // 2dataurl-> ./sprites/spiker.png
+loadSprite("wspike", "./sprites/widespiker.png") // 2dataurl-> ./sprites/widespiker.png
+loadSprite("steel", "./sprites/steelr.png") // 2dataurl-> ./sprites/steelr.png
+loadSprite("mesh", "./sprites/meshr.png") // 2dataurl-> ./sprites/meshr.png
 
-loadSound("jumpland", "./sounds/jumpland.wav")
-loadSound("happy", "./sounds/happy.mp3")
-loadSound("empty", "./sounds/empty.wav")
-loadSound("coin", "./sounds/coin1.wav")
+loadSound("jumpland", "./sounds/jumpland.wav") // 2dataurl-> ./sounds/jumpland.wav
+loadSound("happy", "./sounds/happy.mp3") // 2dataurl-> ./sounds/happy.mp3
+loadSound("empty", "./sounds/empty.wav") // 2dataurl-> ./sounds/empty.wav
+loadSound("coin", "./sounds/coin1.wav") // 2dataurl-> ./sounds/coin1.wav
 
-loadFont("pixel", "'./Kitchen Sink.ttf'")
+loadFont("pixel", "'./Kitchen Sink.ttf'") // 2dataurl-> ./Kitchen Sink.ttf
 
 const credits = {
     'Kaboom.js - Game Framework':'https://kaboomjs.com', 
@@ -246,7 +247,7 @@ const LEVELCFG = {
             "enemy"
         ],
         "-": () => [
-            sprite("steel"),
+            sprite("mesh"),
             area(),
             body({ isStatic: true }),
             //offscreen({ hide: true }),

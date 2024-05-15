@@ -1,6 +1,6 @@
 import bottle, os.path
  
-def make(dir='D:/coding'):
+def make(dir='./'):
     dir = os.path.abspath(dir)
     x = "<ul class=\"fa-ul no-dot\" style='--fa-li-margin: 2em; margin-bottom: 0.25rem;'>"
     y = 0
