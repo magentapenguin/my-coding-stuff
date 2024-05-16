@@ -607,7 +607,7 @@ scene("menu", (x) => {
     addButton("Play", (x)=>x.pos = center(), () => { setCursor("default"); go("game", x ?? JSON.parse(localStorage.getItem("platformersave")) ?? { levelIdx: 0, score: 0 }) })
     addButton("Settings", (x)=>x.pos = center().add(vec2(0, 96)), () => { go("settings") })
     addButton("Credits", (x)=>x.pos = center().add(vec2(0, 96*2)), () => { go("credits") })
-    if (document.getElementById('main').dataset.exitbtn == "true") {addButton("Exit", (x)=>x.pos = center().add(vec2(0, 96*3)), () => {location.assign('/') })}
+    if (document.getElementById('main').dataset.exitbtn == "true") {addButton("Exit", (x)=>x.pos = center().add(vec2(0, 96*3)), () => {location.assign('/platformer/landing.html') })}
     addfullscreenbtn()
 });
 

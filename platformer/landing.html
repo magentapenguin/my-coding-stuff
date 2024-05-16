@@ -3,12 +3,11 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Website Navigator</title>
+        <title>Stickman Jump Game</title>
         <script src="/exit.js"></script>
         <script src="https://kit.fontawesome.com/433c98b60c.js" crossorigin="anonymous" data-auto-replace-svg="nest"></script>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="mask-icon" href="favicon.svg" color="#000000">
-        <link rel="prefetch" href="/cool-bg.jpg" as="image"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.7.3/styles/overlayscrollbars.min.css" integrity="sha512-Bs5euU6gggblSxpjGQtZeL2VUbDzlygloRfncgWNOiT/86SnWnBmbHQW20k9ZeCa0Bf4kl6Y/gvH4YKFE26PrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="icon" href="./favicon.png" type="image/png">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.7.3/styles/overlayscrollbars.min.css" integrity="sha512-Bs5euU6gggblSxpjGQtZeL2VUbDzlygloRfncgWNOiT/86SnWnBmbHQW20k9ZeCa0Bf4kl6Y/gvH4YKFE26PrQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/overlayscrollbars/2.7.3/browser/overlayscrollbars.browser.es6.min.js" integrity="sha512-yF8/A6HJc4a4CzVz3qKhsUzg6Rz1piDFbIsSI3gDaE+8RcRLysYPgWItBmAkvJU2KCskkEaOwe7tCXzQaedi3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <style>
             :root {
@@ -45,12 +44,9 @@
                     color: rgb(27, 152, 255);
                 }
             }
-            .hide {
-                display: none;
-            }
             main {
                 margin: 6rem;
-                border-radius: 0.6rem;
+                border-radius: 0.65rem;
                 background-color: var(--bg, rgba(195, 228, 255, 0.6));
                 backdrop-filter: blur(1rem);
                 padding: 1rem;
@@ -63,15 +59,24 @@
                 h1 {
                     margin-top: 0.5rem;
                 }
-                
                 .os-scrollbar-vertical {
                     right: 0.5rem;
                     --os-padding-perpendicular: 0.1rem;
                 }
             }
+            .no-dot {
+                list-style-type: none;
+            }
+            .hide {
+                display: none;
+            }
+            .click {
+                cursor: pointer;
+                -webkit-user-select: none;
+                user-select: none;
+            }
             .bg {
-                filter: sepia(0.25);
-                background-image: url('cool-bg.jpg');
+                background-image: url('newbanner.png');
                 background-position: center;
                 background-size: cover;
                 position: fixed;
@@ -86,7 +91,7 @@
                 padding-top: 0.2rem;
                 left: 0;
                 bottom: 0;
-                font-size: 1rem;
+                font-size: 0.95rem;
                 color: white;
                 border-top-right-radius: 0.5rem;
                 background-color: rgba(0, 0, 0, 0.2);
@@ -106,39 +111,47 @@
                     margin-left: 0.5rem;
                 }
             }
+            .fa-folder-open {
+                transform: translateX(2px);
+            }
+            .empty {
+                font-style: italic;
+                display: inline-block;
+                margin-left: -1.5em;
+            }
+            ul:has(> .empty) {
+                display: inline-block;
+            }
+            li:has(> ul > .empty) {
+                .click {
+                    cursor: default;
+                }
+                br {
+                    display: none;
+                }
+            }
             .hilite {
                 background-color: rgba(238, 255, 0, 0.568);
             }
-            details {
-                border-radius: 4px;
-                padding: 0.2em 0.2em 0;
-                -webkit-user-select: none;
-                user-select: none;
+            .download {
+                text-decoration: none;
+                opacity: 0.5;
+                margin-left: 0.15em;
+                transition: opacity 0.25s ease-in-out;
             }
-
-            details[open] >*:not(summary) {
-                margin-left: 0.5em;
+            .download:hover {
+                opacity: 1;
             }
-
-            summary {
-                font-weight: bold;
-                margin: -0.2em -0.2em 0;
-                padding: 0.2em;
-                cursor: pointer;
+            exit-btn {
+                position: absolute;
+                top: 5px;
+                left: 12px;
+                padding: 0.5rem;
+                font-size: 1.5rem;
+                transition: text-decoration 0.25s;
             }
-
-            details[open] {
-                padding: 0.2em;
-            }
-
-            details[open] summary {
-                margin-bottom: 0.2em;
-            }
-            ul {
-                list-style-type: none;
-                padding-left: 0;
-                margin-top: -0.25em;
-                margin-bottom: 0.5rem;
+            exit-btn::after {
+                content: 'Back';
             }
             .extra {
                 position: absolute;
@@ -148,29 +161,33 @@
                 height: 100vh;
                 background-color: light-dark(transparent, #000c1680);
             }
-            .icon {
-                margin: 0;
-                transform: translateY(5px);
-                margin-right: 0.25em;
+            .list li {
+                margin-top: 0.2rem;
+                margin-bottom: 0.2rem;
+                font-size: larger;
+            }
+            .list:has(i) {
+                list-style: none;
+            }
+            .list i {
+                margin-right: 0.25rem;
             }
         </style>
     </head>
     <body>
         <div class="bg"></div>
         <div class="extra"></div>
+        <exit-btn href="/"></exit-btn>
         <main data-overlayscrollbars-initialize>
-            <h1>Website Quicklinks</h1>
-            <details>
-                <summary>Games</summary>
-                <ul>
-                    <li><a href="/circle-button/circle-button-index.html"><img src="/circle-button/favicon-32x32.png" width="24" class="icon"></img>Circle Button Game</a></li>
-                    <li><a href="/platformer/landing.html"><img src="/platformer/favicon.png" width="24" class="icon"></img>Stickman Jump Game</a></li>
-                    <li><a href="/python stuff/dist/autoclickerinstaller.exe"><img src="/favicon.svg" width="24" class="icon"></img>Autoclicker</a></li>
-                </ul>
-            </details>
-            <a href="/nav">Full Navigator</a>
+            <h1>Stickman Jump Game!</h1>
+            <h2>Links</h2>
+            <ul class="list">
+                <li><a href="./index.html"><i class="fa-regular fa-gamepad-modern fa-fw"></i>Play!</a></li>
+                <li><a href="./index_new.html" download="platformer-offline.html"><i class="fa-regular fa-download fa-fw"></i>Offline Version (Possibley outdated)</a></li>
+                <li><a href="https://magentapenguin.itch.io/platformer"><i class="fa-brands fa-itch-io fa-fw"></i>On itch.io</a></li>
+            </ul>   
         </main>
-        <small>Image from <a href="https://unsplash.com/photos/birds-eye-view-of-mountains-eluzJSfkNCk" rel="noopener">Unsplash</a></small>
+        <small>Image from <a href="https://unsplash.com/photos/background-pattern-Oi_oaJk3qlo" rel="noopener">Unsplash</a></small>
         <script>
             OverlayScrollbarsGlobal.OverlayScrollbars(document.querySelector('main'), {
                 overflow: {
