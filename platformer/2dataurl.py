@@ -47,8 +47,8 @@ def convert2dataurl(s, filetype='js', fatal=False):
                     continue
                 s = s.replace(comment, '')
                 s = s.replace(filename, dataurl)
-                if filename.endswith('.html'):
-                    s = s.replace('data-exitbtn="true"', 'data-exitbtn="false"')
+    if filetype == 'html':
+        s = s.replace('data-exitbtn="true"', 'data-exitbtn="false"')
     return s
 
 def runfunc_on_file(filename, func, newfile=False, cwd=None, args=(), kwargs={}):
