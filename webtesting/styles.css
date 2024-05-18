@@ -1,0 +1,496 @@
+/* Bootstrap but worse */
+
+/*@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');*/
+:root {
+    --bg-color: light-dark(#f0f0f0, #292929);
+    --text-color: light-dark(#333, #ddd);
+    --color: var(--text-color);
+    --secondary-text-color: light-dark(#474747, #b9b9b9);
+    --secondary-bg-color: light-dark(#ebebeb, #383838);
+    --secondary-active-color: light-dark(#c9c7c7, #555555);
+    --autofill-color: light-dark(#a6ffb2, #216800);
+    --border-color: light-dark(#a1a1a1, #727272);
+    --border-width: 1px;
+    --border-radius: 10px;
+    --main-padding: 10px;
+    --main-margin: 10px;
+    --link: light-dark(rgb(0, 94, 172), rgb(91, 181, 255));
+    --link-hover: light-dark(rgb(0, 57, 104), rgb(27, 152, 255));
+    --accent-color: light-dark(rgb(221, 0, 221), rgb(255, 91, 228));
+    --accent-color-a: light-dark(rgba(221, 0, 221, 0.3), rgba(255, 91, 228, 0.2));
+    --accent-text-color: light-dark(#ddd, #333);
+    --selection-color: #333;
+    --selection-bg-color: var(--accent-color);
+    --global-margin: 0.5rem;
+    color-scheme: light dark;
+    /*font-family: 'Roboto', sans-serif;*/
+    font-size: 1.1rem;
+    --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-family: var(--font);
+}
+*:not(p) {
+    margin-bottom: var(--global-margin);
+}
+a {
+    color: var(--link);
+    text-underline-offset: .15em;
+    transition: color 0.25s ease-in-out;
+    transition: outline 0.05s ease-in-out;
+}
+a:hover {
+    color: var(--link-hover);
+}
+body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: color 0.1s ease-in-out, background-color 0.1s ease-in-out;
+    margin: 0;
+    padding: 0;
+}
+h1 {
+    font-size: 2em;
+    margin: 0;
+    padding: 0;
+    margin-bottom: var(--global-margin);
+}
+main {
+    margin: var(--main-margin);
+    margin-left: calc(var(--main-margin) + 1rem);
+    padding: var(--main-padding);
+}
+
+::selection {
+    background-color: var(--selection-bg-color);
+    color: var(--selection-color);
+}
+
+/* Button styling */
+.btn {
+    display: inline-block;
+    background-color: transparent;
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid var(--border-color);
+    color: var(--secondary-text-color);
+    font-size: 1em;
+    padding: 0.5em 1em;
+    transition: border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out, transform 0.1s ease-in-out, background-color 0.15s ease-in-out;
+    outline: none;
+    font-weight: 550;
+    text-align: center;
+    box-sizing: border-box;
+}
+a.btn {
+    text-decoration: none;
+    color: var(--secondary-text-color);
+}
+input:not([type="file"], [type="image"]), select, textarea {
+    background-color: transparent;
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid var(--border-color);
+    color: var(--text-color);
+    font-size: 1em;
+    height: 2rem;
+    box-sizing: border-box;
+    padding: 0.5em 0.7em;
+    transition: border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out, transform 0.5s ease-in-out, background-color 0.15s ease-in-out;
+    outline: none;
+    font-family: var(--font);
+    accent-color: var(--accent-color);
+}
+.btn {
+    cursor: pointer;
+}
+.btn.active, .btn:has(:checked) {
+    background-color: var(--secondary-active-color) !important;
+}
+.autofilled {
+    background-color: color-mix(in srgb, var(--autofill-color), var(--bg-color) 60%) !important;
+}
+label.btn:has(.autofilled:checked) {
+    background-color: color-mix(in srgb, var(--autofill-color), var(--secondary-active-color) 50%) !important;
+}
+label.btn:has(.autofilled) {
+    background-color: color-mix(in srgb, var(--autofill-color), var(--secondary-bg-color) 80%) !important;
+}
+
+:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+:is(.btn:focus-visible, .btn:focus, .btn:active, .btn:hover, input:focus, input:hover, select:hover, select:focus, textarea:hover, textarea:focus):not(:disabled, [type="file"], [type="image"]) {
+    border-color: var(--accent-color);
+}
+:is(.btn:hover, .btn:focus, input:hover, input:focus, select:hover, select:focus, textarea:hover, textarea:focus):not(:disabled, [type="file"], [type="image"]) {
+    background-color: var(--secondary-bg-color);
+}
+:is(.btn:focus-visible, .btn:active, input:focus, select:focus, textarea:focus):not(:disabled, [type="file"], [type="image"]) {
+    box-shadow: 0 0 0 3px var(--accent-color-a);
+}
+:is(.btn:active):not(:disabled, [type="file"], [type="image"]) {
+    background-color: var(--secondary-active-color);
+}
+.green-accent {
+    --accent-color: light-dark(rgb(0, 119, 10), rgb(0, 200, 0));
+    --accent-color-a: light-dark(rgba(0, 119, 10, 0.3), rgba(0, 200, 0, 0.2));
+}
+.red-accent {
+    --accent-color: light-dark(rgb(170, 0, 0), rgb(255, 39, 39));
+    --accent-color-a: light-dark(rgba(170, 0, 0, 0.3), rgba(255, 39, 39, 0.2));
+}
+exit-btn::after {
+    content: 'Exit';
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+}
+exit-btn {
+    font-size: 1.5em;
+    transition: color 0.25s ease-in-out;
+    margin-bottom: 0.5rem;
+}
+main exit-btn {
+    margin-left: -0.5rem;
+}
+main exit-btn + * {
+    margin-top: 1rem;
+}
+
+exit-btn:hover, exit-btn:focus-visible {
+    color: color-mix(in hsl shorter hue, #f00, var(--text-color) 45%);
+}
+
+/* Button Groups
+Stolen from Bootstrap 5 :P
+*/
+.button-group {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    gap: 0 !important;
+    * {
+        margin-bottom: 0;
+    }
+    .btn {
+        flex: 1 1 auto;
+        border-radius: 0;
+    }
+    .btn:first-child {
+        border-top-left-radius: var(--border-radius);
+        border-bottom-left-radius: var(--border-radius);
+    }
+    .btn:last-child {
+        border-top-right-radius: var(--border-radius);
+        border-bottom-right-radius: var(--border-radius);
+    }
+}
+
+/* Form styling */
+label {
+    font-size: 1.2em;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+.vform {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    * {
+        margin-bottom: 0;
+    }
+}
+.i-group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    width: 50%;
+    label {
+        margin-right: 0.5em;
+        text-align: right;
+    }
+    * {
+        margin-bottom: 0;
+    }
+    input, button, select, textarea {
+        width: 100%;
+    }
+}
+.i-group:has(textarea) {
+    align-items: flex-start;
+    label {
+        margin-top: 0.2em;
+    }
+}
+
+.checkbox-group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    margin-left: 0.25em;
+    label {
+        margin-right: 0.5em;
+        text-align: right;
+    }
+    * {
+        margin-bottom: 0;
+    }
+    input {
+        margin: 0;
+    }
+}
+
+[type="checkbox"],
+[type="radio"] {
+    height: 1.5em !important;
+    border-radius: 0.25em;
+    aspect-ratio: 1 / 1;
+    cursor: pointer;
+}
+
+[type="checkbox"]:focus-visible,
+[type="radio"]:focus-visible {
+    border: var(--accent-color) solid var(--border-width);
+}
+
+[type="color"] {
+    padding: 0.2em 0.3em !important;
+    height: 2em;
+    cursor: pointer;
+    border-radius: var(--border-radius);
+}
+
+input[type="color"]::-moz-color-swatch {
+    border-radius: var(--border-radius);
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border-radius: var(--border-radius);
+}
+
+[type="file"] {
+    font-size: 1em;
+}
+
+::-webkit-file-upload-button {
+    padding: 0.25em 0.75em;
+    height: 2rem;
+    box-sizing: border-box;
+    border-radius: var(--border-radius);
+    border: var(--border-width) solid var(--border-color);
+    color: var(--text-color);
+    transition: border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out, transform 0.1s ease-in-out, background-color 0.15s ease-in-out;
+    outline: none;
+    margin-left: 1rem;
+    font-size: 0.9em;
+    background-color: transparent;
+    cursor: pointer;
+}
+::-webkit-file-upload-button:hover {
+    background-color: var(--secondary-bg-color);
+    border: var(--accent-color) solid var(--border-width);
+}
+::-webkit-file-upload-button:focus-visible {
+    box-shadow: 0 0 0 3px var(--accent-color-a);
+}
+::-webkit-file-upload-button:active {
+    background-color: var(--secondary-active-color);
+}
+
+select {
+    padding: 0 0.5em;
+    height: 2rem;
+}
+
+option {
+    padding: 0.5em;
+    background-color: var(--bg-color);
+}
+
+.go-away {
+    display: none;
+}
+
+
+[type="range"] {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+::-webkit-slider-thumb {
+    cursor: w-resize;
+}
+
+::-webkit-slider-runnable-track {
+    cursor: pointer;
+    border: none !important;
+}
+
+textarea {
+    resize: vertical;
+    height: 4.8em;
+    min-height: 2.4em;
+    font-family: var(--font);
+}
+
+/* Misc utils */
+.d-block {
+    display: block !important;
+}
+.d-none {
+    display: none !important;
+}
+.d-inline {
+    display: inline !important;
+}
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+/* Shadows are disabled in dark mode. */
+@media (prefers-color-scheme: light) {
+    .shadow {
+        box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+    }
+    .shadow-lg {
+        box-shadow: 0 5px 15px 5px rgba(0, 0, 0, 0.2);
+    }
+}
+.w-100 {
+    width: 100%;
+}
+.w-50 {
+    width: 50%;
+}
+.hflex {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    * {
+        margin-bottom: 0;
+    }
+}
+.vflex {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    * {
+        margin-bottom: 0;
+    }
+}
+
+/* Table styling */
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: var(--border-width) solid var(--border-color);
+    padding: 0.5em;
+    text-align: left;
+    border-left: none;
+    border-right: none;
+}
+.small-table td, .small-table th {
+    padding: 0.25em;
+}
+th {
+    background-color: transparent;
+    border-top: none;
+}
+td {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+}
+tr:nth-child(even) {
+    background-color: var(--secondary-bg-color);
+}
+:not(thead) > tr:hover {
+    background-color: var(--secondary-active-color);
+}
+.small-table {
+    width: calc(50% - 1rem);
+    margin-left: 0.5rem;
+}
+/* Meter & Progress styling */
+meter, progress {
+    display: block;
+    width: 100%;
+    height: 1.5em;
+    border-radius: 0.25em;
+    border: var(--border-width) solid var(--border-color);
+    margin-bottom: 0.5rem;
+}
+meter::-webkit-meter-bar {
+    background-color: var(--secondary-bg-color);
+}
+meter::-webkit-meter-optimum-value {
+    background-color: var(--accent-color);
+}
+meter::-webkit-meter-suboptimum-value {
+    background-color: var(--secondary-active-color);
+}
+meter::-webkit-meter-even-less-good-value {
+    background-color: var(--secondary-text-color);
+}
+progress::-webkit-progress-bar {
+    background-color: var(--secondary-bg-color);
+}
+progress::-webkit-progress-value {
+    background-color: var(--accent-color);
+}
+/* Firefox (lol)*/
+::-moz-progress-bar {
+    background-color: var(--accent-color);
+}
+
+/* Bootstrap-like progress bar */
+
+.progress-bar {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    width: 100%;
+    height: 1em;
+    overflow: hidden;
+    border-radius: var(--border-radius);
+    border: none;
+    background-color: var(--secondary-bg-color);
+    margin-bottom: 0.5rem;
+    padding: 0;
+}
+.progress-bar div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+    color: var(--accent-text-color);
+    text-align: center;
+    white-space: nowrap;
+    height: 100%;
+    background-color: var(--accent-color);
+    box-sizing: content-box;
+    font-size: 0.8em;
+}
+
+/* Code styling */
+code {
+    background-color: var(--secondary-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.25em;
+    font-size: 0.9em;
+}
+pre {
+    background-color: var(--secondary-bg-color);
+    border-radius: var(--border-radius);
+    padding: 0.5em;
+    font-size: 0.9em;
+    overflow-x: auto;
+}
+/* Iframe styling */
+iframe {
+    border: none;
+    width: 100%;
+}

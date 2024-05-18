@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: monospace;
+            color: #f0f0f0;
+            background-color: #333;
+            margin: 0;
+            padding: 0.1rem 0.5rem;
+            font-size: 1.5em;
+        }
+        #cursor {
+            animation: flash 1s linear infinite;
+            display: inline-block;
+            color: #fff;
+            transform: translateX(-0.5ch);
+            width: 0;
+            font-weight: 100;
+        }
+        @keyframes flash {
+            from, 50%, to{
+                opacity: 1;
+            }
+            
+            51%, 99% {
+                opacity: 0;
+            }
+        }
+        #input-before, #input-after {
+            background-color: transparent;
+            border: none;
+            color: inherit;
+            font-family: inherit;
+            font-size: inherit;
+            padding: 0;
+            margin: 0;
+            width: auto;
+            outline: none;
+            caret-color: transparent;
+            white-space: pre-wrap;
+        }
+        #input-container {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div id="input-container">
+        <span id="input-before">words</span><span id="cursor">|</span><span id="input-after">words</span>
+    </div>
+    <script>
+        document.addEventListener('keydown', (event) => {
+            const input1 = document.getElementById('input-before');
+            const input2 = document.getElementById('input-after');
+            const cursor = document.getElementById('cursor');
+            if (event.key === 'Backspace') {
+                input1.textContent = input1.textContent.slice(0, -1);
+            } else if (event.key === 'ArrowLeft') {
+                input2.textContent = input1.textContent.slice(-1) + input2.textContent;
+                input1.textContent = input1.textContent.slice(0, -1);
+            } else if (event.key === 'ArrowRight') {
+                input1.textContent += input2.textContent.slice(0, 1);
+                input2.textContent = input2.textContent.slice(1);
+            } else if (event.key === 'Delete') {
+                input2.textContent = input2.textContent.slice(1);
+            } else if (event.key === 'Enter') {
+                input1.textContent += '\n';
+            } else if (event.key.length === 1) {
+                input1.textContent += event.key;
+            }
+            console.log(event.key);
+        });
+        document.addEventListener('click', () => {
+            document.getElementById('cursor').focus();
+        });
+    </script>
+</body>
+</html>

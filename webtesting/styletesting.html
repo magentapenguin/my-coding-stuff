@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="/exit.js" defer></script>
+    <script type="module">
+        import { autofill } from './autofill.js';
+        autofill();
+    </script>
+    <title>Title</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="mask-icon" href="favicon.svg" color="#000000">
+</head>
+<body>
+    <main>
+        <exit-btn href="/" tabindex="0"></exit-btn>
+        <h1>Title</h1>
+        <p>
+            Lorem ipsum, dolor sit amet consectetur adipisicing elit. Inventore sapiente error aliquid. Velit ratione animi ipsa! Velit odit magni repudiandae, commodi fugiat nobis molestias autem corporis eveniet illo, eum distinctio.
+            <br>
+            <a href="#">Test Link</a>
+        </p>
+        <div class="button-group w-50">
+            <a class="shadow w-100 btn" href="#" role="button">Link Button</a>
+            <button class="d-inline shadow w-100 btn" type="button">Button</button>
+            <button class="d-inline shadow w-100 btn" disabled type="button">Button</button>
+        </div>
+        <form class="button-group w-50">
+            <label class="shadow w-100 btn" for="input-btn3"><input id="input-btn3" class="go-away" type="checkbox" name="check-btn" value="true">Checkbox</label>
+            <label class="shadow w-100 btn" for="input-btn1"><input id="input-btn1" class="go-away" type="radio" name="input-btns" value="true">True</label>
+            <label class="shadow w-100 btn" for="input-btn2"><input id="input-btn2" class="go-away" type="radio" name="input-btns" value="false">False</label>
+            <button type="submit" class="shadow w-100 btn green-accent">Submit</button>
+        </form>
+        <form class="vform">
+            <h2>Form Title</h2>
+            <div class="i-group">
+                <label for="input">Label: </label>
+                <input type="text" placeholder="Placeholder" id="input" name="input">
+            </div>
+            <div class="i-group">
+                <label for="color">Color: </label>
+                <input type="color" placeholder="Placeholder" id="color" name="color">
+            </div>
+            <div class="i-group">
+                <label for="file">File: </label>
+                <input type="file" placeholder="Placeholder" id="file" name="file">
+            </div>
+            <div class="i-group">
+                <label for="range">Range: </label>
+                <input type="range" placeholder="Placeholder" id="range" name="range" min="0" max="10" value="5">
+            </div>
+            <div class="i-group">
+                <label for="select">Select: </label>
+                <select id="select" name="select">
+                    <option value="" disabled selected>Select an option</option>
+                    <option value="1">Option 1</option>
+                    <option value="2">Option 2</option>
+                    <option value="3">Option 3</option>
+                </select>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" placeholder="Placeholder" id="checkbox" name="checkbox" checked>
+                <label for="checkbox">Checkbox</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="radio" placeholder="Placeholder" id="radio1" name="radio" value="on" checked>
+                <label for="radio1">Radio Button (on)</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="radio" placeholder="Placeholder" id="radio2" name="radio" value="off">
+                <label for="radio2">Radio Button (off)</label>
+            </div>
+            <div class="i-group">
+                <label for="textarea">Textarea: </label>
+                <textarea id="textarea" name="textarea" placeholder="Placeholder"></textarea>
+            </div>
+            <div class="i-group button-group">
+                <button type="submit" class="btn green-accent">Submit</button>
+                <button type="reset" class="btn red-accent">Reset</button>
+            </div>
+        </form>
+        <table class="small-table">
+            <thead>
+                <tr>
+                    <th>Header 1</th>
+                    <th>Header 2</th>
+                    <th>Header 3</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Row 1</td>
+                    <td>Row 1</td>
+                    <td>Row 1</td>
+                </tr>
+                <tr>
+                    <td>Row 2</td>
+                    <td>Row 2</td>
+                    <td>Row 2</td>
+                </tr>
+                <tr>
+                    <td>Row 3</td>
+                    <td>Row 3</td>
+                    <td>Row 3</td>
+                </tr>
+            </tbody>
+        </table>
+        <h2>An Attempt at Styling <code>&lt;meter&gt;</code> and <code>&lt;progress&gt;</code></h2>
+        <p>
+            <div class="hflex">Progress bar: <progress value="50" max="100">50%</progress></div>
+            <div class="hflex">Meter: <meter value="50" min="0" max="100">50%</meter></div>
+            <div class="hflex">Bootstrap Style: <div class="progress-bar"><div style="width: 50%">50%</div></div></div>
+            <input type="range" min="0" max="100" value="50" id="meter-val" class="w-100">
+            <script>
+                document.getElementById("meter-val").addEventListener("input", e => {
+                    document.querySelector("progress").value = e.target.value;
+                    document.querySelector("meter").value = e.target.value;
+                    document.querySelector(".progress-bar div").style.width = e.target.value + "%";
+                    document.querySelector(".progress-bar div").innerText = e.target.value + "%";
+                });
+            </script>
+        </p>
+    </main>
+</body>
+</html>

@@ -179,33 +179,40 @@
         </main>
         <small>Image from <a href="https://unsplash.com/photos/birds-eye-view-of-mountains-eluzJSfkNCk" rel="noopener">Unsplash</a></small>
         <script>
-            document.querySelectorAll("li:has(> ul > .empty) .click").forEach(x => {
-                x.classList.add("no-fold")
-            });
-            document.querySelectorAll(".fa-ul li:has(> .fa-ul) .click:not(.no-fold)").forEach(x => {
-                let run = e => {
-                    let y = x.querySelector("& [data-fa-i2svg]").children[0];
-                    if (y.classList.values().toArray().includes('fa-folder-closed')) {
-                        y.classList.add("fa-solid", "fa-folder-open");
-                    } else {
-                        y.classList.add("fa-solid", "fa-folder-closed");
+            window.addEventListener("load",()=>{
+                document.querySelectorAll("li:has(> ul > .empty) .click").forEach(x => {
+                    x.classList.add("no-fold")
+                });
+                document.querySelectorAll(".fa-ul li:has(> .fa-ul) .click:not(.no-fold)").forEach(x => {
+                    let run = e => {
+                        let y = x.querySelector("& [data-fa-i2svg]").children[0];
+                        if (y.classList.values().toArray().includes('fa-folder-closed')) {
+                            y.classList.add("fa-solid", "fa-folder-open");
+                        } else {
+                            y.classList.add("fa-solid", "fa-folder-closed");
+                        }
+                        x.closest("li").querySelector("ul").classList.toggle("hide");
                     }
-                    x.closest("li").querySelector("ul").classList.toggle("hide");
-                }
-                x.addEventListener("click", run);
-                var m = new MutationObserver(() => {if (document.querySelector("html").classList.contains("fontawesome-i2svg-complete")) {setTimeout(run(), 10)}});
-                m.observe(document.querySelector("html"), {attributes: true, attributeFilter: ["class"]})
-                console.log(x, m);
-            });
-            document.querySelectorAll("li:has(> ul > .empty) > .click > .fa-li > i").forEach(x => {
-                x.classList.add("fa-solid", "fa-folder");
-            });
-            OverlayScrollbarsGlobal.OverlayScrollbars(document.querySelector('main'), {
-                overflow: {
-                    x: 'hidden',
-                },
+                    x.addEventListener("click", run);
+                    if (document.querySelector("html").classList.contains("fontawesome-i2svg-complete")) {
+                        run()
+                        console.log(x);
+                    } else {
+                        var m = new MutationObserver(() => {if (document.querySelector("html").classList.contains("fontawesome-i2svg-complete")) {setTimeout(run(), 10)}});
+                        m.observe(document.querySelector("html"), {attributes: true, attributeFilter: ["class"]})
+                        console.log(x, m);
+                    }
+                });
+                document.querySelectorAll("li:has(> ul > .empty) > .click > .fa-li > i").forEach(x => {
+                    x.classList.add("fa-solid", "fa-folder");
+                });
+                OverlayScrollbarsGlobal.OverlayScrollbars(document.querySelector('main'), {
+                    overflow: {
+                        x: 'hidden',
+                    },
+                });
             });
         </script>
-        <script src="https://instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script>
+        <script src="/instantpage.min.js" type="module"></script>
     </body>
 </html>

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import bottle, os.path
  
 def make(dir='./'):
@@ -56,6 +59,12 @@ def nav():
 
 @bottle.route("/<path:path>")
 def static(path):
+    print(path)
+    if not os.path.isfile(path):
+        if os.path.exists(path + ".html"):
+            bottle.redirect(path.split("/")[-1] + ".html", 302)
+        if os.path.exists(path + "/index.html"):
+            bottle.redirect(path.split("/")[-1] + "/index.html", 302)
     return bottle.static_file(path, root='./')
 
 bottle.run(host='localhost',port=8080, debug=True)
