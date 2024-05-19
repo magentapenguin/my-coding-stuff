@@ -69,14 +69,24 @@ def runfunc_on_file(filename, func, newfile=False, cwd=None, args=(), kwargs={})
         f.write(s)
     return filename
 
-def run(filename, cwd=None):
-    return runfunc_on_file(
-        filename,
-        convert2dataurl,
-        newfile=True,
-        cwd=cwd,
-        args=(os.path.split(filename)[1].split('.')[1],)
-    )
+def run(mode, filename, cwd=None):
+    if mode == "quick":
+        x = dataurl_from_file(filename)
+        if len(x) >= 2000:
+            print("Url too large, saved to file.")
+            with open("saveddataurl.txt", 'w') as f:
+                f.write(x)
+        else:
+            print(x)
+        
+    elif mode == "full":
+        return runfunc_on_file(
+            filename,
+            convert2dataurl,
+            newfile=True,
+            cwd=cwd,
+            args=(os.path.split(filename)[1].split('.')[1],)
+        )
 
 
 if __name__ == '__main__':
