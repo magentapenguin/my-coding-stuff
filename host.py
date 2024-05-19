@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+from gevent import monkey; monkey.patch_all()
 
 import bottle, os.path
  
@@ -67,4 +68,4 @@ def static(path):
             bottle.redirect(path.split("/")[-1] + "/index.html", 302)
     return bottle.static_file(path, root='./')
 
-bottle.run(host='localhost',port=8080, debug=True)
+bottle.run(host='localhost',port=8080, debug=True, server='gevent')

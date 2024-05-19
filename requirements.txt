@@ -2,3 +2,4 @@ bottle==0.12.25
 colorama==0.4.6
 pyinstaller==6.6.0
 pillow==10.3.0
+gevent==24.2.1

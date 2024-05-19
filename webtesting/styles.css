@@ -494,3 +494,13 @@ iframe {
     border: none;
     width: 100%;
 }
+
+/* Icon styling */
+.fa-svg-man {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    margin-right: 0;
+    margin-bottom: 0;
+    vertical-align: -0.125em;
+}

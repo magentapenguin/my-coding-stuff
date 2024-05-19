@@ -8,12 +8,54 @@
     <title>Title</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="mask-icon" href="favicon.svg" color="#000000">
+    <style>
+        .dropdown {
+            display: inline-block;
+        }
+        .btn:has(> .dropdown) {
+            position: relative;
+        }
+
+        .btn > .dropdown {
+            display: none;
+            position: absolute;
+            background-color: var(--secondary-bg-color);
+            border: var(--border-width) solid var(--border-color);
+            transform: translate(1.8em, -1em);
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            list-style: none;
+            padding-left: 0;
+            width: auto;
+            padding: 0.5em;
+            flex-direction: column;
+            gap: 0.5em;
+            li {
+                margin-bottom: 0;
+            }
+        }
+        .btn:hover > .dropdown {
+            display: flex;
+        }
+    </style>
 </head>
 <body>
     <main>
         <exit-btn href="/" tabindex="0"></exit-btn>
         <h1>Dropdown Test</h1>
-        <button class="shadow btn" type="button">Button </button>
+        <button class="shadow btn" type="button">Dropdown <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M137.4 374.6c12.5 12.5 32.8 12.5 45.3 0l128-128c9.2-9.2 11.9-22.9 6.9-34.9s-16.6-19.8-29.6-19.8L32 192c-12.9 0-24.6 7.8-29.6 19.8s-2.2 25.7 6.9 34.9l128 128z"/></svg>
+            <ul class="dropdown">
+                <li>
+                    <a>Link</a>
+                </li>
+                <li>
+                    <a>Link</a>
+                </li>
+                <li>
+                    <a>Link</a>
+                </li>
+            </ul>
+        </button>
     </main>
 </body>
 </html>
