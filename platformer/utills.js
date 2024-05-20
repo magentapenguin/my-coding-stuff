@@ -1,3 +1,6 @@
+// Please note that this file is not meant to be run on its own. It is meant to be imported into other files.
+
+
 /**
  * Creates a tooltip object with the specified text.
  * @param {string} txt - The text to display in the tooltip.
@@ -142,7 +145,7 @@ export function addButton(txt, p, f, hover) {
  */
 export function cursormod(c, scale = 1, basescale = 1) {
     return {
-        reqires: ["pos", "area"],
+        requires: ["pos", "area"],
         id: "cursormod",
         add() {
             /**

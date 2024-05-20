@@ -12,14 +12,28 @@
 		},
 		"ghcr.io/devcontainers-contrib/features/browserify": {
 			"version": "latest"
+		},
+		"ghcr.io/itsmechlark/features/redis-server": {
+			"version": "latest"
 		}
 	},
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	// "forwardPorts": [],
+	"forwardPorts": [8080],
 
 	//Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip3 install --user -r requirements.txt"
+	"postCreateCommand": "pip3 install --user -r requirements.txt",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"twixes.pypi-assistant",
+				"GitHub.copilot",
+				"GitHub.copilot-chat",
+				"ms-python.black-formatter",
+				"ecmel.vscode-html-css"
+			]
+		}
+	}
 
 	// Configure tool-specific properties.
 	// "customizations": {},

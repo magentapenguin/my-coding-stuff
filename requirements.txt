@@ -3,3 +3,5 @@ colorama==0.4.6
 pyinstaller==6.6.0
 pillow==10.3.0
 gevent==24.2.1
+bottle-session==1.0
+webauthn==2.1.0

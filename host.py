@@ -3,7 +3,10 @@
 from gevent import monkey; monkey.patch_all()
 
 import bottle, os.path
+from webtesting.storage.storage import storapp
  
+app = bottle.Bottle()
+
 def make(dir='./'):
     dir = os.path.abspath(dir)
     x = "<ul class=\"fa-ul no-dot\" style='--fa-li-margin: 2em; margin-bottom: 0.25rem;'>"
@@ -12,7 +15,7 @@ def make(dir='./'):
         y+=1
         if entry.is_file() and not entry.name.endswith(".tpl.html") and not entry.name.startswith("."):
             x += f"<li><span class=\"fa-li\"><i class=\"fa-regular fa-fw fa-file\"></i></span><a href=\"/{os.path.relpath(entry.path)[0:]}\""+("target='_blank'" if not entry.name.endswith('.html') else '')+f">{entry.name}</a></li>"
-        elif entry.is_dir() and not (entry.name.startswith(".") or entry.name.endswith("__pycache__")):
+        elif entry.is_dir() and not (entry.name.startswith(".") or entry.name.endswith("__pycache__") or entry.name == "node_modules"):
             print(entry.name)
             x += f"<li><span class=\"click\"><span class=\"fa-li\"><i class=\"fa-solid fa-fw fa-folder-open\"></i></span>{entry.name}</span><br>"
             x += make(entry.path)
@@ -22,16 +25,16 @@ def make(dir='./'):
     x += "</ul>"
     return x
 
-@bottle.hook('before_request')
+@app.hook('before_request')
 def no_drive():
     if not os.path.exists('.'):
         bottle.abort(503, "Website Offline :(")
 
-@bottle.hook('after_request')
+@app.hook('after_request')
 def cacheit():
     bottle.response.headers['Cache-Control'] = 'public, max-age=31536000'
 
-@bottle.error(503)
+@app.error(503)
 def offline(error):
     return bottle.template("""<!DOCTYPE html>
 <html lang="en-us">
@@ -50,16 +53,19 @@ def offline(error):
     </body>
 </html>""", error=error)
 
-@bottle.route("/")
+@app.route("/")
 def index():
     return bottle.template("./index.tpl.html")
 
-@bottle.route("/nav")
+@app.route("/nav")
 def nav():
     return bottle.template("./nav.tpl.html", make=make)
 
-@bottle.route("/<path:path>")
+@app.route("/<path:path>")
 def static(path):
+    if path.startswith('storage'):
+        return
+
     print(path)
     if not os.path.isfile(path):
         if os.path.exists(path + ".html"):
@@ -68,4 +74,7 @@ def static(path):
             bottle.redirect(path.split("/")[-1] + "/index.html", 302)
     return bottle.static_file(path, root='./')
 
-bottle.run(host='localhost',port=8080, debug=True, server='gevent')
+
+app.mount('/storage', storapp)
+
+app.run(host='localhost',port=8080, debug=True, server='gevent')

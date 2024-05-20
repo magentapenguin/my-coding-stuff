@@ -2,7 +2,7 @@ from PIL import Image
 
 def resize_image(image_path, output_path, size):
     original_image = Image.open(image_path)
-    # Remove colors "FF00DC" and "00FF21"
+    # Remove colors "FF00DC" and "00FF21", as they are used for marking sprite size
     original_image = original_image.convert("RGBA")
     pixels = original_image.load()
     width, height = original_image.size
@@ -20,7 +20,8 @@ def resize_image(image_path, output_path, size):
 
 
 if __name__ == '__main__':
-    image_path = './sprites/mesh.png'
+    # I should probably turn this into a command line tool
+    image_path = './sprites/mesh.png' 
     output_path = './sprites/meshr.png'
     size = (16*4, 16*4)
     resize_image(image_path, output_path, size)

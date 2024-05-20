@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/exit.js" defer async></script>
+    <script src="/{{curdir}}/auth.js" defer async type="module"></script>
+    <title>Storage Home</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="mask-icon" href="favicon.svg" color="#000000">
+    <style>
+        h2 {
+            margin-top: 0;
+        }
+        .notyf__toast {
+            box-sizing: content-box;
+        }
+        @keyframes ripple2 {
+            0% {
+                transform: scale(0) translateY(-45%) translateX(13%);
+            }
+            100% {
+                transform: scale(1) translateY(-30%) translateX(13%);
+            }
+        }
+        .notyf__message {
+            word-wrap: break-word;
+            max-width: 99%;
+        }
+        .notyf__ripple {
+            animation: ripple2 .4s ease-out forwards !important;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css" integrity="sha256-IwkvZNRC/3S26O1gWwjBINmrPZ4zYvPX4z/98OKWHkQ=" crossorigin="anonymous">
+</head>
+<body>
+    <main>
+        <exit-btn href="/" tabindex="0"></exit-btn>
+        <h1>Title</h1>
+        <button class="btn" id="register">Logout</button>
+    </main>
+</body>
+</html>

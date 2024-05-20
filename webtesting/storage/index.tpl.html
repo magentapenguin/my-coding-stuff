@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/exit.js" defer async></script>
+    <script src="/{{curdir}}/auth.js" defer async type="module"></script>
+    <title>Storage</title>
+    % if loggedin:
+    <meta http-equiv="refresh" content="0;url=/storage/home">
+    % end
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="mask-icon" href="favicon.svg" color="#000000">
+    <style>
+        h2 {
+            margin-top: 0;
+        }
+        #usernamelabel {
+            margin-bottom: 1.2em;
+        }
+        .notyf__toast {
+            box-sizing: content-box;
+        }
+        @keyframes ripple2 {
+            0% {
+                transform: scale(0) translateY(-45%) translateX(13%);
+            }
+            100% {
+                transform: scale(1) translateY(-30%) translateX(13%);
+            }
+        }
+        .notyf__message {
+            word-wrap: break-word;
+            max-width: 99%;
+        }
+        .notyf__ripple {
+            animation: ripple2 .4s ease-out forwards !important;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css" integrity="sha256-IwkvZNRC/3S26O1gWwjBINmrPZ4zYvPX4z/98OKWHkQ=" crossorigin="anonymous">
+</head>
+<body>
+    <main>
+        <exit-btn href="/" tabindex="0"></exit-btn>
+        <h1>Storage</h1>
+        % if not loggedin:
+        <button class="btn" id="register">Register</button>
+        <button class="btn" id="login">Login</button>
+        <dialog id="register-dialog">
+            <h2>Create an Account</h2>
+            <form id="register-form" class="vform">
+                <div class="i-group w-100">
+                    <label for="register-username" id="usernamelabel">Username:</label>
+                    <span >
+                        <input type="text" name="username" placeholder="Username" id="register-username" required pattern="[0-9a-zA-Z]{3,20}" autocomplete="username">
+                        <small>Only letters and numbers allowed, must be at least 3 characters long, max 20 characters</small>
+                    </span>
+                </div>
+                <div class="button-group">
+                    <button type="submit" class="btn green-accent w-100">Register</button>
+                    <button type="reset" formnovalidate class="btn red-accent w-100">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+        <dialog id="success">
+            <h2>Success</h2>
+            <p>
+                Your account has been created successfully.
+                Press OK to login.
+            </p>
+            <button class="btn green-accent" id="success-ok">OK</button>
+        </dialog>
+        % end
+    </main>
+</body>
+</html>
