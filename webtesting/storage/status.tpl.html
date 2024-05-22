@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/exit.js" defer async></script>
+    <title>Title</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="mask-icon" href="favicon.svg" color="#000000">
+</head>
+<body>
+    <svg class="go-away">
+        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="square" >
+            <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+            <path d="M384 80c8.8 0 16 7.2 16 16V416c0 8.8-7.2 16-16 16H64c-8.8 0-16-7.2-16-16V96c0-8.8 7.2-16 16-16H384zM64 32C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64H64z"/>
+        </symbol>
+    </svg>
+    <svg class="go-away">
+        <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="square-check" >
+            <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+            <path d="M64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
+        </symbol>
+    </svg>
+    <main>
+        <exit-btn href="/storage" tabindex="0"></exit-btn>
+        <h1>Project Status</h1>
+        <p>
+            The project is currently in development. The following features are planned:
+            <ul class="no-dot">
+                <li>
+                    <details>
+                        <summary><svg class="fa-svg-man svg-big"><use xlink:href="#square-check"></use></svg> Accounts</summary>
+                        <ul class="no-dot small-mt">
+                            <li><svg class="fa-svg-man svg-big"><use xlink:href="#square-check"></use></svg> Creation</li>
+                            <li><svg class="fa-svg-man svg-big"><use xlink:href="#square-check"></use></svg> Login</li>
+                            <li><svg class="fa-svg-man svg-big"><use xlink:href="#square-check"></use></svg> Deletion</li>
+                        </ul>
+                    </details>
+                </li>
+                <li>
+                    <details open>
+                        <summary><svg class="fa-svg-man"><use xlink:href="#square"></use></svg> Files</summary>
+                        <ul class="no-dot small-mt">
+                            <li><svg class="fa-svg-man"><use xlink:href="#square"></use></svg> Upload</li>
+                            <li><svg class="fa-svg-man"><use xlink:href="#square"></use></svg> Download</li>
+                            <li><svg class="fa-svg-man"><use xlink:href="#square"></use></svg> Deletion</li>
+                            <li><svg class="fa-svg-man"><use xlink:href="#square"></use></svg> Attributes</li>
+                        </ul>
+                    </details>
+                </li>
+            </ul>
+        </p>
+    </main>
+</body>
+</html>

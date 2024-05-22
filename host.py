@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from gevent import monkey; monkey.patch_all()
+#from gevent import monkey; monkey.patch_all()
 
 import bottle, os.path
 from webtesting.storage.storage import storapp
@@ -77,4 +77,4 @@ def static(path):
 
 app.mount('/storage', storapp)
 
-app.run(host='localhost',port=8080, debug=True, server='gevent')
+app.run(host='localhost',port=8080, debug=True)#, server='gevent')

@@ -1,9 +1,16 @@
 import bottle_session
 import os
-import bottle, re, hashlib
-import redis, webauthn, base64, dataclasses
+import s3fs
+import bottle
+import re
+import hashlib
+import redis
+import webauthn
+import base64
+import dataclasses
 from json import loads, dumps, JSONDecoder, JSONEncoder
 from datetime import datetime, timedelta
+from typing import Any
 
 app = bottle.Bottle()
 
@@ -11,9 +18,10 @@ app = bottle.Bottle()
 # THIS NOT MY CODE
 # I copied it from bottle_redis.py
 # All credits to the original author
+# It had a bug that I need fixed to use it
 
 import inspect
-from bottle import __version__, PluginError
+# removed import to PluginError, and __version__ as they could cause conflicts with this file
 
 
 class RedisPlugin(object):
@@ -31,7 +39,7 @@ class RedisPlugin(object):
             if not isinstance(other, RedisPlugin):
                 continue
             if other.keyword == self.keyword:
-                raise PluginError(
+                raise bottle.PluginError(
                     "Found another redis plugin with "
                     "conflicting settings (non-unique keyword)."
                 )
@@ -40,7 +48,7 @@ class RedisPlugin(object):
 
     def apply(self, callback, route):
         # hack to support bottle v0.9.x
-        if __version__.startswith("0.9"):
+        if bottle.__version__.startswith("0.9"):
             config = route["config"]
             _callback = route["callback"]
         else:
@@ -70,7 +78,7 @@ class RedisPlugin(object):
 class Base64Encoder(JSONEncoder):
     def default(self, obj):
         if isinstance(obj, bytes):
-            return base64.b64encode(obj).decode("ascii")
+            return {"b64": base64.b64encode(obj).decode("ascii")}
         # Let the base class default method raise the TypeError
         return super().default(obj)
 
@@ -97,11 +105,69 @@ redis_plugin.redisdb = connection_pool
 app.install(session_plugin)
 app.install(redis_plugin)
 
+s3 = s3fs.S3FileSystem(
+    key=os.getenv("AWS_S3_ACCESS_KEY"),
+    secret=os.getenv("AWS_S3_SECRET_KEY"),
+)
+try:
+    s3.mkdir("bookishsystem/bookish-system")
+except FileExistsError:
+    pass
 
 @app.route("/")
 def index(session, rdb):
+    if bottle.request.query.get("logout") is not None:
+        session["token"] = ""
+        session["user"] = ""
+        print("Logged out", session.get("token"), session.get("user"))
+        bottle.redirect("/storage")
     return bottle.template(
-        curdir + "/index.tpl.html", session=session, rdb=rdb, curdir=curdir, loggedin="user" in session
+        curdir + "/index.tpl.html",
+        curdir=curdir,
+        session=session,
+        rdb=rdb,
+        loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
+    )
+
+
+@app.route("/home")
+def home(session, rdb):
+    if bottle.request.query.get("delete") is not None and validate_session_token(
+        session.get("token"), session.get("user"), rdb
+    ):
+        print("Deleting Account", session.get("user"))
+        users = loads(rdb.get("users"), cls=Base64Decoder)
+        del users[session.get("user")]
+        rdb.set("users", dumps(users, cls=Base64Encoder))
+        
+        tokens = loads(rdb.get("tokens"))
+        del tokens[session.get("user")]
+        rdb.set("tokens", dumps(tokens))
+    return bottle.template(
+        curdir + "/home.tpl.html",
+        session=session,
+        curdir=curdir,
+        loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
+    )
+
+
+@app.route("/status")
+def status(session, rdb):
+    return bottle.template(
+        curdir + "/status.tpl.html",
+        session=session,
+        curdir=curdir,
+        loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
+    )
+
+
+@app.route("/terms")
+def terms(session, rdb):
+    return bottle.template(
+        curdir + "/terms.html",
+        session=session,
+        curdir=curdir,
+        loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
     )
 
 
@@ -152,23 +218,49 @@ def auth(session, rdb):
         return {"challenge": challenge[1]}
 
 
-def make_session_token(user: str, rdb) -> str:
-    token = (hashlib.sha256(user.encode()) + os.urandom(16)).hex()
+def make_session_token(user: str, rdb: Any) -> str:
+    """
+    Generate a session token for the given user and store it in the Redis database.
+
+    Args:
+        user (str): The username for which the session token is generated.
+        rdb (Any): The Redis database connection object.
+
+    Returns:
+        str: The generated session token.
+
+    """
+    token = (hashlib.sha256(user.encode()).digest() + os.urandom(16)).hex()
     tokens = loads(rdb.get("tokens"))
     tokens[user] = [token, datetime.now().isoformat()]
+    rdb.set("tokens", dumps(tokens))
     return token
 
 
-def validate_session_token(token, user, rdb):
+def validate_session_token(token: str, user: str, rdb: Any) -> bool:
+    """
+    Validates the session token for a given user.
+
+    Args:
+        token (str): The session token to validate.
+        user (str): The user associated with the session token.
+        rdb (Any): The Redis database connection object.
+
+    Returns:
+        bool: True if the session token is valid, False otherwise.
+    """
     tokens = loads(rdb.get("tokens"))
     if user in tokens:
         if (
             tokens[user][0] == token
             and datetime.fromisoformat(tokens[user][1]) + timedelta(seconds=60 * 60)
             > datetime.now()
-            and hashlib.sha256(user.encode()) == bytes.fromhex(token)[:-16]
+            and hashlib.sha256(user.encode()).digest() == bytes.fromhex(token)[:-16]
         ):
             return True
+        else:
+            del tokens[user]
+            rdb.set("tokens", dumps(tokens))
     return False
 
 
@@ -181,23 +273,15 @@ def login(session, rdb):
     def find_user(credid):
         for key, user in users.items():
             print(
-                user["credential_id"]
-                .replace("/", "_")
-                .replace("=", "")
-                .replace("+", "-"),
-                credid,
+                user["credential_id"],
+                webauthn.base64url_to_bytes(credid),
             )
-            if (
-                user["credential_id"]
-                .replace("/", "_")
-                .replace("=", "")
-                .replace("+", "-")
-                == credid
-            ):
+            if user["credential_id"] == webauthn.base64url_to_bytes(credid):
                 return key
         return None
 
     if user := find_user(data["id"]):
+        print(session.get("challenge"))
         authentication_verification = webauthn.verify_authentication_response(
             credential=data,
             expected_challenge=webauthn.base64url_to_bytes(
@@ -205,9 +289,7 @@ def login(session, rdb):
             ),
             expected_rp_id="bookish-system",
             expected_origin="https://bookish-system-jgvv7pxj96wh5wjq-8080.app.github.dev",
-            credential_public_key=webauthn.base64url_to_bytes(
-                users[user]["credential_public_key"]
-            ),
+            credential_public_key=users[user]["credential_public_key"],
             credential_current_sign_count=users[user]["sign_count"],
             require_user_verification=True,
         )
@@ -220,6 +302,48 @@ def login(session, rdb):
         print("User not found")
         bottle.abort(400, "User not found")
 
+@app.route("/storage", method=["GET", "DELETE", "PUT"])
+def storage(session, rdb):
+    bottle.abort(401, "Unauthorized")
+    if validate_session_token(session.get("token"), session.get("user"), rdb):
+        if bottle.request.method == "GET":
+            return {"files": s3.ls("bookishsystem/")}
+        elif bottle.request.method == "DELETE":
+            data = bottle.request.json
+            if modifyfile(data["file"], "delete"):
+                return
+            else:
+                bottle.abort(404, "File not found")
+        elif bottle.request.method == "PUT":
+            data = bottle.request.json
+            modifyfile(data["file"], "create")
+            if modifyfile(data["file"], "write", data["data"]):
+                return
+            else:
+                bottle.abort(404, "File not found")
+    else:
+        bottle.abort(401, "Unauthorized")
 
 
-storapp = app
+def modifyfile(file: str, how: str, data: Any = None) -> bool:
+    if how == "delete":
+        if s3.exists(file):
+            s3.rm(file)
+            return True
+    elif how == "create":
+        if not s3.exists(file):
+            s3.touch(file)
+            return True
+    elif how == "rename":
+        if s3.exists(file):
+            s3.rename(file, data)
+            return True
+    elif how == "write":
+        if s3.exists(file):
+            with s3.open(file, "wb") as f: 
+                f.write(data)
+            return True
+    return False
+
+
+storapp = app  # Rename app to storapp to avoid conflict with the app variable in the main.py file

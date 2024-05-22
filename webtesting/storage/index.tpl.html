@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+<!-- This file uses the SimpleTemplate engine that comes with the python module bottle. -->
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/styles.css">
-    <script src="/exit.js" defer async></script>
-    <script src="/{{curdir}}/auth.js" defer async type="module"></script>
+    <script src="/exit.js" defer></script>
     <title>Storage</title>
-    % if loggedin:
-    <meta http-equiv="refresh" content="0;url=/storage/home">
-    % end
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="mask-icon" href="favicon.svg" color="#000000">
     <style>
@@ -44,6 +41,13 @@
     <main>
         <exit-btn href="/" tabindex="0"></exit-btn>
         <h1>Storage</h1>
+        <p>
+            This is a simple web application that allows you to store files.
+            You can create an account and login to access your files.
+            Total storage is limited to 10MB per user.
+            <br>
+            <small>Currently, the system is not finished, but <a href="/storage/status">you can see project status here</a></small>
+        </p>
         % if not loggedin:
         <button class="btn" id="register">Register</button>
         <button class="btn" id="login">Login</button>
@@ -57,7 +61,10 @@
                         <small>Only letters and numbers allowed, must be at least 3 characters long, max 20 characters</small>
                     </span>
                 </div>
-                <div class="button-group">
+                <div class="i-group w-100">
+                    <small>By creating an account, you must read and agree to the <a href="/storage/terms">Terms of Service</a>.</small>
+                </div>
+                <div class="button-footer">
                     <button type="submit" class="btn green-accent w-100">Register</button>
                     <button type="reset" formnovalidate class="btn red-accent w-100">Cancel</button>
                 </div>
@@ -69,8 +76,16 @@
                 Your account has been created successfully.
                 Press OK to login.
             </p>
-            <button class="btn green-accent" id="success-ok">OK</button>
+            <div class=".button-footer">
+                <button class="btn green-accent" id="success-ok">OK</button>
+            </div>
         </dialog>
+        <script src="/{{curdir}}/auth.js" type="module"></script>
+        % else:
+        <p>
+            You are logged in as <strong>{{session.get('user')}}</strong>.<br>
+            <a class="btn med-mt" href="/storage/home">Home</a>
+        </p>
         % end
     </main>
 </body>

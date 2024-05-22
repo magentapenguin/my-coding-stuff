@@ -18,7 +18,7 @@ const notyf = new Notyf({
  */
 async function canihaveusername(x) {
     try {
-        let response = await fetch('storage/canihave/user/'+x, {
+        let response = await fetch('/storage/canihave/user/'+x, {
             method: 'GET'
         })
         console.log(response)
@@ -36,7 +36,7 @@ async function canihaveusername(x) {
 
 async function getchallenge() {
     // Please note that this is SHOULD NOT fail silently
-    let response = await fetch('storage/auth/', {
+    let response = await fetch('/storage/auth/', {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -65,7 +65,7 @@ async function register(username) {
         rp_name: 'bookish-system',
     })
     console.log(registration)
-    let response = await fetch('storage/auth', {
+    let response = await fetch('/storage/auth', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ async function register(username) {
 async function authenticate() {
     let challenge = await getchallenge()
     let assertion = await client.authenticate([],challenge)
-    let response = await fetch('storage/login', {
+    let response = await fetch('/storage/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -92,16 +92,22 @@ async function authenticate() {
     if (response.status === 200) {
         return assertion
     } else {
-        throw new Error('Failed to fetch')
+        throw new Error(response.statusText)
     }
 }
 
 function onLoginSubmit(e) {
+    let btntext = e.target.innerHTML
+    e.target.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="fa-svg-man spin"><path d="M224 32c0-17.7 14.3-32 32-32C397.4 0 512 114.6 512 256c0 46.6-12.5 90.4-34.3 128c-8.8 15.3-28.4 20.5-43.7 11.7s-20.5-28.4-11.7-43.7c16.3-28.2 25.7-61 25.7-96c0-106-86-192-192-192c-17.7 0-32-14.3-32-32z"/></svg> Authenticating...'
+    e.target.disabled=true
     e.preventDefault()
     authenticate().then(output => {
         console.log(output)
+        window.location.reload()
     }).catch((error) => {
         notyf.error('Failed to authenticate: '+error.message)
+        e.target.innerHTML = btntext
+        e.target.disabled=false
     })
 }
 
@@ -117,7 +123,14 @@ function onRegisterSubmit(e) {
         e.target.querySelector('[type="submit"]').innerHTML = 'Register'
         return
     }
-    setTimeout(() => {
+    canihaveusername(usernameElement.value).then(output => {
+        if (!output) {
+            usernameElement.setCustomValidity('Username is already taken')
+            usernameElement.reportValidity()
+        } else {
+            usernameElement.setCustomValidity('')
+        }
+
     if (usernameElement.checkValidity()) {
         console.log('Registering', usernameElement.value)
         register(usernameElement.value).then(output => {
@@ -136,7 +149,7 @@ function onRegisterSubmit(e) {
         e.target.querySelectorAll('[type="submit"], [type="reset"]').forEach(x=>x.disabled=false)
         e.target.querySelector('[type="submit"]').innerHTML = 'Register'
     }
-    }, 500)
+    })
        
 }
 
