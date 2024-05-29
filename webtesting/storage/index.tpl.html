@@ -49,6 +49,11 @@
             <small>Currently, the system is not finished, but <a href="/storage/status">you can see project status here</a></small>
         </p>
         % if not loggedin:
+        <div class="alert red-accent go-away" id="no-support">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="fa-svg-man svg-big"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 32c14.2 0 27.3 7.5 34.5 19.8l216 368c7.3 12.4 7.3 27.7 .2 40.1S486.3 480 472 480H40c-14.3 0-27.6-7.7-34.7-20.1s-7-27.8 .2-40.1l216-368C228.7 39.5 241.8 32 256 32zm0 128c-13.3 0-24 10.7-24 24V296c0 13.3 10.7 24 24 24s24-10.7 24-24V184c0-13.3-10.7-24-24-24zm32 224a32 32 0 1 0 -64 0 32 32 0 1 0 64 0z"/></svg>
+            Your browser does not support the required features for this application.
+            Please use a modern browser like Firefox, Chrome, Edge or Safari.
+        </div>
         <button class="btn" id="register">Register</button>
         <button class="btn" id="login">Login</button>
         <dialog id="register-dialog">
@@ -56,7 +61,7 @@
             <form id="register-form" class="vform">
                 <div class="i-group w-100">
                     <label for="register-username" id="usernamelabel">Username:</label>
-                    <span >
+                    <span>
                         <input type="text" name="username" placeholder="Username" id="register-username" required pattern="[0-9a-zA-Z]{3,20}" autocomplete="username">
                         <small>Only letters and numbers allowed, must be at least 3 characters long, max 20 characters</small>
                     </span>
@@ -88,5 +93,8 @@
         </p>
         % end
     </main>
+    <footer>
+        &copy; 2024 Your Company
+    </footer>
 </body>
 </html>

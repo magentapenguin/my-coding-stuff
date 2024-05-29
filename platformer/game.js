@@ -166,6 +166,7 @@ const LEVELS = [
         "========================",
     ],
     [
+        "     . ",
         "     ---",
         "      $ ",
         "          ",
@@ -176,6 +177,26 @@ const LEVELS = [
         "           ",
         "@         $",
         "================",
+    ],
+    [
+        "                            .",
+        "                       *     ",
+        "                       #     ",
+        "                       #     ",
+        "                       #     ",
+        "                       #     ",
+        "@     $ $              #>    ",
+        "====================---==    ",
+        "#                      #     ",
+        "#                      #     ",
+        "#                $$$   #     ",
+        "#      =================     ",
+        "#                            ",
+        "#                            ",
+        "#                     *     #",
+        "#                    ========",
+        "#                 ^          ",
+        "===================          ",
     ]
 ]
 
@@ -246,7 +267,7 @@ const LEVELCFG = {
             sprite("ghosty"),
             area({ scale: vec2(0.6, 0.9) }),
             anchor("bot"),
-            body({mass: 5, gravityScale: 0,}),
+            body({mass: 5, gravityScale: 2,}),
             patrol(),
             //offscreen({ hide: true }),
             "ghosty"
@@ -353,6 +374,7 @@ function addfullscreenbtn() {
             document.exitFullscreen()
             btn.play("small")
         }
+        
     })
 
     return btn

@@ -21,7 +21,7 @@ def resize_image(image_path, output_path, size):
 
 if __name__ == '__main__':
     # I should probably turn this into a command line tool
-    image_path = './sprites/mesh.png' 
-    output_path = './sprites/meshr.png'
-    size = (16*4, 16*4)
+    image_path = './favicon.png' 
+    output_path = './favicon-32x32.png'
+    size = (32, 32)
     resize_image(image_path, output_path, size)

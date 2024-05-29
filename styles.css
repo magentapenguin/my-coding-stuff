@@ -4,6 +4,8 @@
 :root {
     --bg-color: light-dark(#f0f0f0, #292929);
     --text-color: light-dark(#333, #ddd);
+    --tooltip-bg-color: light-dark(#ddde,#222e);
+    --tooltip-no-transparency-bg-color: light-dark(#ddd,#222);
     --color: var(--text-color);
     --secondary-text-color: light-dark(#474747, #b9b9b9);
     --secondary-bg-color: light-dark(#ebebeb, #383838);
@@ -55,6 +57,42 @@ body {
     margin: 0;
     padding: 0;
 }
+
+html, body {
+    box-sizing: border-box;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+body {
+    box-sizing: border-box;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+header, footer {
+    flex-grow: 0;
+    flex-shrink: 0;
+    padding: 0.5rem;
+    background-color: var(--secondary-bg-color);
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0;
+}
+footer {
+    border-top: var(--border-width) solid var(--border-color);
+}
+
+header {
+    border-bottom: var(--border-width) solid var(--border-color);
+}
+
+main {
+    flex-grow: 1;
+}
+
 h1 {
     font-size: 2em;
     margin: 0;
@@ -88,7 +126,7 @@ main {
     text-align: center;
     box-sizing: border-box;
     font-family: var(--font);
-    outline-offset: 0;
+    outline-offset: 2px;
 }
 :where(a.btn) {
     text-decoration: none;
@@ -113,13 +151,13 @@ main {
     outline: 3px solid var(--accent-color);
 }
 .three-d-btn {
-    box-shadow: 0 3px 0 var(--border-color);
+    box-shadow: 1px 3px 0 var(--border-color);
     transition: box-shadow 0s, transform 0s;
     transform: translateY(-1px);
 }
 .three-d-btn:active {
     box-shadow: none;
-    transform: translateY(2px);
+    transform: translate(1px, 2px);
 }
 input:not([type="file"], [type="image"]), select, textarea {
     background-color: transparent;
@@ -178,12 +216,12 @@ label.btn:has(.autofilled) {
 .green-accent {
     --accent-color: light-dark(rgb(0, 119, 10), rgb(0, 200, 0));
     --accent-color-a: light-dark(rgba(0, 119, 10, 0.3), rgba(0, 200, 0, 0.2));
-    --accent-highlite-text-color: light-dark(#108600, #6fff6a);
+    --accent-highlite-text-color: light-dark(#108600, #4cff46);
 }
 .red-accent {
     --accent-color: light-dark(rgb(207, 58, 58), rgb(255, 0, 0));
     --accent-color-a: light-dark(rgba(207, 58, 58, 0.3), rgba(255, 0, 0, 0.2));
-    --accent-highlite-text-color: light-dark(#ff0000, #ff6a6a);
+    --accent-highlite-text-color: light-dark(#ff0000, #ff3535);
 }
 .important-btn {
     color: var(--accent-highlite-text-color) !important;
@@ -219,6 +257,7 @@ Stolen from Bootstrap 5 :P
     flex-direction: row;
     align-items: stretch;
     border-collapse: collapse;
+    gap: 0 !important;
     * {
         margin-bottom: 0;
     }
@@ -273,6 +312,8 @@ label {
         margin-top: 0.2em;
     }
 }
+
+
 
 .checkbox-group {
     display: flex;
@@ -413,6 +454,15 @@ textarea {
 .w-50 {
     width: 50%;
 }
+@media (max-width: 768px) {
+    .w-50 {
+        width: 100%;
+    }
+    .i-group {
+        width: 100%;
+    }
+}
+
 .hflex {
     display: flex;
     flex-direction: row;
@@ -631,4 +681,91 @@ dialog .button-footer {
 }
 li {
     vertical-align: middle;
+}
+/* Alerts */
+.alert {
+    padding: 0.5em 1em;
+    border: var(--border-width) solid color-mix(in hsl shorter hue, var(--border-color), var(--accent-color) 50%);
+    background-color: color-mix(in hsl shorter hue, var(--bg-color), var(--accent-color) 50%);
+    border-radius: var(--border-radius);
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    .alert-title {
+        font-weight: 700;
+    }
+    .fa-svg-man {
+        margin-right: 0.5em;
+        font-size: 1.25em;
+    }
+}
+/* Tooltips */
+.tooltip {
+    position: absolute;
+    width: fit-content;
+    top: 0;
+    left: 0;
+    padding: 5px;
+    border-radius: 5px;
+    background: var(--tooltip-bg-color);
+    color: var(--text-color);
+    z-index: 99999999999999;
+}
+
+.tooltip__arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--tooltip-bg-color);
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+    .tooltip {
+        --tooltip-bg-color: var(--tooltip-no-transparency-bg-color);
+    }
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    clip-path: polygon(0 0, 0 0, 0 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Forced colors */
+
+@media (forced-colors: active) {
+    .btn {
+        background-color: ButtonFace !important;
+        color: ButtonText !important;
+    }
+    .btn:hover {
+        border-color: Highlight;
+    }
+    .btn-reset {
+        color: ButtonText;
+    }
+    .btn-reset:hover {
+        color: HighlightText;
+    }
+    .btn-reset:focus-visible {
+        outline-color: Highlight;
+    }
+    .three-d-btn {
+        forced-color-adjust: none;
+        --border-color: ButtonText;
+        --accent-color: Highlight;
+        --accent-color-a: none;
+    }
+    .three-d-btn:hover {
+        --border-color: Highlight;
+    }
+
 }

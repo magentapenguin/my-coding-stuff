@@ -165,6 +165,17 @@
                 height: 100vh;
                 background-color: light-dark(transparent, #000c1680);
             }
+            @media (forced-colors: active) {
+                * {
+                    color: CanvasText;
+                }
+                main {
+                    background-color: Canvas !important;
+                }
+                small {
+                    background-color: Canvas !important;
+                }
+            }
         </style>
     </head>
     <body>

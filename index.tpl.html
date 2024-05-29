@@ -153,6 +153,17 @@
                 transform: translateY(5px);
                 margin-right: 0.25em;
             }
+            @media (forced-colors: active) {
+                * {
+                    color: CanvasText;
+                }
+                main {
+                    background-color: Canvas !important;
+                }
+                small {
+                    background-color: Canvas !important;
+                }
+            }
         </style>
     </head>
     <body>
@@ -164,7 +175,7 @@
                 <summary>Games</summary>
                 <ul>
                     <li><a href="/circle-button/circle-button-index.html"><img src="/circle-button/favicon-32x32.png" width="24" class="icon"></img>Circle Button Game</a></li>
-                    <li><a href="/platformer/landing.html"><img src="/platformer/favicon.png" width="24" class="icon"></img>Stickman Jump Game</a></li>
+                    <li><a href="/platformer/landing.html"><img src="/platformer/favicon-32x32.png" width="24" class="icon"></img>Stickman Jump Game</a></li>
                     <li><a href="/python stuff/dist/autoclickerinstaller.exe"><img src="/favicon.svg" width="24" class="icon"></img>Autoclicker</a></li>
                 </ul>
             </details>

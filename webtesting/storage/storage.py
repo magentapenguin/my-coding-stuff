@@ -11,6 +11,25 @@ import dataclasses
 from json import loads, dumps, JSONDecoder, JSONEncoder
 from datetime import datetime, timedelta
 from typing import Any
+from Crypto.Cipher import AES
+
+def loadfile(file: bytes, filename: str) -> tuple[bytes, str]:
+    if not filename.endswith(".bin"):
+        return file, filename
+    key = os.getenv("AES_KEY").encode()
+    tag = file[16:]
+    nonce = file[16:16+15]
+    cipher = AES.new(key, AES.MODE_OCB, nonce=nonce)
+    data = cipher.decrypt_and_verify(file, tag)
+    return data, filename.lstrip(".bin")
+
+def savefile(file: bytes, filename: str) -> tuple[bytes, str]:
+    if filename.endswith(".bin"):
+        return file, filename
+    key = os.getenv("AES_KEY").encode()
+    cipher = AES.new(key, AES.MODE_OCB)
+    data, tag = cipher.encrypt_and_digest(file)
+    return tag+cipher.nonce+data, filename + ".bin"
 
 app = bottle.Bottle()
 
@@ -95,7 +114,7 @@ class Base64Decoder(JSONDecoder):
 
 curdir = os.path.relpath(os.path.dirname(__file__))
 
-session_plugin = bottle_session.SessionPlugin()
+session_plugin = bottle_session.SessionPlugin(cookie_secure=True, cookie_httponly=True, cookie_lifetime=60*60*24*7) # 7 days
 redis_plugin = RedisPlugin()
 
 connection_pool = redis.ConnectionPool(host="localhost", port=6379)
@@ -186,7 +205,7 @@ def auth(session, rdb):
     bottle.response.content_type = "application/json"
     if bottle.request.method == "POST":
         data = bottle.request.json
-        if not re.match(r"[0-9a-zA-Z]{3,20}", data["username"]):
+        if not re.match(r"[0-9a-zA-Z]{3,20}", data["username"]) or canihaveuser(data["username"], session=session, rdb=rdb)["output"] is False:
             bottle.abort(400, "Invalid username")
         registration_verification = webauthn.verify_registration_response(
             credential=data["credential"],
@@ -206,6 +225,8 @@ def auth(session, rdb):
                 print("User already exists")
                 bottle.abort(400, "User already exists")
             users[data["username"]] = dataclasses.asdict(registration_verification)
+            print("Creating user folder", data["username"],)
+            s3.mkdir("bookishsystem/bookish-system/"+data["username"],)
             rdb.set("users", dumps(users, cls=Base64Encoder))
             return
     else:
@@ -304,10 +325,11 @@ def login(session, rdb):
 
 @app.route("/storage", method=["GET", "DELETE", "PUT"])
 def storage(session, rdb):
-    bottle.abort(401, "Unauthorized")
+    #bottle.abort(401, "Unauthorized")
+    user = session.get("user")
     if validate_session_token(session.get("token"), session.get("user"), rdb):
         if bottle.request.method == "GET":
-            return {"files": s3.ls("bookishsystem/")}
+            return {"files": s3.ls("bookishsystem/bookish-system/"+user)}
         elif bottle.request.method == "DELETE":
             data = bottle.request.json
             if modifyfile(data["file"], "delete"):
@@ -344,6 +366,19 @@ def modifyfile(file: str, how: str, data: Any = None) -> bool:
                 f.write(data)
             return True
     return False
+
+
+print(s3.ls("bookishsystem/bookish-system/"))
+
+db = redis.Redis(connection_pool=connection_pool)
+for user in loads(db.get("users"), cls=Base64Decoder):
+    try:
+        print("Creating user folder", user)
+        s3.mkdir("bookishsystem/bookish-system/"+user+"/")
+    except FileExistsError:
+        pass
+    print(s3.ls("bookishsystem/bookish-system/"+user+"/"))
+
 
 
 storapp = app  # Rename app to storapp to avoid conflict with the app variable in the main.py file

@@ -7,6 +7,7 @@ const notyf = new Notyf({
         x: 'right',
         y: 'bottom',
     },
+    dismissible: true,
 })
 
 /**
@@ -181,3 +182,10 @@ document.querySelector('#register-dialog [type="reset"]').addEventListener('clic
 
 document.getElementById('login').addEventListener('click', onLoginSubmit)
 document.getElementById('success-ok').addEventListener('click', onLoginSubmit)
+
+if (!client.isAvailable()) {
+    // Just incase the browser doesn't support webauthn
+    document.getElementById('login').classList.add('go-away')
+    document.getElementById('register').classList.add('go-away')
+    document.getElementById('no-support').classList.remove('go-away')
+}
