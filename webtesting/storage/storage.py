@@ -11,25 +11,35 @@ import dataclasses
 from json import loads, dumps, JSONDecoder, JSONEncoder
 from datetime import datetime, timedelta
 from typing import Any
+import typing
 from Crypto.Cipher import AES
+import mimetypes
 
 def loadfile(file: bytes, filename: str) -> tuple[bytes, str]:
-    if not filename.endswith(".bin"):
+    if not filename.endswith(".aes.bin"):
         return file, filename
-    key = os.getenv("AES_KEY").encode()
+    key = bytes.fromhex(os.getenv("AES_KEY"))
     tag = file[16:]
     nonce = file[16:16+15]
     cipher = AES.new(key, AES.MODE_OCB, nonce=nonce)
     data = cipher.decrypt_and_verify(file, tag)
-    return data, filename.lstrip(".bin")
+    return data, filename.lstrip(".aes.bin")
 
 def savefile(file: bytes, filename: str) -> tuple[bytes, str]:
-    if filename.endswith(".bin"):
+    if filename.endswith(".aes.bin"):
         return file, filename
-    key = os.getenv("AES_KEY").encode()
+    key = bytes.fromhex(os.getenv("AES_KEY"))
     cipher = AES.new(key, AES.MODE_OCB)
     data, tag = cipher.encrypt_and_digest(file)
-    return tag+cipher.nonce+data, filename + ".bin"
+    return tag+cipher.nonce+data, filename + ".aes.bin"
+
+def aesfilename(filename: str) -> str:
+    if filename.endswith(".aes.bin"):
+        return filename
+    return filename + ".aes.bin"
+
+def filedecode(filename):
+    return filename.lstrip(".aes.bin"), mimetypes.guess_type(filename.lstrip(".aes.bin"))[0]
 
 app = bottle.Bottle()
 
@@ -167,6 +177,7 @@ def home(session, rdb):
         session=session,
         curdir=curdir,
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
+        #files={},
     )
 
 
@@ -329,17 +340,22 @@ def storage(session, rdb):
     user = session.get("user")
     if validate_session_token(session.get("token"), session.get("user"), rdb):
         if bottle.request.method == "GET":
-            return {"files": s3.ls("bookishsystem/bookish-system/"+user)}
+            data = bottle.request.json
+            try:
+                
+                return readfile(user, data["file"])
+            except FileNotFoundError:
+                bottle.abort(404, "File not found")
         elif bottle.request.method == "DELETE":
             data = bottle.request.json
-            if modifyfile(data["file"], "delete"):
+            if modifyfile(user, data["file"], "delete"):
                 return
             else:
                 bottle.abort(404, "File not found")
         elif bottle.request.method == "PUT":
             data = bottle.request.json
-            modifyfile(data["file"], "create")
-            if modifyfile(data["file"], "write", data["data"]):
+            modifyfile(user, data["file"], "create")
+            if modifyfile(user, data["file"], "write", data["data"]):
                 return
             else:
                 bottle.abort(404, "File not found")
@@ -347,7 +363,8 @@ def storage(session, rdb):
         bottle.abort(401, "Unauthorized")
 
 
-def modifyfile(file: str, how: str, data: Any = None) -> bool:
+def modifyfile(user: str, file: str, how: str, data: typing.Union[bytes, None] = None) -> bool:
+    file = "bookishsystem/bookish-system/"+user+"/"+aesfilename(file)
     if how == "delete":
         if s3.exists(file):
             s3.rm(file)
@@ -356,16 +373,17 @@ def modifyfile(file: str, how: str, data: Any = None) -> bool:
         if not s3.exists(file):
             s3.touch(file)
             return True
-    elif how == "rename":
-        if s3.exists(file):
-            s3.rename(file, data)
-            return True
     elif how == "write":
         if s3.exists(file):
             with s3.open(file, "wb") as f: 
-                f.write(data)
+                f.write(savefile(data, file)[0])
             return True
     return False
+
+def readfile(user: str, file: str) -> bytes:
+    file = "bookishsystem/bookish-system/"+user+"/"+aesfilename(file)
+    with s3.open(file, "rb") as f:
+        return loadfile(f.read(), file)[0]
 
 
 print(s3.ls("bookishsystem/bookish-system/"))
@@ -374,7 +392,7 @@ db = redis.Redis(connection_pool=connection_pool)
 for user in loads(db.get("users"), cls=Base64Decoder):
     try:
         print("Creating user folder", user)
-        s3.mkdir("bookishsystem/bookish-system/"+user+"/")
+        s3.touch("bookishsystem/bookish-system/"+user+"/.keep")
     except FileExistsError:
         pass
     print(s3.ls("bookishsystem/bookish-system/"+user+"/"))

@@ -33,6 +33,11 @@
 				"ecmel.vscode-html-css"
 			]
 		}
+	},
+	"portsAttributes": {
+		"8080": {
+			"label": "Web Server"
+		}
 	}
 
 	// Configure tool-specific properties.
