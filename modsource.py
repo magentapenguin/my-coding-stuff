@@ -5,7 +5,7 @@ mods = [
         "to": "if auth_data.rp_id_hash != expected_rp_id_hash_bytes and False: #HUGE RISK HERE",
     },
     {
-        "file": "/home/vscode/.local/lib/python3.12/site-packages/webauthn/registration/verify_authentication_response.py",
+        "file": "/home/vscode/.local/lib/python3.12/site-packages/webauthn/authentication/verify_authentication_response.py",
         "from": "if auth_data.rp_id_hash != expected_rp_id_hash_bytes:",
         "to": "if auth_data.rp_id_hash != expected_rp_id_hash_bytes and False: #HUGE RISK HERE",
     },

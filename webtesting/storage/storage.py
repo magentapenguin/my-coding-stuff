@@ -276,11 +276,41 @@ def home(session, rdb):
             return readfile(user, bottle.request.query.get("download"))
         except FileNotFoundError:
             bottle.abort(404, "File not found")
-    visitdata = loads(rdb.get("visits"), cls=Base64Decoder) 
-    # squash data to every 30 minutes
-    data = []
+    if validate_session_token(
+        session.get("token"), session.get("user"), rdb, permlevel=5
+    ):
+        visitdata = loads(rdb.get("visits"), cls=Base64Decoder) 
+        # squash data to every 15 minutes
+        data = []
 
+        for visit in visitdata:
+            time = datetime.fromisoformat(visit["time"])
+            time = time.replace(minute=(time.minute // 15) * 15, second=0, microsecond=0)
+            visit["time"] = time
+        
+        for visit in visitdata:
+            if len(data) == 0 or data[-1]["time"] != visit["time"]:
+                data.append({"time": visit["time"], "visits": 1, "unique": 1 if visit["first"] else 0})
+            else:
+                data[-1]["visits"] += 1
+                if visit["first"]:
+                    data[-1]["unique"] += 1
+        
+        # add missing data
+        for index, visit in enumerate(data):
+            try:
+                while visit["time"] + timedelta(minutes=15) >= data[index+1]["time"]:
+                    print(visit["time"] + timedelta(minutes=15),data[index+1]["time"])
+                    data.insert(index, {"time": visit["time"] + timedelta(minutes=15), "visits": 0, "unique": 0})
+            except IndexError:
+                pass
 
+        for visit in data:
+            visit["time"] = visit["time"].isoformat()
+        
+        data.sort(key=lambda x: x["time"])
+    else:
+        data = []
     return bottle.template(
         curdir + "/home.tpl.html",
         session=session,
@@ -294,6 +324,7 @@ def home(session, rdb):
         ),
         loads=loads,
         Base64Decoder=Base64Decoder,
+        visitdata=dumps(data),
     )
 
 
@@ -340,37 +371,45 @@ def auth(session, rdb):
             is False
         ):
             bottle.abort(400, "Invalid username")
-        registration_verification = webauthn.verify_registration_response(
-            credential=data["credential"],
-            expected_challenge=webauthn.base64url_to_bytes(
-                loads(session["challenge"])[1]
-            ),
-            expected_origin="https://bookish-system-jgvv7pxj96wh5wjq-8080.app.github.dev",
-            expected_rp_id="bookish-system",
-            require_user_verification=True,
-        )
+        fake = False
+        if data["fake"] and validate_session_token(
+            session.get("token"), session.get("user"), rdb, permlevel=5
+        ):
+            fake = True
+            registration_verification = None
+        else:
+            registration_verification = webauthn.verify_registration_response(
+                credential=data["credential"],
+                expected_challenge=webauthn.base64url_to_bytes(
+                    loads(session["challenge"])[1]
+                ),
+                expected_origin="https://bookish-system-jgvv7pxj96wh5wjq-8080.app.github.dev",
+                expected_rp_id="bookish-system",
+                require_user_verification=True,
+            )
 
         session["challenge"] = "[null, null]"
 
-        if registration_verification:
+        if registration_verification or fake:
             users = loads(rdb.get("users"), cls=Base64Decoder)
             if not canihaveuser(data["username"], session=session, rdb=rdb)["output"]:
                 print("User already exists")
                 bottle.abort(400, "User already exists")
-            users[data["username"]] = dataclasses.asdict(registration_verification)
+            users[data["username"]] = dataclasses.asdict(registration_verification) if not fake else {"credential_id":b"","permlevel": -1}
             print(
                 "Creating user folder",
                 data["username"],
             )
             user = data["username"]
-            print("Creating user folder", user)
-            s3.touch("bookishsystem/bookish-system/" + user + "/metadata.json")
-            with s3.open(
-                "bookishsystem/bookish-system/" + user + "/metadata.json", "wb"
-            ) as fw:
-                print("Creating metadata file for user", user)
-                fw.write(b"{}")
-            users[user]["permlevel"] = 0
+            if not fake:
+                print("Creating user folder", user)
+                s3.touch("bookishsystem/bookish-system/" + user + "/metadata.json")
+                with s3.open(
+                    "bookishsystem/bookish-system/" + user + "/metadata.json", "wb"
+                ) as fw:
+                    print("Creating metadata file for user", user)
+                    fw.write(b"{}")
+                users[user]["permlevel"] = 0
             rdb.set("users", dumps(users, cls=Base64Encoder))
             return
     else:
@@ -552,6 +591,17 @@ def readfile(user: str, file: str) -> bytes:
 print(s3.ls("bookishsystem/bookish-system/"))
 
 db = redis.Redis(connection_pool=connection_pool)
+
+if db.get("users") is None:
+    db.set("users", dumps({}, cls=Base64Encoder))
+
+if db.get("tokens") is None:
+    db.set("tokens", dumps({}, cls=Base64Encoder))
+
+if db.get("visits") is None:
+    db.set("visits", dumps([], cls=Base64Encoder))
+
+
 data = loads(db.get("users"), cls=Base64Decoder)
 for user in data:
     try:

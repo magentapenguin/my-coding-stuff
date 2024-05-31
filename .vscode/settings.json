@@ -4,5 +4,6 @@
         "dataurl",
         "dompurify",
         "Notyf"
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "off"
 }

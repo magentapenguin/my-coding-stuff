@@ -22,7 +22,7 @@
 	"forwardPorts": [8080],
 
 	//Use 'postCreateCommand' to run commands after the container is created.
-	"postCreateCommand": "pip3 install --user -r requirements.txt; python3 modsource.py",
+	"postCreateCommand": "python -m pip install --user -r requirements.txt; python modsource.py",
 	"customizations": {
 		"vscode": {
 			"extensions": [
