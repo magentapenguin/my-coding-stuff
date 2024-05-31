@@ -559,7 +559,7 @@
                 x = shopitems.map((x)=>{return [x.elemid, x.level]})
                 y = Object.fromEntries(x)
                 d = {score: score, shoplvls:y, shoplocked: document.getElementById('shop').classList.contains('fullhide')}
-                forge.md.sha512.create();
+
                 var md = forge.md.sha256.create();
                 dstr = JSON.stringify(d)
                 md.update(dstr);

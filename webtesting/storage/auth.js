@@ -56,7 +56,7 @@ async function register(username) {
     console.log(username)
     let challenge = await getchallenge()
     let registration = await client.register(username, challenge, {
-        authenticatorType: "auto",
+        authenticatorType: "both",
         userVerification: "required",
         discoverable: "preferred",
         timeout: 60000,
