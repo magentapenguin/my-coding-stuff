@@ -18,14 +18,13 @@ import mimetypes
 
 def logvisitor(session, rdb):
     visits = loads(rdb.get("visits"))
-    session["visits"] = session.get("visits", 0) + 1
+    session["visits"] = int(session.get("visits", 0)) + 1
     visits.append(
         {
             "user": session.get("user"),
-            "token": session.get("token"),
             "visits": session["visits"],
             "time": datetime.now(timezone.utc).isoformat(),
-            "first": session.get("visits") == 1,
+            "first": session.get("visits") == "1",
         }
     )
     rdb.set("visits", dumps(visits))
@@ -277,6 +276,11 @@ def home(session, rdb):
             return readfile(user, bottle.request.query.get("download"))
         except FileNotFoundError:
             bottle.abort(404, "File not found")
+    visitdata = loads(rdb.get("visits"), cls=Base64Decoder) 
+    # squash data to every 30 minutes
+    data = []
+
+
     return bottle.template(
         curdir + "/home.tpl.html",
         session=session,
