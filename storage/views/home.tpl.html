@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <script src="/exit.js" defer async></script>
+    <title>Storage Home</title>
+    <link rel="icon" href="favicon.svg" type="image/svg+xml">
+    <link rel="mask-icon" href="favicon.svg" color="#000000">
+    <style>
+        h2 {
+            margin-top: 0;
+        }
+        .notyf__toast {
+            box-sizing: content-box;
+        }
+        @keyframes ripple2 {
+            0% {
+                transform: scale(0) translateY(-45%) translateX(13%);
+            }
+            100% {
+                transform: scale(1) translateY(-30%) translateX(13%);
+            }
+        }
+        .notyf__message {
+            word-wrap: break-word;
+            max-width: 99%;
+        }
+        .notyf__ripple {
+            animation: ripple2 .4s ease-out forwards !important;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css" integrity="sha256-IwkvZNRC/3S26O1gWwjBINmrPZ4zYvPX4z/98OKWHkQ=" crossorigin="anonymous">
+</head>
+<body>
+    % faking_user = session.get("faking_user_as")
+    % if faking_user and (faking_user != session.get("user")) and session.get("user"):
+    <style>
+        #fake-user {
+            --accent-color: #20b14c;
+            --accent-text-color: white;
+            background-color: var(--accent-color);
+            color: var(--accent-text-color);
+            padding: 0.1rem;
+            text-align: center;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1.375rem;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: none;
+        }
+        #fake-user strong {
+            font-weight: bold;
+        }
+        #fake-user a {
+            color: var(--accent-text-color);
+            text-decoration: none;
+            border: 1px solid var(--accent-text-color);
+            padding: 0.2rem 0.5rem;
+            padding-top: 0.1rem;
+            margin-left: 0.2rem;
+            border-radius: 0.5rem;
+            text-align: justify;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #fake-user a:hover {
+            background-color: var(--accent-text-color);
+            color: var(--accent-color);
+        }
+        #fake-user p {
+            vertical-align: middle;
+            margin: 0;
+        }
+        #fake-user button {
+            background-color: transparent;
+            border: none;
+            color: var(--accent-text-color);
+            position: absolute;
+            font-size: 1.2em;
+            padding: 0.2rem 0.5rem;
+            margin-left: 0.5rem;
+            margin-bottom: 0;
+            right: 0;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+    <header id="fake-user">
+        <p>
+            You are now faking as <strong>{{session.get("user")}}</strong>.
+            <a href="/?logout">Logout</a>
+        </p>
+        <button id="fake-user-go-away"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></button>
+        <script>
+            document.getElementById("fake-user-go-away").addEventListener("click", () => {
+                document.getElementById("fake-user").animate([
+                    {transform: "translateY(0)"},
+                    {transform: "translateY(-100%)"}
+                ], {duration: 50}).onfinish = () => {
+                    document.getElementById("fake-user").remove();
+                }
+            });
+        </script>
+    </header>
+    % end
+    <main>
+        <exit-btn href="/" tabindex="0"></exit-btn>
+        % userlock = loads(rdb.get("users"), cls=Base64Decoder).get(session.get('user'),{})
+        % if loggedin and (not userlock.get('locked',False)) or (faking_user and (not userlock.get('permlevel',0) == -1)):
+        <svg class="go-away">
+            <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="download" >
+                <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path d="M288 32c0-17.7-14.3-32-32-32s-32 14.3-32 32V274.7l-73.4-73.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l128 128c12.5 12.5 32.8 12.5 45.3 0l128-128c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L288 274.7V32zM64 352c-35.3 0-64 28.7-64 64v32c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V416c0-35.3-28.7-64-64-64H346.5l-45.3 45.3c-25 25-65.5 25-90.5 0L165.5 352H64zm368 56a24 24 0 1 1 0 48 24 24 0 1 1 0-48z"/>
+            </symbol>
+        </svg>
+        <svg class="go-away">
+            <symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="delete-icon" >
+                <!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                <path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/>
+            </symbol>
+        </svg>
+        <h1>{{session.get('user')}}'s Home</h1>
+        <a class="btn red-accent" href="/?logout">Logout</a> <button class="btn red-accent" id="delete">Delete Account</button>
+        <% def size_fmt(size):
+            for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+                if size < 1024:
+                    return f"{size:.2f} {unit}"
+                end
+                size /= 1024
+            end
+            return f"{size:.2f}"
+        end   
+        %>
+        <p>
+            Welcome to your home, {{session.get('user')}}.
+            <br>
+            You can access your files here.
+            <small>(You may need to refresh the page to see the changes)</small>
+        </p>
+        % size = getsize(session.get('user'), rdb)
+        % usage = size[0]
+        % cap = size[1]
+        <p class="vflex">
+            <span id="storageusage"><strong>Storage Usage:</strong> {{size_fmt(usage)}} / {{size_fmt(cap)}}</span>
+            <meter value="{{round(usage/cap*100)}}" min="0" max="100" aria-describedby="storageusage"></meter>
+        </p>
+        <dialog id="delete-account">
+            <h2>Are you sure?</h2>
+            <p>
+                Your account will be <strong>PERMANENTLY</strong> deleted!
+            </p>
+            <form class="button-footer">
+                <a class="btn red-accent important-btn" href="n/home?deleteself">Delete</a>
+                <button class="btn" formmethod="dialog" autofocus>Cancel</button>
+            </form>
+        </dialog>
+        
+        <button class="btn three-d-btn" id="upload-file"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M288 109.3V352c0 17.7-14.3 32-32 32s-32-14.3-32-32V109.3l-73.4 73.4c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3l128-128c12.5-12.5 32.8-12.5 45.3 0l128 128c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L288 109.3zM64 352H192c0 35.3 28.7 64 64 64s64-28.7 64-64H448c35.3 0 64 28.7 64 64v32c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V416c0-35.3 28.7-64 64-64zM432 456a24 24 0 1 0 0-48 24 24 0 1 0 0 48z"/></svg> Upload File</button>
+        <dialog id="file-modal">
+            <form id="file-form" action="/storage" method="post" enctype="multipart/form-data">
+                <h2>Upload File</h2>
+                <br>
+                <label for="file" class="btn mb-0">Select File</label>
+                <input type="file" name="file" id="file" required multiple>
+                <br>
+                <table class="less-fancy">
+                    <thead>
+                        <tr>
+                            <th>File Name</th>
+                            <th>File Size</th>
+                            <th>File Type</th>
+                        </tr>
+                    </thead>
+                    <tbody id="upload-file-list">
+                        <tr>
+                            <td colspan="3">No files selected</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="button-footer mb-0">
+                    <button class="btn" id="upload-cancel" autofocus type="reset">Cancel</button>
+                    <button class="btn" type="submit">Upload</button>
+                </div>
+            </form>
+        </dialog>
+        <table class="less-fancy">
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>File Size</th>
+                    <th>File Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                % for file in files:
+                <tr>
+                    <td>{{file['name']}}</td>
+                    <td>{{size_fmt(file['size'])}}</td>
+                    <td>{{file['type']}}</td>
+                    <td>
+                        <div class="btn-group no-mb">
+                        <a class="btn btn-small three-d-btn" href="/home?download={{file['name']}}"><svg class="fa-svg-man"><use xlink:href="#download"></use></svg> Download</a>
+                        <button class="btn red-accent btn-small three-d-btn del-btn" data-name="{{file['name']}}"><svg class="fa-svg-man"><use xlink:href="#delete-icon"></use></svg> Delete</button>
+                        </div>
+                    </td>
+                </tr>
+                % end
+                % if len(files) == 0:
+                <tr>
+                    <td colspan="4"><span class="center">No files</span></td>
+                </tr>
+                % end
+            </tbody>
+        </table>
+
+        <script src="/{{curdir}}/home.js" defer type="module"></script>
+        % if loads(rdb.get("users"), cls=Base64Decoder).get(session.get('user'))['permlevel'] >= 5:
+        <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="lock-icon" ><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/></symbol></svg>
+        <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="unlock-icon"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M144 144c0-44.2 35.8-80 80-80c31.9 0 59.4 18.6 72.3 45.7c7.6 16 26.7 22.8 42.6 15.2s22.8-26.7 15.2-42.6C331 33.7 281.5 0 224 0C144.5 0 80 64.5 80 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H144V144z"/></symbol></svg>
+        <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" id="signin-icon"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M217.9 105.9L340.7 228.7c7.2 7.2 11.3 17.1 11.3 27.3s-4.1 20.1-11.3 27.3L217.9 406.1c-6.4 6.4-15 9.9-24 9.9c-18.7 0-33.9-15.2-33.9-33.9l0-62.1L32 320c-17.7 0-32-14.3-32-32l0-64c0-17.7 14.3-32 32-32l128 0 0-62.1c0-18.7 15.2-33.9 33.9-33.9c9 0 17.6 3.6 24 9.9zM352 416l64 0c17.7 0 32-14.3 32-32l0-256c0-17.7-14.3-32-32-32l-64 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l64 0c53 0 96 43 96 96l0 256c0 53-43 96-96 96l-64 0c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/></symbol></svg>
+        <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" id="prot-user"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c1.8 0 3.5-.2 5.3-.5c-76.3-55.1-99.8-141-103.1-200.2c-16.1-4.8-33.1-7.3-50.7-7.3H178.3zm308.8-78.3l-120 48C358 277.4 352 286.2 352 296c0 63.3 25.9 168.8 134.8 214.2c5.9 2.5 12.6 2.5 18.5 0C614.1 464.8 640 359.3 640 296c0-9.8-6-18.6-15.1-22.3l-120-48c-5.7-2.3-12.1-2.3-17.8 0zM591.4 312c-3.9 50.7-27.2 116.7-95.4 149.7V273.8L591.4 312z"/></symbol></svg>
+        <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" id="locked-user"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H392.6c-5.4-9.4-8.6-20.3-8.6-32V352c0-2.1 .1-4.2 .3-6.3c-31-26-71-41.7-114.6-41.7H178.3zM528 240c17.7 0 32 14.3 32 32v48H496V272c0-17.7 14.3-32 32-32zm-80 32v48c-17.7 0-32 14.3-32 32V480c0 17.7 14.3 32 32 32H608c17.7 0 32-14.3 32-32V352c0-17.7-14.3-32-32-32V272c0-44.2-35.8-80-80-80s-80 35.8-80 80z"/></symbol></svg>
+        <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" id="non-user"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7L353.3 251.6C407.9 237 448 187.2 448 128C448 57.3 390.7 0 320 0C250.2 0 193.5 55.8 192 125.2L38.8 5.1zM264.3 304.3C170.5 309.4 96 387.2 96 482.3c0 16.4 13.3 29.7 29.7 29.7H514.3c3.9 0 7.6-.7 11-2.1l-261-205.6z"/></symbol></svg>
+        <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="user"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304H178.3z"/></symbol></svg>
+        <br>
+        <h2>Admin Panel</h2>
+        <p>
+            You are an admin. You can manage users here.
+        </p>
+        <details>
+            <summary>Visits</summary>
+        <div style="width: min(100%,1000px); position: relative; aspect-ratio: 2/1;"><canvas id="visits"></canvas></div>
+        <script src="/{{curdir}}/admin.js" defer></script>
+        <script>
+            window.visits = {{!visitdata}};
+        </script>
+        </details>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+        <details>
+            <summary>Users</summary>
+            <dialog id="register-dialog">
+            <h2>Create an Account</h2>
+            <form id="register-form" class="vform">
+                <div class="i-group w-100">
+                    <label for="register-username" id="usernamelabel">Username:</label>
+                    <span>
+                        <input type="text" name="username" placeholder="Username" id="register-username" required pattern="[0-9a-zA-Z]{3,20}" autocomplete="username">
+                        <small>Only letters and numbers allowed, must be at least 3 characters long, max 20 characters</small>
+                    </span>
+                </div>
+                <div class="i-group w-100">
+                    <small>By creating an account, you must read and agree to the <a href="/terms">Terms of Service</a>.</small>
+                </div>
+                <div class="button-footer">
+                    <button type="submit" class="btn green-accent w-100">Register</button>
+                    <button type="reset" class="btn red-accent w-100" id="register-dialog-close">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+        % users = loads(rdb.get("users"), cls=Base64Decoder)
+        <button class="btn three-d-btn" id="add-fake-user" {{! 'disabled data-tooltip="true" data-tooltip-text="You do not have permission to use this"' if users.get(session.get('user'))['permlevel'] < 7 else ''}}><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512H418.3c1.8 0 3.5-.2 5.3-.5c-76.3-55.1-99.8-141-103.1-200.2c-16.1-4.8-33.1-7.3-50.7-7.3H178.3zm308.8-78.3l-120 48C358 277.4 352 286.2 352 296c0 63.3 25.9 168.8 134.8 214.2c5.9 2.5 12.6 2.5 18.5 0C614.1 464.8 640 359.3 640 296c0-9.8-6-18.6-15.1-22.3l-120-48c-5.7-2.3-12.1-2.3-17.8 0zM591.4 312c-3.9 50.7-27.2 116.7-95.4 149.7V273.8L591.4 312z"/></svg> Add Fake User</button>
+        <table class="less-fancy">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Permission Level</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                % for username, user in users.items():
+                <tr>
+                    <td>{{! ('<svg class="fa-svg-man svg-fw" data-tooltip="true" data-tooltip-text="Fake User"><use xlink:href="#non-user"></use></svg> ' if user.get('permlevel', 0) < 0 else '<svg class="fa-svg-man svg-fw" data-tooltip="true" data-tooltip-text="User Locked"><use xlink:href="#locked-user"></use></svg> ') if user.get('locked') else ('<svg class="fa-svg-man svg-fw" data-tooltip="true" data-tooltip-text="User Protected"><use xlink:href="#prot-user"></use></svg> ' if users.get(session.get('user'))['permlevel'] <= user['permlevel'] else '<svg class="fa-svg-man svg-fw"><use xlink:href="#user"></use></svg> ')}}{{username}}</td>
+                    <td>{{user["permlevel"]}}</td>
+                    <td>
+                        <div class="btn-group no-mb">
+                        % if users.get(session.get('user'))['permlevel'] >= 7 and users.get(session.get('user'))['permlevel'] > user['permlevel']:
+                        <a class="btn btn-small three-d-btn red-accent" href="/home?user={{username}}&delete"><svg class="fa-svg-man"><use xlink:href="#delete-icon"></use></svg> Delete User</a>
+                        % if user['permlevel'] >= 0:
+                        <a class="btn btn-small three-d-btn red-accent" href="/home?user={{username}}&lock"><svg class="fa-svg-man"><use xlink:href="#{{'un' if user['locked'] else ''}}lock-icon"></use></svg> {{'Unl' if user.get('locked') else 'L'}}ock User</a>
+                        % else:
+                        <button class="btn btn-small three-d-btn red-accent" disabled data-tooltip="true" data-tooltip-text="It is not possible to do that"><svg class="fa-svg-man"><use xlink:href="#{{'un' if user['locked'] else ''}}lock-icon"></use></svg> {{'Unl' if user.get('locked') else 'L'}}ock User</button>
+                        % end
+                        % if users.get(session.get('user'))['permlevel'] >= 12 and user['permlevel'] >= 0:
+                        <a class="btn btn-small three-d-btn red-accent" href="/home?user={{username}}&fake"><svg class="fa-svg-man"><use xlink:href="#signin-icon"></use></svg> Fake User</a>
+                        % elif not user['permlevel'] >= 0:
+                        <button class="btn btn-small three-d-btn red-accent" disabled data-tooltip="true" data-tooltip-text="It is not possible to do that"><svg class="fa-svg-man"><use xlink:href="#signin-icon"></use></svg> Fake User</button>
+                        % end
+                        % else:
+                        <button class="btn btn-small three-d-btn red-accent" disabled data-tooltip="true" data-tooltip-text="You do not have permission to use this"><svg class="fa-svg-man"><use xlink:href="#delete-icon"></use></svg> Delete User</button>
+                        <button class="btn btn-small three-d-btn red-accent" disabled data-tooltip="true" data-tooltip-text="You do not have permission to use this"><svg class="fa-svg-man"><use xlink:href="#{{'un' if user['locked'] else ''}}lock-icon"></use></svg> {{'Unl' if user.get('locked') else 'L'}}ock User</button>
+                        % end
+                        </div>
+                    </td>
+                </tr>
+                % end
+                % if len(users) == 0:
+                <tr>
+                    <td colspan="2"><span class="center">No users</span></td>
+                </tr>
+                % end
+            </tbody>
+        </table>
+        </details>
+        % end
+        % elif userlock:
+        <h1>Account Locked</h1>
+        <p>
+            Your account has been locked by an admin.
+            <br>
+            Please contact an admin to unlock your account.
+        </p>
+        <a class="btn red-accent" href="/?logout">Logout</a>
+        % else:
+        <h1>Unauthorized!</h1>
+        <p>
+            You are not logged in.
+            <br>
+            Please <a href="/">login</a> to continue.
+        </p>
+        % end
+        
+    </main>
+    <footer>
+        &copy; 2024 Your Company
+    </footer>
+</body>
+</html>

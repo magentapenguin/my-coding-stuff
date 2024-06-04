@@ -1,4 +1,4 @@
-import { client } from '/webtesting/storage/webauthn/index.js';
+import { client } from '/static/webauthn/index.js';
 import { Notyf } from 'https://cdn.jsdelivr.net/npm/notyf@3.10.0/+esm'
 
 const notyf = new Notyf({
@@ -19,7 +19,7 @@ const notyf = new Notyf({
  */
 async function canihaveusername(x) {
     try {
-        let response = await fetch('/storage/canihave/user/'+x, {
+        let response = await fetch('/canihave/user/'+x, {
             method: 'GET'
         })
         console.log(response)
@@ -37,7 +37,7 @@ async function canihaveusername(x) {
 
 async function getchallenge() {
     // Please note that this is SHOULD NOT fail silently
-    let response = await fetch('/storage/auth/', {
+    let response = await fetch('/auth/', {
         method: 'GET',
         headers: {
             'Accept': 'application/json',
@@ -66,7 +66,7 @@ async function register(username) {
         rp_name: 'bookish-system',
     })
     console.log(registration)
-    let response = await fetch('/storage/auth', {
+    let response = await fetch('/auth', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ async function register(username) {
 async function authenticate() {
     let challenge = await getchallenge()
     let assertion = await client.authenticate([],challenge)
-    let response = await fetch('/storage/login', {
+    let response = await fetch('/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
