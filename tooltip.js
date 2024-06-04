@@ -6,6 +6,8 @@ import {
     arrow,
     autoUpdate,
 } from 'https://cdn.jsdelivr.net/npm/@floating-ui/dom@1.6.3/+esm';
+import { sanitize } from 'https://cdn.jsdelivr.net/npm/dompurify/+esm'
+
 
 export class Tooltip {
     constructor(button) {
@@ -27,7 +29,7 @@ export class Tooltip {
         this.cleanup = () => {};
     }
     onHover() {
-        this.tooltip.innerHTML = this.button.getAttribute('data-tooltip-text');
+        this.tooltip.innerHTML = sanitize(this.button.getAttribute('data-tooltip-text'));
         this.tooltip.appendChild(this.arrowEl);
         document.body.appendChild(this.tooltip);
         if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
