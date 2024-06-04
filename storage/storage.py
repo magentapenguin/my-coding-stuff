@@ -1,3 +1,5 @@
+#from gevent import monkey; monkey.patch_all()
+
 import bottle_session
 import os
 import s3fs
@@ -8,13 +10,16 @@ import redis
 import webauthn
 import base64
 import dataclasses
-import brotli
+import brotli, gzip, zlib
 from json import loads, dumps, JSONDecoder, JSONEncoder, JSONDecodeError
 from datetime import datetime, timedelta, timezone
 from typing import Any
 import typing
 from Crypto.Cipher import AES
 import mimetypes
+
+DEV = True
+LOCATION = f"bookishsystem/{'bookish-system' if not DEV else 'dev'}/"
 
 def logvisitor(session, rdb):
     visits = loads(rdb.get("visits"))
@@ -70,32 +75,37 @@ def filedecode(filename):
 
 
 def metadata(user: str, filename: str, file: bytes):
-    with s3.open("bookishsystem/bookish-system/" + user + "/metadata.json", "r") as f:
+    with s3.open(LOCATION + user + "/metadata.json", "r") as f:
         metadata = loads(f.read())
     metadata[filename] = {
         "type": mimetypes.guess_type(filename)[0],
         "size": len(file),
         "name": filename,
     }
-    with s3.open("bookishsystem/bookish-system/" + user + "/metadata.json", "w") as f:
+    with s3.open(LOCATION + user + "/metadata.json", "w") as f:
         f.write(dumps(metadata))
 
 def rmmetadata(user: str, filename: str):
-    with s3.open("bookishsystem/bookish-system/" + user + "/metadata.json", "r") as f:
+    with s3.open(LOCATION + user + "/metadata.json", "r") as f:
         metadata = loads(f.read())
     del metadata[filename]
-    with s3.open("bookishsystem/bookish-system/" + user + "/metadata.json", "w") as f:
+    with s3.open(LOCATION + user + "/metadata.json", "w") as f:
         f.write(dumps(metadata))
 
 
 def getmetadata(user: str, filename: str):
-    with s3.open("bookishsystem/bookish-system/" + user + "/metadata.json", "r") as f:
+    with s3.open(LOCATION + user + "/metadata.json", "r") as f:
         metadata = loads(f.read())
     return metadata.get(filename)
 
+def getsize(user: str, rdb: Any):
+    print(user)
+    return sum([file["size"] for file in s3.ls(LOCATION + user + "/", detail=True)]), (10,15,20,30,40,50)[min(5,loads(rdb.get("users"))[user].get("permlevel",0))] * 1024 * 1024
 
 def getfiles(user: str):
-    with s3.open("bookishsystem/bookish-system/" + user + "/metadata.json", "r") as f:
+    if not user:
+        return []
+    with s3.open(LOCATION + user + "/metadata.json", "r") as f:
         metadata = loads(f.read())
     return list(metadata.values())
 
@@ -181,8 +191,12 @@ class Base64Decoder(JSONDecoder):
             return base64.b64decode(obj["b64"])
         return obj
 
+bottle.BaseRequest.MEMFILE_MAX = 1024 * 1024 * 1024
+
 
 curdir = os.path.relpath(os.path.dirname(__file__))
+
+bottle.TEMPLATE_PATH.insert(0, curdir+"/views")
 
 session_plugin = bottle_session.SessionPlugin(
     cookie_secure=True, cookie_httponly=True, cookie_lifetime=60 * 60 * 24 * 7, cookie_name="session"
@@ -196,14 +210,22 @@ redis_plugin.redisdb = connection_pool
 app.install(session_plugin)
 app.install(redis_plugin)
 
+
+
 s3 = s3fs.S3FileSystem(
     key=os.getenv("AWS_S3_ACCESS_KEY"),
     secret=os.getenv("AWS_S3_SECRET_KEY"),
 )
 try:
-    s3.touch("bookishsystem/bookish-system/0")
+    s3.touch(LOCATION+"/0")
 except FileExistsError:
     pass
+
+@app.route("/<path>")
+def altstatic(path):
+    if path.strip("/").endswith(".tpl.html"):
+        bottle.abort(404, "Not Found")
+    return bottle.static_file(path, root=".")
 
 @app.route("/")
 def index(session, rdb):
@@ -211,21 +233,27 @@ def index(session, rdb):
     if bottle.request.query.get("logout") is not None:
         session["token"] = ""
         session["user"] = ""
+        session["faking_user_as"] = ""
         print("Logged out", session.get("token"), session.get("user"))
-        bottle.redirect("/storage")
+        bottle.redirect("/")
     return bottle.template(
-        curdir + "/index.tpl.html",
-        curdir=curdir,
+        "index.tpl.html",
+        curdir="static",
         session=session,
         rdb=rdb,
-        loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
+        loggedin=validate_session_token(session.get("token"), session.get("user"), rdb, allowlocked=True),
+        loads=loads,
+        Base64Decoder=Base64Decoder,
     )
 
+@app.route("/static/<path:path>")
+def static(path):
+    return bottle.static_file(path, root=curdir + "/static")
 
 @app.route("/home")
 def home(session, rdb):
     logvisitor(session, rdb)
-    if bottle.request.query.get("delete") is not None and validate_session_token(
+    if bottle.request.query.get("deleteself") is not None and validate_session_token(
         session.get("token"), session.get("user"), rdb
     ):
         print("Deleting Account", session.get("user"))
@@ -237,28 +265,45 @@ def home(session, rdb):
         del tokens[session.get("user")]
         rdb.set("tokens", dumps(tokens))
 
-        s3.rm("bookishsystem/bookish-system/" + session.get("user"), recursive=True)
+        s3.rm(LOCATION + session.get("user"), recursive=True)
 
-    if bottle.request.query.get("deleteuser") is not None and validate_session_token(
-        session.get("token"), session.get("user"), rdb, permlevel=5
-    ):
-        print("Deleting User", bottle.request.query.get("deleteuser"))
+    if validate_session_token(
+        session.get("token"), session.get("user"), rdb, permlevel=7
+    ) and bottle.request.query.get("user") is not None:
         users = loads(rdb.get("users"), cls=Base64Decoder)
-        del users[bottle.request.query.get("deleteuser")]
-        rdb.set("users", dumps(users, cls=Base64Encoder))
-        try:
-            tokens = loads(rdb.get("tokens"))
-            del tokens[bottle.request.query.get("deleteuser")]
-            rdb.set("tokens", dumps(tokens))
+        target = bottle.request.query.get("user")
+        print("Target", target, users.get(target))
+        if users.get(target)['permlevel'] > loads(rdb.get("users"), cls=Base64Decoder)[session.get("user")]['permlevel']:
+            bottle.redirect("/home")
+        if bottle.request.query.get("delete") is not None:
+            print("Deleting User", target)
+            del users[target]
+            rdb.set("users", dumps(users, cls=Base64Encoder))
+            try:
+                tokens = loads(rdb.get("tokens"))
+                del tokens[target]
+                rdb.set("tokens", dumps(tokens))
 
-            s3.rm("bookishsystem/bookish-system/" + bottle.request.query.get("deleteuser"), recursive=True)
+                s3.rm(LOCATION + target, recursive=True)
 
-        except KeyError:
-            pass
-        bottle.redirect("/storage/home")
+            except KeyError:
+                pass
+        elif bottle.request.query.get("lock") is not None:
+            print("Locking User", target)
+            users[target]["locked"] = not users[target]["locked"]
+            rdb.set("users", dumps(users, cls=Base64Encoder))
+        
+        elif bottle.request.query.get("fake") is not None and users.get(session.get('user'))['permlevel'] >= 12:
+            print("Faking user", target)
+            session["faking_user_as"] = session.get('user')
+            session["token"] = make_session_token(target, rdb)
+            session["user"] = target
+
+            
+        bottle.redirect("/home")
 
     if bottle.request.query.get("download") is not None and validate_session_token(
-        session.get("token"), session.get("user"), rdb
+        session.get("token"), session.get("user"), rdb, allowlocked=session.get("faking_user_as") is not None
     ):
         print("Downloading", bottle.request.query.get("download"), getfiles(session.get("user")))
         if getmetadata(session.get("user"), bottle.request.query.get("download")) is None:
@@ -289,21 +334,20 @@ def home(session, rdb):
             visit["time"] = time
         
         for visit in visitdata:
-            if len(data) == 0 or data[-1]["time"] != visit["time"]:
-                data.append({"time": visit["time"], "visits": 1, "unique": 1 if visit["first"] else 0})
-            else:
-                data[-1]["visits"] += 1
-                if visit["first"]:
-                    data[-1]["unique"] += 1
+            if datetime.now(timezone.utc) - visit["time"] < timedelta(hours=24):
+                if len(data) == 0 or data[-1]["time"] != visit["time"]:
+                    data.append({"time": visit["time"], "visits": 1, "unique": 1 if visit["first"] else 0})
+                else:
+                    data[-1]["visits"] += 1
+                    if visit["first"]:
+                        data[-1]["unique"] += 1
         
         # add missing data
         for index, visit in enumerate(data):
-            try:
-                while visit["time"] + timedelta(minutes=15) >= data[index+1]["time"]:
-                    print(visit["time"] + timedelta(minutes=15),data[index+1]["time"])
-                    data.insert(index, {"time": visit["time"] + timedelta(minutes=15), "visits": 0, "unique": 0})
-            except IndexError:
-                pass
+            if index == 0:
+                continue
+            if visit["time"] - data[index - 1]["time"] > timedelta(minutes=15):
+                data.insert(index, {"time": data[index - 1]["time"] + timedelta(minutes=15), "visits": 0, "unique": 0})
 
         for visit in data:
             visit["time"] = visit["time"].isoformat()
@@ -312,19 +356,16 @@ def home(session, rdb):
     else:
         data = []
     return bottle.template(
-        curdir + "/home.tpl.html",
+        "home.tpl.html",
         session=session,
         rdb = rdb,
-        curdir=curdir,
+        curdir="static",
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
-        files=(
-            getfiles(session.get("user"))
-            if validate_session_token(session.get("token"), session.get("user"), rdb)
-            else None
-        ),
+        files=getfiles(session.get("user")),
         loads=loads,
         Base64Decoder=Base64Decoder,
         visitdata=dumps(data),
+        getsize=getsize,
     )
 
 
@@ -332,9 +373,9 @@ def home(session, rdb):
 def status(session, rdb):
     logvisitor(session, rdb)
     return bottle.template(
-        curdir + "/status.tpl.html",
+        "status.tpl.html",
         session=session,
-        curdir=curdir,
+        curdir="static",
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
     )
 
@@ -343,9 +384,9 @@ def status(session, rdb):
 def terms(session, rdb):
     logvisitor(session, rdb)
     return bottle.template(
-        curdir + "/terms.html",
+        "terms.html",
         session=session,
-        curdir=curdir,
+        curdir="static",
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
     )
 
@@ -372,8 +413,8 @@ def auth(session, rdb):
         ):
             bottle.abort(400, "Invalid username")
         fake = False
-        if data["fake"] and validate_session_token(
-            session.get("token"), session.get("user"), rdb, permlevel=5
+        if data.get("fake") and validate_session_token(
+            session.get("token"), session.get("user"), rdb, permlevel=7
         ):
             fake = True
             registration_verification = None
@@ -383,7 +424,7 @@ def auth(session, rdb):
                 expected_challenge=webauthn.base64url_to_bytes(
                     loads(session["challenge"])[1]
                 ),
-                expected_origin="https://bookish-system-jgvv7pxj96wh5wjq-8080.app.github.dev",
+                expected_origin="https://bookish-system-jgvv7pxj96wh5wjq-8080.app.github.dev" if DEV else "???",
                 expected_rp_id="bookish-system",
                 require_user_verification=True,
             )
@@ -395,7 +436,7 @@ def auth(session, rdb):
             if not canihaveuser(data["username"], session=session, rdb=rdb)["output"]:
                 print("User already exists")
                 bottle.abort(400, "User already exists")
-            users[data["username"]] = dataclasses.asdict(registration_verification) if not fake else {"credential_id":b"","permlevel": -1}
+            users[data["username"]] = dataclasses.asdict(registration_verification) if not fake else {"credential_id":b'', "permlevel": -1, "locked": True}
             print(
                 "Creating user folder",
                 data["username"],
@@ -403,13 +444,15 @@ def auth(session, rdb):
             user = data["username"]
             if not fake:
                 print("Creating user folder", user)
-                s3.touch("bookishsystem/bookish-system/" + user + "/metadata.json")
-                with s3.open(
-                    "bookishsystem/bookish-system/" + user + "/metadata.json", "wb"
-                ) as fw:
-                    print("Creating metadata file for user", user)
-                    fw.write(b"{}")
+                if not s3.exists(LOCATION + user + "/metadata.json"):
+                    s3.touch(LOCATION + user + "/metadata.json")
+                    with s3.open(
+                        LOCATION + user + "/metadata.json", "wb"
+                    ) as fw:
+                        print("Creating metadata file for user", user)
+                        fw.write(b"{}")
                 users[user]["permlevel"] = 0
+                users[user]["locked"] = False
             rdb.set("users", dumps(users, cls=Base64Encoder))
             return
     else:
@@ -441,27 +484,31 @@ def make_session_token(user: str, rdb: Any) -> str:
     return token
 
 
-def validate_session_token(token: str, user: str, rdb: Any, permlevel: int = 0) -> bool:
+def validate_session_token(token: str, user: str, rdb: Any, permlevel: int = 0, allowlocked: bool = False) -> bool:
     """
-    Validates the session token for a given user.
+    Validates a session token for a given user.
 
     Args:
         token (str): The session token to validate.
         user (str): The user associated with the session token.
-        rdb (Any): The Redis database connection object.
+        rdb (Any): The Redis database object.
+        permlevel (int, optional): The required permission level. Defaults to 0.
+        allowlocked (bool, optional): Whether to allow locked users. Defaults to False.
 
     Returns:
         bool: True if the session token is valid, False otherwise.
     """
     tokens = loads(rdb.get("tokens"))
+    users = loads(rdb.get("users"), cls=Base64Decoder)
     if user in tokens:
         if (
             tokens[user][0] == token
-            and datetime.fromisoformat(tokens[user][1]) + timedelta(seconds=60 * 60)
+            and datetime.fromisoformat(tokens[user][1]) + timedelta(seconds=60 * 60 * 24)
             > datetime.now()
             and hashlib.sha256(user.encode()).digest() == bytes.fromhex(token)[:-16]
+            and not users[user].get("locked", False) or allowlocked
         ):
-            if loads(rdb.get("users"), cls=Base64Decoder)[user].get("permlevel", 0) >= permlevel:
+            if users[user].get("permlevel", 0) >= permlevel:
                 return True
         else:
             del tokens[user]
@@ -507,18 +554,18 @@ def login(session, rdb):
         print("User not found")
         bottle.abort(400, "User not found")
 
-@app.route("/storage/home", method=["ANY"])
-def redirect_home():
-    bottle.redirect("/storage/home", 301)
 
 @app.route("/storage", method=["GET", "DELETE", "POST"])
 def storage(session, rdb):
     # bottle.abort(401, "Unauthorized")
     user = session.get("user")
     print("User", user)
-    if validate_session_token(session.get("token"), session.get("user"), rdb):
+    if validate_session_token(session.get("token"), session.get("user"), rdb, allowlocked=session.get("faking_user_as") is not None):
         if bottle.request.method == "GET":
             data = bottle.request.query
+            if data.get("precheck").isdigit():
+                print("Precheck passed")
+                return {"output": not (int(data.get("precheck")) + getsize(user, rdb)[0] > getsize(user, rdb)[1])}
             if data.get("file") is None:
                 return getfiles(user)
             if data.get("file") == "metadata.json":
@@ -550,21 +597,39 @@ def storage(session, rdb):
                 filedata = file.file.read()
                 filename = file.filename
 
+                len(filedata) + getsize(user, rdb)[0] > getsize(user, rdb)[1] and bottle.abort(413, "File too large")
+
                 modifyfile(user, filename, "create")
                 if modifyfile(user, filename, "write", filedata):
                     print("File written", filename)
                 metadata(user, filename, filedata)
 
-                bottle.redirect("/storage/home")
+                bottle.redirect("/home")
             return
     else:
         bottle.abort(401, "Unauthorized")
 
+@app.route("/get/<path>", method=["GET"])
+def publicget(path):
+    user = "public"
+    data = bottle.request.query
+    if path == "metadata.json":
+        bottle.abort(403, "Forbidden")
+    if data.get("download") is not None:
+        bottle.response.set_header(
+            "Content-Disposition",
+            "attachment; filename=" + filedecode(path)[0],
+        )
+    try:
+        bottle.response.set_header("Content-Type", filedecode(path)[1])
+        return readfile(user, path)
+    except FileNotFoundError:
+        bottle.abort(404, "File not found")
 
 def modifyfile(
     user: str, file: str, how: str, data: typing.Union[bytes, None] = None
 ) -> bool:
-    file = "bookishsystem/bookish-system/" + user + "/" + aesfilename(file)
+    file = LOCATION + user + "/" + aesfilename(file)
     if how == "delete":
         if s3.exists(file):
             s3.rm(file)
@@ -583,12 +648,10 @@ def modifyfile(
 
 
 def readfile(user: str, file: str) -> bytes:
-    file = "bookishsystem/bookish-system/" + user + "/" + aesfilename(file)
+    file = LOCATION + user + "/" + aesfilename(file)
     with s3.open(file, "rb") as f:
         return loadfile(f.read(), file, True)[0]
 
-
-print(s3.ls("bookishsystem/bookish-system/"))
 
 db = redis.Redis(connection_pool=connection_pool)
 
@@ -606,18 +669,18 @@ data = loads(db.get("users"), cls=Base64Decoder)
 for user in data:
     try:
         print("Creating user folder", user)
-        if not s3.exists("bookishsystem/bookish-system/" + user + "/metadata.json"):
-            s3.touch("bookishsystem/bookish-system/" + user + "/metadata.json")
+        if not s3.exists(LOCATION + user + "/metadata.json"):
+            s3.touch(LOCATION + user + "/metadata.json")
     except FileExistsError:
         pass
     try:
         with s3.open(
-            "bookishsystem/bookish-system/" + user + "/metadata.json", "rb"
+            LOCATION + user + "/metadata.json", "rb"
         ) as f:
            loads(f.read().decode("utf-8"))
     except JSONDecodeError:
         with s3.open(
-            "bookishsystem/bookish-system/" + user + "/metadata.json", "wb"
+            LOCATION + user + "/metadata.json", "wb"
         ) as fw:
             print("Creating metadata file for user", user)
             fw.write(b"{}")
@@ -628,6 +691,13 @@ for user in data:
     if data[user].get("permlevel") is None:
         data[user]["permlevel"] = 0
 
+    if data[user].get("locked") is None:
+        data[user]["locked"] = False
+
+
 db.set("users", dumps(data, cls=Base64Encoder))
 
 storapp = app  # Rename app to storapp to avoid conflict with the app variable in the main.py file
+
+if __name__ == "__main__":
+    app.run(host='localhost',port=8080, debug=DEV) #server='gevent')

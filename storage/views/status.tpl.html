@@ -22,8 +22,84 @@
             <path d="M64 80c-8.8 0-16 7.2-16 16V416c0 8.8 7.2 16 16 16H384c8.8 0 16-7.2 16-16V96c0-8.8-7.2-16-16-16H64zM0 96C0 60.7 28.7 32 64 32H384c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zM337 209L209 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L303 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/>
         </symbol>
     </svg>
+    % faking_user = session.get("faking_user_as")
+    % if faking_user and (faking_user != session.get("user")) and session.get("user"):
+    <style>
+        #fake-user {
+            --accent-color: #20b14c;
+            --accent-text-color: white;
+            background-color: var(--accent-color);
+            color: var(--accent-text-color);
+            padding: 0.1rem;
+            text-align: center;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1.375rem;
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: none;
+        }
+        #fake-user strong {
+            font-weight: bold;
+        }
+        #fake-user a {
+            color: var(--accent-text-color);
+            text-decoration: none;
+            border: 1px solid var(--accent-text-color);
+            padding: 0.2rem 0.5rem;
+            padding-top: 0.1rem;
+            margin-left: 0.2rem;
+            border-radius: 0.5rem;
+            text-align: justify;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        #fake-user a:hover {
+            background-color: var(--accent-text-color);
+            color: var(--accent-color);
+        }
+        #fake-user p {
+            vertical-align: middle;
+            margin: 0;
+        }
+        #fake-user button {
+            background-color: transparent;
+            border: none;
+            color: var(--accent-text-color);
+            position: absolute;
+            font-size: 1.2em;
+            padding: 0.2rem 0.5rem;
+            margin-left: 0.5rem;
+            margin-bottom: 0;
+            right: 0;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+    </style>
+    <header id="fake-user">
+        <p>
+            You are now faking as <strong>{{session.get("user")}}</strong>.
+            <a href="/?logout">Logout</a>
+        </p>
+        <button id="fake-user-go-away"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></button>
+        <script>
+            document.getElementById("fake-user-go-away").addEventListener("click", () => {
+                document.getElementById("fake-user").animate([
+                    {transform: "translateY(0)"},
+                    {transform: "translateY(-100%)"}
+                ], {duration: 50}).onfinish = () => {
+                    document.getElementById("fake-user").remove();
+                }
+            });
+        </script>
+    </header>
+    % end
     <main>
-        <exit-btn href="/storage" tabindex="0"></exit-btn>
+        
+        <exit-btn href="/" tabindex="0"></exit-btn>
         <h1>Project Status</h1>
         <p>
             The project is currently in development. The following features are planned:
@@ -40,7 +116,7 @@
                 </li>
                 <li>
                     <details open>
-                        <summary><svg class="fa-svg-man"><use xlink:href="#square"></use></svg> Files</summary>
+                        <summary><svg class="fa-svg-man"><use xlink:href="#square-check"></use></svg> Files</summary>
                         <ul class="no-dot small-mt">
                             <li><svg class="fa-svg-man"><use xlink:href="#square-check"></use></svg> Upload</li>
                             <li><svg class="fa-svg-man"><use xlink:href="#square-check"></use></svg> Download</li>
