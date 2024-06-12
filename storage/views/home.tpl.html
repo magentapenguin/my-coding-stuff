@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles.css">
-    <script src="/exit.js" defer async></script>
+    <link rel="stylesheet" href="/styles.css" nonce="{{nonce}}">
+    <script src="/exit.js" nonce="{{nonce}}" defer async></script>
     <title>Storage Home</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="mask-icon" href="favicon.svg" color="#000000">
-    <style>
+    <style nonce="{{nonce}}">
         h2 {
             margin-top: 0;
         }
@@ -31,12 +31,12 @@
             animation: ripple2 .4s ease-out forwards !important;
         }
     </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css" integrity="sha256-IwkvZNRC/3S26O1gWwjBINmrPZ4zYvPX4z/98OKWHkQ=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css" integrity="sha256-IwkvZNRC/3S26O1gWwjBINmrPZ4zYvPX4z/98OKWHkQ=" crossorigin="anonymous" nonce="{{nonce}}">
 </head>
 <body>
     % faking_user = session.get("faking_user_as")
     % if faking_user and (faking_user != session.get("user")) and session.get("user"):
-    <style>
+    <style nonce="{{nonce}}">
         #fake-user {
             --accent-color: #20b14c;
             --accent-text-color: white;
@@ -97,7 +97,7 @@
             <a href="/?logout">Logout</a>
         </p>
         <button id="fake-user-go-away"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></button>
-        <script>
+        <script nonce="{{nonce}}">
             document.getElementById("fake-user-go-away").addEventListener("click", () => {
                 document.getElementById("fake-user").animate([
                     {transform: "translateY(0)"},
@@ -156,7 +156,7 @@
                 Your account will be <strong>PERMANENTLY</strong> deleted!
             </p>
             <form class="button-footer">
-                <a class="btn red-accent important-btn" href="n/home?deleteself">Delete</a>
+                <a class="btn red-accent important-btn" href="/home?deleteself">Delete</a>
                 <button class="btn" formmethod="dialog" autofocus>Cancel</button>
             </form>
         </dialog>
@@ -220,7 +220,7 @@
             </tbody>
         </table>
 
-        <script src="/{{curdir}}/home.js" defer type="module"></script>
+        <script src="/{{curdir}}/home.js" defer type="module" nonce="{{nonce}}"></script>
         % if loads(rdb.get("users"), cls=Base64Decoder).get(session.get('user'))['permlevel'] >= 5:
         <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="lock-icon" ><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M144 144v48H304V144c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192V144C80 64.5 144.5 0 224 0s144 64.5 144 144v48h16c35.3 0 64 28.7 64 64V448c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V256c0-35.3 28.7-64 64-64H80z"/></symbol></svg>
         <svg class="go-away"><symbol xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" id="unlock-icon"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M144 144c0-44.2 35.8-80 80-80c31.9 0 59.4 18.6 72.3 45.7c7.6 16 26.7 22.8 42.6 15.2s22.8-26.7 15.2-42.6C331 33.7 281.5 0 224 0C144.5 0 80 64.5 80 144v48H64c-35.3 0-64 28.7-64 64V448c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V256c0-35.3-28.7-64-64-64H144V144z"/></symbol></svg>
@@ -237,12 +237,12 @@
         <details>
             <summary>Visits</summary>
         <div style="width: min(100%,1000px); position: relative; aspect-ratio: 2/1;"><canvas id="visits"></canvas></div>
-        <script src="/{{curdir}}/admin.js" defer></script>
+        <script src="/{{curdir}}/admin.js" defer nonce="{{nonce}}"></script>
         <script>
             window.visits = {{!visitdata}};
         </script>
         </details>
-        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js" nonce="{{nonce}}"></script>
         <details>
             <summary>Users</summary>
             <dialog id="register-dialog">
