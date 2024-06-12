@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles.css">
-    <script src="/exit.js" defer async></script>
+    <link rel="stylesheet" href="/styles.css" nonce="{{nonce}}">
+    <script src="/exit.js" nonce="{{nonce}}" defer async ></script>
     <title>Title</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="mask-icon" href="favicon.svg" color="#000000">
@@ -24,7 +24,7 @@
     </svg>
     % faking_user = session.get("faking_user_as")
     % if faking_user and (faking_user != session.get("user")) and session.get("user"):
-    <style>
+    <style nonce="{{nonce}}">
         #fake-user {
             --accent-color: #20b14c;
             --accent-text-color: white;
@@ -85,7 +85,7 @@
             <a href="/?logout">Logout</a>
         </p>
         <button id="fake-user-go-away"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></button>
-        <script>
+        <script nonce="{{nonce}}">
             document.getElementById("fake-user-go-away").addEventListener("click", () => {
                 document.getElementById("fake-user").animate([
                     {transform: "translateY(0)"},

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/styles.css">
-    <script src="/exit.js" defer></script>
+    <link rel="stylesheet" href="/styles.css" nonce="{{nonce}}">
+    <script src="/exit.js" defer nonce="{{nonce}}" ></script>
     <title>Storage</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml">
     <link rel="mask-icon" href="favicon.svg" color="#000000">
-    <style>
+    <style nonce="{{nonce}}">
         h2 {
             margin-top: 0;
         }
@@ -34,12 +34,12 @@
             animation: ripple2 .4s ease-out forwards !important;
         }
     </style>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css" integrity="sha256-IwkvZNRC/3S26O1gWwjBINmrPZ4zYvPX4z/98OKWHkQ=" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3.10.0/notyf.min.css" nonce="{{nonce}}" integrity="sha256-IwkvZNRC/3S26O1gWwjBINmrPZ4zYvPX4z/98OKWHkQ=" crossorigin="anonymous">
 </head>
 <body>
     % faking_user = session.get("faking_user_as")
     % if faking_user and (faking_user != session.get("user")) and session.get("user"):
-    <style>
+    <style nonce="{{nonce}}">
         #fake-user {
             --accent-color: #20b14c;
             --accent-text-color: white;
@@ -96,11 +96,11 @@
     </style>
     <header id="fake-user">
         <p>
-            You are now faking as <strong>{{session.get("user")}}</strong> from <strong>{{faking_user}}</strong>.
+            You are now faking as <strong>{{session.get("user")}}</strong>.
             <a href="/?logout">Logout</a>
         </p>
         <button id="fake-user-go-away"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" class="fa-svg-man"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg></button>
-        <script>
+        <script nonce="{{nonce}}">
             document.getElementById("fake-user-go-away").addEventListener("click", () => {
                 document.getElementById("fake-user").animate([
                     {transform: "translateY(0)"},
@@ -160,7 +160,7 @@
                 <button class="btn green-accent" id="success-ok">OK</button>
             </div>
         </dialog>
-        <script src="/{{curdir}}/auth.js" type="module"></script>
+        <script src="/{{curdir}}/auth.js" type="module" nonce="{{nonce}}"></script>
         % else:
         <p>
             You are logged in as <strong>{{session.get('user')}}</strong>.<br>

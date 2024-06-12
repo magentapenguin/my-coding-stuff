@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template: repeat(auto-fill, minmax(200px, 1fr)) / repeat(auto-fill, minmax(400px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+
+        .user {
+            background-color: #ddd;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly;
+        }
+        .user img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            cursor: zoom-in;
+        }
+        .user img.zoom {
+            position: fixed;
+            top: 0;
+            left: 0.5rem;
+            right: 0.5rem;
+            bottom: 0;
+            margin: auto;
+            z-index: 1000;
+            cursor: zoom-out;
+            width: 90vw;
+            max-height: 99vh;
+        }
+        .user h3 {
+            margin: 0;
+            padding: 0;
+            margin-top: 1rem;
+        }
+
+        .del {
+            background-color: transparent;
+            color: #f00;
+            border: none;
+            display: inline;
+            padding: 0.5rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .go-away {
+            display: none;
+        }
+
+        svg {
+            width: 1rem;
+            height: 1rem;
+            color: currentColor;
+            vertical-align: -0.125em;
+        }
+        svg path {
+            fill: currentColor;
+        }
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #333;
+                color: #fff;
+            }
+            .user {
+                background-color: #444;
+            }
+            .del {
+                color: rgb(133, 0, 0);
+            }
+        }
+        @media (forced-colors: active) {
+            .user {
+                outline: CanvasText 1px solid;
+            }
+            .del:hover {
+                color: Highlight;
+            }
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const users = document.querySelectorAll('.user');
+            users.forEach(user => {
+                setInterval(()=>{
+                    user.querySelector('img').src = `/img/${user.dataset.user}?${Math.random()}`;
+                }, 2000)
+                user.querySelector('.del').addEventListener('click', () => {
+                    fetch(`/img/${user.dataset.user}`, {
+                        method: 'DELETE'
+                    }).then(res => {
+                        if (res.ok) {
+                            location.reload();
+                        }
+                    });
+                });
+                user.querySelector('img').addEventListener('click', () => {
+                    user.querySelector('img').classList.toggle('zoom');
+                });
+            });
+            
+            setInterval(()=>{
+                fetch(`/users`).then(res => {
+                    if (res.ok) {
+                        return res.json();
+                    }
+                }).then(data => {
+                    console.log(data.users, Object.values(users).map(user => user.dataset.user));
+                    if (data.users.length !== users.length || data.users.some(user => !Object.values(users).map(user => user.dataset.user).includes(user))) {
+                        location.reload();
+                    }
+                });
+            }, 2000);
+        });
+    </script>
+</head>
+<body>
+    <svg class="go-away"><symbol id="del" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M135.2 17.7L128 32H32C14.3 32 0 46.3 0 64S14.3 96 32 96H416c17.7 0 32-14.3 32-32s-14.3-32-32-32H320l-7.2-14.3C307.4 6.8 296.3 0 284.2 0H163.8c-12.1 0-23.2 6.8-28.6 17.7zM416 128H32L53.2 467c1.6 25.3 22.6 45 47.9 45H346.9c25.3 0 46.3-19.7 47.9-45L416 128z"/></symbol></svg>
+    <div class="grid">
+        % for user in users:
+        <div class="user" data-user="{{user}}">
+            <img src="/img/{{user}}" title="{{user}}">
+            <h3>{{user}} <button class="del"><svg><use xlink:href="#del"></use></svg></button></h3>
+        </div>
+        % end
+    </div>
+</body>
+</html>

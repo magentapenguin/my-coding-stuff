@@ -173,6 +173,46 @@ class RedisPlugin(object):
 # End of copied code
 ##########################
 
+class CSPPlugin(object):
+    name = "csp"
+    api = 2
+
+    def __init__(self, keyword="nonce", report_to=None):
+        self.keyword = keyword
+        self.report_to = report_to
+
+    def setup(self, app):
+        for other in app.plugins:
+            if not isinstance(other, CSPPlugin):
+                continue
+            if other.keyword == self.keyword:
+                raise bottle.PluginError(
+                    "Found another csp plugin with "
+                    "conflicting settings (non-unique keyword)."
+                )
+
+    def apply(self, callback, route):
+        config = route.config
+        _callback = route.callback
+
+        args = inspect.getfullargspec(_callback)[
+            0
+        ]
+        keyword = self.keyword
+        if keyword not in args:
+            return callback
+
+        def wrapper(*args, **kwargs):
+            nonce = base64.b64encode(os.urandom(16)).decode("ascii")
+            kwargs[self.keyword] = nonce
+            bottle.response.add_header("Content-Security-Policy", f"default-src 'self'; script-src 'self' 'nonce-{nonce}'; style-src 'self' 'nonce-{nonce}' 'sha256-QXCBuXDibT6KhucTM3uywomPnVf1ate0G+gt06OGOpc=';" + (f"report-uri {self.report_to}" if self.report_to else ""))
+            
+            rv = callback(*args, **kwargs)
+            return rv
+
+        return wrapper
+
+
 
 class Base64Encoder(JSONEncoder):
     def default(self, obj):
@@ -203,13 +243,14 @@ session_plugin = bottle_session.SessionPlugin(
 )
 redis_plugin = RedisPlugin()
 
+
 connection_pool = redis.ConnectionPool(host="localhost", port=6379)
 
 session_plugin.connection_pool = connection_pool
 redis_plugin.redisdb = connection_pool
 app.install(session_plugin)
 app.install(redis_plugin)
-
+app.install(CSPPlugin())
 
 
 s3 = s3fs.S3FileSystem(
@@ -228,7 +269,7 @@ def altstatic(path):
     return bottle.static_file(path, root=".")
 
 @app.route("/")
-def index(session, rdb):
+def index(session, rdb, nonce):
     logvisitor(session, rdb)
     if bottle.request.query.get("logout") is not None:
         session["token"] = ""
@@ -243,6 +284,7 @@ def index(session, rdb):
         rdb=rdb,
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb, allowlocked=True),
         loads=loads,
+        nonce = nonce,
         Base64Decoder=Base64Decoder,
     )
 
@@ -251,7 +293,7 @@ def static(path):
     return bottle.static_file(path, root=curdir + "/static")
 
 @app.route("/home")
-def home(session, rdb):
+def home(session, rdb, nonce):
     logvisitor(session, rdb)
     if bottle.request.query.get("deleteself") is not None and validate_session_token(
         session.get("token"), session.get("user"), rdb
@@ -363,6 +405,7 @@ def home(session, rdb):
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
         files=getfiles(session.get("user")),
         loads=loads,
+        nonce = nonce,
         Base64Decoder=Base64Decoder,
         visitdata=dumps(data),
         getsize=getsize,
@@ -370,23 +413,25 @@ def home(session, rdb):
 
 
 @app.route("/status")
-def status(session, rdb):
+def status(session, rdb, nonce):
     logvisitor(session, rdb)
     return bottle.template(
         "status.tpl.html",
         session=session,
         curdir="static",
+        nonce = nonce,
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
     )
 
 
 @app.route("/terms")
-def terms(session, rdb):
+def terms(session, rdb, nonce):
     logvisitor(session, rdb)
     return bottle.template(
         "terms.html",
         session=session,
         curdir="static",
+        nonce = nonce,
         loggedin=validate_session_token(session.get("token"), session.get("user"), rdb),
     )
 
