@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#from gevent import monkey; monkey.patch_all()
+from gevent import monkey; monkey.patch_all()
 
 import bottle, os.path
-from webtesting.storage.storage import storapp
+#from webtesting.storage.storage import storapp
+import mimetypes
  
 app = bottle.Bottle()
 
@@ -67,6 +68,8 @@ def static(path):
         return
 
     print(path)
+    if path.strip("/").endswith(".tpl.html"):
+        bottle.abort(404, "Not Found")
     if not os.path.isfile(path):
         if os.path.exists(path + ".html"):
             bottle.redirect(path.split("/")[-1] + ".html", 302)
@@ -75,6 +78,7 @@ def static(path):
     return bottle.static_file(path, root='./')
 
 
-app.mount('/storage', storapp)
 
-app.run(host='localhost',port=8080, debug=True)#, server='gevent')
+#app.mount('/storage', storapp)
+
+app.run(host='localhost',port=8070, debug=True, server='gevent')

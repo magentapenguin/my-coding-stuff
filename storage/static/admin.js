@@ -25,13 +25,24 @@ const chart = new Chart(
         },
         options: {
             responsive: true,
+            interaction: {
+                intersect: false,
+                mode: 'nearest',
+            },
             scales: {
                 x: {
                     display: true,
                     title: {
                         display: true,
                         text: 'Time'
-                    }
+                    },
+                    ticks: {
+                        // For a category axis, the val is the index so the lookup via getLabelForValue is needed
+                        callback: function(val, index) {
+                            // Hide every 2nd tick label
+                            return index % 2 === 0 ? this.getLabelForValue(val) : '';
+                        },
+                    },
                 },
                 y: {
                     display: true,
@@ -39,6 +50,16 @@ const chart = new Chart(
                         display: true,
                         text: 'Visits'
                     }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Visits over time'
                 }
             }
         }
@@ -62,7 +83,7 @@ document.getElementById("add-fake-user").addEventListener("click", function() {
 
 async function register(username) {
     console.log(username)
-    let response = await fetch('/storage/auth', {
+    let response = await fetch('/auth', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -109,3 +130,7 @@ function onRegisterSubmit(e) {
 }
 
 document.getElementById('register-form').addEventListener('submit', onRegisterSubmit)
+
+document.getElementById('register-dialog-close').addEventListener('click', function() {
+    document.getElementById('register-dialog').close()
+})

@@ -14,6 +14,9 @@
             font-size: 3em;
             max-width: 100%;
         }
+        * {
+            text-shadow: currentColor 0 0.1rem 0.5rem;
+        }
         html::before {
             content: " ";
             display: block;
@@ -71,7 +74,7 @@
     </style>
 </head>
 <body>
-    <div id="input-container"><span id="input-before"></span><span id="cursor" class="cursor line">|</span><span id="input-after"></span></div>
+    <div id="input-container"><span id="input-before"></span><span id="cursor" class="cursor centered">=</span><span id="input-after"></span></div>
     <script>
         document.addEventListener('keydown', (event) => {
             const input1 = document.getElementById('input-before');
