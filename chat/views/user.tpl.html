@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{settings.title}}</title>
+    <link rel="stylesheet" href="/static/styles.css" nonce="{{nonce}}">
+    <link rel="stylesheet" href="/static/user-styles.css" nonce="{{nonce}}">
+    <link rel="prefetch" href="https://www.gravatar.com/avatar/000000000000000000000000000000000000000000000000000000?d=mp" as="image" nonce="{{nonce}}">
+    <script src="/static/user-scripts.js" nonce="{{nonce}}" type="module"></script>
+</head>
+<body>
+    <main>
+        <h1>Settings</h1>
+        % if user:
+            <div id="avatar-cfg">
+                <img alt="Avatar" class="avatar">
+                <form class="vflex">
+                    <div class="checkbox-group">
+                        <input type="radio" id="photo-gravatar" name="photo" value="gravatar"><label for="photo-gravatar"> Gravatar <a href="https://gravatar.com/profile">Change</a></label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" id="photo-url" name="photo" value="url"><label for="photo-url"> URL</label><input class="textlike-input" type="url" id="photo-url-input" name="photo-url" placeholder="URL">
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" id="photo-identicon" name="photo" value="identicon"><label for="photo-identicon"> Identicon</label>
+                    </div>
+                </form>
+            </div>
+        % else:
+            WIP
+        % end
+    </main>
+</body>
+</html>

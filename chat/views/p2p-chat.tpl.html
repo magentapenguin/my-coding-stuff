@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{settings.title}}</title>
+    <link rel="stylesheet" href="/static/styles.css" nonce="{{nonce}}">
+    <link rel="prefetch" href="https://www.gravatar.com/avatar/000000000000000000000000000000000000000000000000000000?d=mp" as="image" nonce="{{nonce}}">
+    <script src="/static/user-scripts.js" nonce="{{nonce}}" type="module"></script>
+</head>
+<body>
+    <main>
+        <h1>{{!settings.prefix_title("P2P ")}}</h1>
+        <user-cfg></user-cfg>
+        <div id="chat"></div>
+    </main>
+    <script type="module" nonce="{{nonce}}">
+        import { P2PChat } from '/static/p2p-chat.js';
+        import { App } from '/static/chat.js';
+        const app = new App(P2PChat);
+        app.init();
+    </script>
+</body>
+</html>
