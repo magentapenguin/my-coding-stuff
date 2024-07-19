@@ -22,9 +22,9 @@
     --accent-color: light-dark(rgb(221, 0, 221), rgb(255, 91, 228));
     --accent-color-a: light-dark(rgba(221, 0, 221, 0.3), rgba(255, 91, 228, 0.2));
     --accent-text-color: #333;
-    --accent-highlite-text-color: light-dark(#ff00ff, #ff6aff);
+    --accent-highlite-text-color: light-dark(#00eeff, #6ae1ff);
     --selection-color: #333;
-    --selection-bg-color: var(--accent-color);
+    --selection-bg-color: #00eeff;
     --global-margin: 0.5rem;
     color-scheme: light dark;
     /*font-family: 'Roboto', sans-serif;*/
@@ -340,11 +340,17 @@ label {
     border-radius: 0.25em;
     aspect-ratio: 1 / 1;
     cursor: pointer;
+    margin-top: 0;
 }
 
 [type="checkbox"]:focus-visible,
 [type="radio"]:focus-visible {
     border: var(--accent-color) solid var(--border-width);
+}
+
+[type="checkbox"].small,
+[type="radio"].small {
+    height: unset !important;
 }
 
 [type="color"] {

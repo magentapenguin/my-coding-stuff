@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Interface</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        /* Custom Theme */
+        :root {
+            color-scheme: dark;
+            --bg-color: #111;
+            --text-color: #eee;
+            --
+        }
+    </style>
+</head>
+<body>
+    <main>
+        % if auth:
+        <h1>Database Interface</h1>
+        <p>Use the form below to interact with the database.</p>
+        % else:
+        <h2>Login</h2>
+        <form action="/login" method="post" class="vform w-50">
+            <div class="i-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            <div class="i-group">
+                <label for="password">Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="i-group">
+                <button type="submit" class="btn">Login</button>
+            </div>
+        </form>
+        % end
+    </main>
+</body>
+</html>

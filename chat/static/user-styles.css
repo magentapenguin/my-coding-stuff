@@ -1,0 +1,13 @@
+#avatar-cfg {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+.avatar {
+    width: 5em;
+    height: 5em;
+    border-radius: 50%;
+}
