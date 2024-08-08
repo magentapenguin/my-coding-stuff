@@ -15,6 +15,9 @@
 		},
 		"ghcr.io/itsmechlark/features/redis-server": {
 			"version": "latest"
+		},
+		"ghcr.io/joedmck/devcontainer-features/cloudflared": {
+			"version": "latest"
 		}
 	},
 

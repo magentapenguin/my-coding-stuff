@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        * {
+            box-sizing: border-box;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>URL Shortener</h1>
+    <form id="url-shortener" action="/form/shorten">
+        <label for="url">URL</label>
+        <input type="url" id="url-input" name="url" placeholder="URL">
+        <button id="url-shorten" type="submit">Shorten</button>
+    </form>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>URL</th>
+                <th>Shortened URL</th>
+            </tr>
+        </thead>
+        <tbody id="url-list">
+            
+        </tbody>
+    </table>
+    <script src="/static/url-shortener.js"></script>
+</body>
+</html>

@@ -2,16 +2,16 @@
     --border: 1px solid #444;
 
     --primary: #4c97ec;
-    --primary-alpha: #4c97ec3a;
+    --primary-alpha: rgb(from var(--primary) r g b / 0.227);
 
     --link: #5bb5ff;
     --link-hover: #1b98ff;
 
     --red: #f53030;
-    --red-alpha: #f530303a;
+    --red-alpha: rgb(from var(--red) r g b / 0.227);
 
     --green: #0f9e3a;
-    --green-alpha: #0f9e3a3a;
+    --green-alpha: rgb(from var(--green) r g b / 0.227);
 
     --bg: #131313;
     --text: #d8d8d8;
@@ -150,6 +150,8 @@ input[type="text"], .textlike-input {
     margin: 0.5em;
     width: max-content;
     transition: border-color 0.2s, box-shadow 0.2s;
+    margin-left: 0;
+    margin-right: 0;
 }
 input[type="text"]:focus, .textlike-input:focus {
     outline: none;
@@ -181,6 +183,10 @@ input[type="text"].small, .textlike-input.small {
     gap: 0.5em;
     align-items: center;
 }
+.center {
+    justify-content: center;
+    align-items: center;
+}
 .checkbox-group {
     display: flex;
     flex-direction: row;
@@ -191,14 +197,14 @@ input[type="text"].small, .textlike-input.small {
         margin-right: 0.5em;
         text-align: right;
     }
-    * {
-        margin-bottom: 0;
-    }
     input {
         margin: 0;
     }
 }
 
+.w-50 {
+    width: 50%;
+}
 
 [type="checkbox"],
 [type="radio"] {
@@ -223,12 +229,15 @@ button {
     padding: 0.5em 1em;
     border-radius: 0.5em;
     border: none;
-    background-color: var(--bg);
+    background-color: transparent;
     color: var(--text);
     border: var(--border);
     margin: 0.5em;
     cursor: pointer;
     transition: border-color 0.2s, box-shadow 0.2s;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: 700;
 }
 button:focus {
     outline: none;
@@ -239,7 +248,7 @@ button:hover {
     border-color: var(--primary);
 }
 button:disabled {
-    background-color: var(--bg-secondary);
+    background-color: rgb(from var(--bg-secondary) r g b / 0.5);
     color: var(--text-secondary);
     cursor: not-allowed;
 }
@@ -255,6 +264,30 @@ button.disconnect:hover {
 *, *::before, *::after {
     box-sizing: border-box;
 }
+
+p {
+    margin: 0;
+}
+h1 {
+    margin: 0;
+}
+h2 {
+    margin: 0;
+}
+h3 {
+    margin: 0;
+}
+h4 {
+    margin: 0;
+}
+h5 {
+    margin: 0;
+}
+h6 {
+    margin: 0;
+}
+
+
 main {
     display: flex;
     flex-direction: column;
@@ -353,4 +386,56 @@ user-cfg.loading > div {
     bottom: 0;
     left: 0;
     font-size: 1.75em;
+}
+/* Tooltips */
+.tooltip {
+    position: absolute;
+    width: fit-content;
+    top: 0;
+    left: 0;
+    padding: 5px;
+    border-radius: 5px;
+    background: var(--bg-secondary);
+    color: var(--secondary-text-color);
+    font-size: 0.9em;
+    z-index: 99999999999999;
+}
+
+.tooltip__arrow {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--bg-secondary);
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+:where([data-tooltip="true"]) {
+    cursor: help;
+    text-decoration: dashed;
+    font-weight: bolder;
+}
+
+.i-group {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    width: 50%;
+    label {
+        margin-right: 0.5em;
+        text-align: right;
+    }
+    * {
+        margin-bottom: 0;
+    }
+    input, button, select, textarea {
+        width: 100%;
+    }
+}
+.i-group:has(textarea) {
+    align-items: flex-start;
+    label {
+        margin-top: 0.2em;
+    }
 }

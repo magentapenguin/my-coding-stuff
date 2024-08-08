@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{settings.title}}</title>
+    <link rel="stylesheet" href="/static/styles.css" nonce="{{nonce}}">
+    <link rel="prefetch" href="https://www.gravatar.com/avatar/000000000000000000000000000000000000000000000000000000?d=mp" as="image" nonce="{{nonce}}">
+    <script src="/static/user-scripts.js" nonce="{{nonce}}" type="module"></script>
+    <script type="module" nonce="{{nonce}}">
+        import { initTooltips } from '/static/tooltip.js';
+        initTooltips();
+    </script>
+</head>
+<body>
+    <main>
+        % if login:
+        <form action="/api/login" class="vflex center" method="post">
+            <h1>Login</h1>
+            <div class="i-group">
+                <label for="username">Username<br>(or email)</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            <div class="i-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required class="textlike-input" autocomplete="current-password">
+            </div>
+            <button type="submit" class="w-50">Login</button>
+            <small>No Account? <a href="/register">Create one!</a></small>
+        </form>
+        % else:
+        <form action="/api/newuser" class="vflex center" method="post">
+            <h1>Register</h1>
+            <div class="i-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" required autocomplete="username">
+            </div>
+            <div class="i-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" required class="textlike-input" autocomplete="current-password">
+            </div>
+            <div class="i-group">
+                <label for="email" class="hflex">Email <span data-tooltip="true" data-tooltip-text="Optional, used for Gravatar integration">?</span></label>
+                <input type="email" id="email" name="email" class="textlike-input" autocomplete="email">
+            </div>
+            <button type="submit" class="w-50">Register</button>
+        </form>
+        % end
+    </main>
+</body>
+</html>
