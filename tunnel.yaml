@@ -1,0 +1,9 @@
+tunnel: dbe1b19e-9eca-4154-ab1d-f8e0968fbf3f
+
+ingress:
+  - hostname: local.cat5python.com
+    service: http://localhost:8080
+    annotations:
+      cloudflare.cloudflare_access: "true"
+  - service: http_status:404
+

@@ -17,23 +17,22 @@ class UserElement extends HTMLElement {
             if (user === undefined) {
                 this.querySelector('p').textContent = 'Sign in';
                 this.querySelector('img').src = '/static/img/avatar.svg';
-                this.onclick = () => {
-                    location.assign('/login');
-                }
+                this.setAttribute('href','/login');
                 return;
             }
             this.querySelector('p').textContent = user.name;
             this.querySelector('img').src = user.photoURL;
+            this.setAttribute('href','/user');
         });
         this.setAttribute('tabindex', '0');
-        this.addEventListener('click', this.onclick);
+        this.addEventListener('click', this.clicked);
         this.addEventListener('keydown', (event) => {
             if (event.key === 'Enter') {
-                this.onclick();
+                this.clicked();
             }
         });
     }
-    onclick() {
+    clicked() {
         console.log('click');
         this.classList.add('loading');
         this.inert = true;
@@ -41,7 +40,7 @@ class UserElement extends HTMLElement {
         let loaderDiv = document.createElement('div');
         loaderDiv.innerHTML = loader;
         this.appendChild(loaderDiv);
-        location.assign('/user');
+        location.assign(this.getAttribute('href') ?? '/user');
     }
 }
 

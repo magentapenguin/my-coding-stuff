@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        * {
+            box-sizing: border-box;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+    </style>
+</head>
+<body>
+    <h1>URL Shortened!</h1>
+    <p>Shortened URL: <a href="#"></a></p>
+
+    <a href="/">Shorten another URL</a>
+    <script>
+        var url = "{{url}}";
+        url = location.origin + "/" + url;
+        document.querySelector("a").href = url;
+        document.querySelector("a").textContent = url;
+    </script>
+</body>
+</html>

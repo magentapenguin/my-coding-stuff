@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+        }
+        .fancy-btn {
+            position: relative;
+            border-radius: 1em;
+        }
+        .fancy-btn button {
+            box-sizing: content-box;
+            background-color: #222;
+            color: #fff;
+            font-size: 1.5em;
+            border: 2px solid #333;
+            padding: 0.5em 1em;
+            border-radius: inherit;
+            z-index: 1;
+            cursor: pointer;
+        }
+        .fancy-btn .fancy-btn-glow {
+            --blur: 0.45em;
+            --y-offset: -0.05em;
+            --blur-padding-x: 0em;
+            --blur-padding-y: 0.1em;
+            content: '';
+            position: absolute;
+            top: calc(var(--blur) + var(--blur-padding-y));
+            left: calc(var(--blur) + var(--blur-padding-x));
+            width: calc(100% - 2 * var(--blur) - 2 * var(--blur-padding-x));
+            height: calc(100% - 2 * var(--blur-padding-y) - var(--y-offset));
+            background: linear-gradient(45deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00);
+            background-size: 400%;
+            border-radius: inherit;
+            z-index: -2;
+            filter: blur(var(--blur));
+            animation: bgpan 5s infinite linear;
+        }
+        @keyframes bgpan {
+            from {
+                background-position: 0%;
+            }
+            to {
+                background-position: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!--A button with a glowy rainbow shadow-->
+    <div class="fancy-btn"><button class="fancy-btn">Click me!</button><div class="fancy-btn-glow"></div></div>
+</body>
+</html>

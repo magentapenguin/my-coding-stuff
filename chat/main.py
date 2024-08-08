@@ -1,9 +1,18 @@
+import hashlib
 import bottle, os, base64, inspect
 from bottle_websocket import GeventWebSocketServer
 from bottle_websocket import websocket
 import redis, json, gevent
 import geventwebsocket.exceptions
 import bottle_session
+from passlib.context import CryptContext
+import datetime
+
+
+pwd_context = CryptContext(
+    schemes=["pbkdf2_sha256"],
+    deprecated="auto",
+)
 
 ##########################
 # THIS NOT MY CODE
@@ -138,8 +147,8 @@ def websocketchat(nonce):
     return bottle.template('ws-chat.tpl.html', settings=settings, nonce=nonce)
 
 @bottle.route('/user')
-def user(nonce, rdb):
-    return bottle.template('user.tpl.html', settings=settings, nonce=nonce, user=api_user(rdb))
+def user(nonce, rdb, session):
+    return bottle.template('user.tpl.html', settings=settings, nonce=nonce, user=api_user(rdb, session))
 
 @bottle.route('/ws/socket', apply=[websocket])
 def handle_websocket(ws, rdb: redis.Redis):
@@ -193,28 +202,35 @@ def make_session_token(user: str, rdb: redis.Redis) -> str:
 
     Args:
         user (str): The username for which the session token is generated.
-        rdb (Any): The Redis database connection object.
+        rdb (redis.Redis): The Redis database connection object.
 
     Returns:
         str: The generated session token.
 
     """
-    pass
+    token = (hashlib.sha256(user.encode()).digest() + os.urandom(16)).hex() + '$' + datetime.datetime.now().isoformat()
+    rdb.hset('tokens', user, token)
+    return token
 
 
-def validate_session_token(token: str, user: str, rdb: redis.Redis) -> bool:
+def validate_session_token(session: bottle_session.Session, rdb: redis.Redis) -> bool:
     """
-    Validates a session token for a given user.
+    Validate the session token stored in the session object.
 
     Args:
-        token (str): The session token to validate.
-        user (str): The user associated with the session token.
-        rdb (redis.Redis): The Redis database object.
+        session (bottle_session.Session): The session object.
+        rdb (redis.Redis): The Redis database connection object.
 
     Returns:
         bool: True if the session token is valid, False otherwise.
+
     """
-    pass
+    user = session.get('user')
+    token = session.get('token')
+    if not user or not token or not rdb.hexists('tokens', user):
+        return False
+    
+    return token == rdb.hget('tokens', user).decode() and token[:64] == hashlib.sha256(user.encode()).hexdigest() and datetime.datetime.fromisoformat(token.split('$')[1]) > datetime.datetime.now() - datetime.timedelta(days=7)
 
 @bottle.route('/p2p')
 def p2pchat(nonce):
@@ -226,7 +242,126 @@ def static(filename):
     return bottle.static_file(filename, root=os.path.dirname(os.path.abspath(__file__)) + '/static')
 
 @bottle.route('/api/user')
-def api_user(rdb, session, abort=True):
-    bottle.abort(401, 'Unauthorized')
-#{'name': 'Someone', 'email': '', 'photoURL': 'https://gravatar.com/avatar/763d7485d891072fab513c279621eb8af5d665c78002e7132432cbe872d6dfd3?d=mp'}
+def api_user(rdb: redis.Redis, session, abort=True):
+    if not validate_session_token(session, rdb):
+        if abort:
+            bottle.abort(401, 'Unauthorized')
+        return None
+    
+    user = json.loads(rdb.hget('users',session['user']).decode())
+    # Remove the hash from the user object
+    user.pop('hash')
+    user['name'] = session['user']
+    return user
+
+@bottle.route('/api/login', method=['POST','GET'])
+def api_login(rdb: redis.Redis, session):
+    if bottle.request.method == 'GET' and validate_session_token(session, rdb):
+        bottle.redirect('/user')
+    data = dict(bottle.request.forms)
+    if not data or not isinstance(data, dict) or 'username' not in data or 'password' not in data:
+        bottle.abort(400, 'Bad Request')
+    user = data['username']
+    # if the username is an email, convert it to a username
+    if '@' in user:
+        # Search for the user with the email
+        d = rdb.hgetall('users')
+        for u,d in zip(d,d):
+            d = d.decode()
+            d = rdb.hget('users', d).decode()
+            d = json.loads(d)
+            print(u,d)
+            if d.get('email',False) == user:
+                print('Found user with email')
+                user = u.decode()
+                break
+
+    password = data['password']
+    if pwd_context.verify(password, json.loads(rdb.hget('users', user))['hash']):
+        session['user'] = user
+        session['token'] = make_session_token(user, rdb)
+        bottle.redirect('/user')
+    else:
+        bottle.abort(401, 'Unauthorized')
+
+@bottle.route('/api/newuser', method=['POST','GET'])
+def api_newuser(rdb: redis.Redis, session):
+    data = dict(bottle.request.forms)
+    if not data or not isinstance(data, dict) or 'username' not in data or 'password' not in data:
+        bottle.abort(400, 'Bad Request')
+    user = data['username']
+    password = data['password']
+    if rdb.hexists('users', user):
+        bottle.abort(409, 'Conflict')
+    rdb.hset('users', user, json.dumps({'hash': pwd_context.hash(password), 'created': datetime.datetime.now().isoformat(), 'email': data.get('email', ''), 'photoURL': 'https://gravatar.com/avatar/'+hashlib.sha256(user.encode()).hexdigest()+'?d=mp'}))
+    session['user'] = user
+    session['token'] = make_session_token(user, rdb)
+    bottle.redirect('/user')
+
+@bottle.route('/api/logout')
+def api_logout(session, rdb: redis.Redis):
+    session.delete()
+    rdb.hdel('tokens', session['user'])
+    bottle.redirect('/')
+
+@bottle.route('/api/icanhasuser', method='GET')
+def api_icanhasuser(rdb: redis.Redis, session):
+    # Check if the user exists
+    user = bottle.request.query.get('user')
+    if not user:
+        bottle.abort(400, 'Bad Request')
+    return {'exists': rdb.hexists('users', user)}
+
+
+def alert(rdb: redis.Redis, message: str):
+    "Indicate something that staff should be aware of, or that requires their attention."
+    date = datetime.datetime.now().isoformat()
+    rdb.hset('alerts', date+'-'+hashlib.sha256(message.encode()).hexdigest(), date)
+
+@bottle.route('/login')
+def login(nonce):
+    return bottle.template('login.tpl.html', settings=settings, login=True, nonce=nonce)
+
+@bottle.route('/register')
+def register(nonce):
+    return bottle.template('login.tpl.html', settings=settings, login=False, nonce=nonce)
+
+@bottle.route('/')
+def index(nonce):
+    return bottle.template('index.tpl.html', settings=settings, nonce=nonce)
+
+err401tmplt = \
+"""<!DOCTYPE html>
+<html>
+<head>
+    <title>{{settings.title}}</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="prefetch" href="https://www.gravatar.com/avatar/000000000000000000000000000000000000000000000000000000?d=mp" as="image">
+    <script src="/static/user-scripts.js" type="module"></script>
+</head>
+<body>
+    <main>
+        <user-cfg></user-cfg>
+        <h1>You need to be logged in!</h1>
+        <p>
+        <a href="/">Home</a> | <a id="back" href="#">Back</a>
+        <br>
+        <a href="/login">Login</a> or <a href="/register">make an account</a>!
+        </p>
+        <p>401 Unauthorized</p>
+        <script>
+            document.getElementById('back').addEventListener('click', () => {
+                window.history.back();
+            });
+        </script>
+    </main>
+</body>
+</html>"""
+                              
+
+@bottle.error(401)
+def error401(error):
+    return bottle.template(err401tmplt, settings=settings)
+
+
 bottle.run(host='localhost', port=8080, server=GeventWebSocketServer, debug=True)

@@ -1,4 +1,31 @@
 import dompurify from 'https://cdn.jsdelivr.net/npm/dompurify/+esm';
+import markdownIt from "https://cdn.jsdelivr.net/npm/markdown-it@14.1.0/+esm";
+/*
+import markdownItAttrs from 'https://cdn.jsdelivr.net/npm/markdown-it-attrs@4.1.6/+esm'
+import markdownItAnchor from 'https://cdn.jsdelivr.net/npm/markdown-it-anchor@9.0.1/+esm';
+*/
+import markdownItAbbr from 'https://cdn.jsdelivr.net/npm/markdown-it-abbr@2.0.0/+esm';
+import markdownItDeflist from 'https://cdn.jsdelivr.net/npm/markdown-it-deflist@3.0.0/+esm';
+
+
+const md = markdownIt({
+    html: false,
+    linkify: true,
+    typographer: true
+});
+/*
+md.use(markdownItAttrs);
+md.use(markdownItAnchor, {
+    level: 1,
+    permalink: true,
+    permalinkBefore: true,
+    permalinkSymbol: "#",
+});
+*/
+md.use(markdownItAbbr);
+md.use(markdownItDeflist);
+
+
 
 async function sha256(string) {
     const buffer = new TextEncoder('utf-8').encode(string);
@@ -22,14 +49,15 @@ export async function renderMessage(message) {
     messageElement.innerHTML = dompurify.sanitize(`
         <div class="header">
             <img src="${message?.user?.photoURL ?? User.unknown.photoURL}">
-            <div class="username">${message?.user?.name ?? User.unknown.name}</div>
+            <div class="username"></div>
         </div>
         <div class="main">
             ${message?.reply ? `<div class="reply"></div>` : ''}
-            <div class="text">${message?.text}</div>
+            <div class="text">${dompurify.sanitize(md.render(message.text))}</div>
             <div class="date">${new Date(message?.createdAt).toLocaleString()}</div>
         </div>
-    `, { USE_PROFILES: { html: true }, FORBID_TAGS: ['style','link'], ALLOWED_TAGS: ['img','a','strong']});
+    `, { USE_PROFILES: { html: true }, FORBID_TAGS: ['style','link']});
+    messageElement.querySelector('.username').textContent = message?.user?.name ?? User.unknown.name;
     return messageElement;
 }
 
@@ -164,9 +192,12 @@ export class User {
 
     static async getCurrentUser() {
         try {
-            let out = await fetch('/api/user')
+            var out = await fetch('/api/user')
+            console.log(out)
             out = await out.json()
-        } catch {
+            console.log(out)
+        } catch (e) {
+            console.error(e);
             return undefined;
         }
         out = await User.fromJSONAsync(out)
@@ -202,14 +233,14 @@ export class User {
         return new User('System', 'N/A', 'https://www.gravatar.com/avatar/000000000000000000000000000000000000000000000000000000?d=mp');
     }
     static get unknown() {
-        return new User('Unknown', 'N/A', 'https://www.gravatar.com/avatar/000000000000000000000000000000000000000000000000000000?d=mp');
+        return new User('Anonymous', 'N/A', '/static/img/avatar.svg');
     }
     static get self() {
-        return new User('You', 'N/A', cachedUser.photoURL);
+        return new User('You', 'N/A', cachedUser.photoURL ?? '/static/img/avatar.svg');
     }
 }
 
-var cachedUser = null;
+var cachedUser = User.unknown;
 User.getCurrentUser(); // Preload user
 
 
@@ -249,6 +280,7 @@ export class App {
     }
     disconnect() {
         this.dom.prestart.querySelector('button').disabled = false;
+        this.dom.messages.innerHTML = '';
         this.chat.disconnect();
         this.dom.prestart.querySelector('button.disconnect').disabled = true;
     }
@@ -280,6 +312,12 @@ export class App {
         addMessage2DOM(message, this.dom.messages);
     }
     async sendMessage(message) {
+        if (message.user === undefined) {
+            message.user = User.unknown;
+        }
+        if (message.user.name === User.self.name) {
+            message.user = User.getcachedCurrentUser() ?? User.unknown;
+        }
         console.log('Sending', message);
         await this.chat.sendMessage(message);
     }
